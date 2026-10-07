@@ -1,0 +1,3 @@
+# Lab 0
+
+This is the first lab for TCES 430, it was focused really on just getting the STM32 f7 setup. I think that it was a good intro lab just to get everything setup, but I do think that using a make file would've been easier. Since I'm using a mac for this lab I was running into a issue where it wasn't correctly writing to the board. The project would compile and build but it wouldn't write to the board; Once I manueally upened the port with openocd it worked. For the next lab I'm going to just create a makefile and manually move it over, vscode anyhow is better than some eclips based trash so y'know.
