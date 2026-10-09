@@ -1,20 +1,10 @@
-11:58:04 **** Incremental Build of configuration Debug for project Lab_1 ****
+08:17:14 **** Incremental Build of configuration Debug for project Lab_1 ****
 make -j14 all 
-arm-none-eabi-gcc "../Src/main.c" -mcpu=cortex-m7 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F746xx -c -I../Inc -I../Drivers/STM32F7xx_HAL_Driver/Inc -I../Drivers/STM32F7xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F7xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Src/main.d" -MT"Src/main.o" --specs=nano.specs -mfpu=fpv5-sp-d16 -mfloat-abi=hard -mthumb -o "Src/main.o"
-../Src/main.c:24:4: warning: #warning "FPU is not initialized, but the project is compiling for an FPU. Please initialize the FPU before use." [-Wcpp]
-   24 |   #warning "FPU is not initialized, but the project is compiling for an FPU. Please initialize the FPU before use."
-      |    ^~~~~~~
-arm-none-eabi-gcc -o "Lab_1.elf" @"objects.list"   -mcpu=cortex-m7 -T"/Users/rileyhopper/Programming/School/TCES-430/Lab_1/STM32F746NGHX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Lab_1.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv5-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
-Finished building target: Lab_1.elf
- 
 arm-none-eabi-size  Lab_1.elf 
-arm-none-eabi-objdump -h -S Lab_1.elf  > "Lab_1.list"
    text	   data	    bss	    dec	    hex	filename
    1176	      4	   1572	   2752	    ac0	Lab_1.elf
 Finished building: default.size.stdout
  
-Finished building: Lab_1.list
- 
 
-11:58:04 Build Finished. 0 errors, 1 warnings. (took 234ms)
+08:17:14 Build Finished. 0 errors, 0 warnings. (took 77ms)
 
