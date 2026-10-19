@@ -1,14 +1,14 @@
-08:13:14 **** Incremental Build of configuration Debug for project Lab_1 ****
+07:02:57 **** Incremental Build of configuration Debug for project Lab2 ****
 make -j14 all 
-arm-none-eabi-size  Lab_1.elf 
+arm-none-eabi-size  Lab2.elf 
    text	   data	    bss	    dec	    hex	filename
-   1176	      4	   1572	   2752	    ac0	Lab_1.elf
+   2376	      4	   1572	   3952	    f70	Lab2.elf
 Finished building: default.size.stdout
  
-08:17:14 **** Incremental Build of configuration Debug for project Lab_1 ****
+07:03:20 **** Incremental Build of configuration Debug for project Lab2 ****
 make -j14 all 
-arm-none-eabi-size  Lab_1.elf 
+arm-none-eabi-size  Lab2.elf 
    text	   data	    bss	    dec	    hex	filename
-   1176	      4	   1572	   2752	    ac0	Lab_1.elf
+   2376	      4	   1572	   3952	    f70	Lab2.elf
 Finished building: default.size.stdout
  

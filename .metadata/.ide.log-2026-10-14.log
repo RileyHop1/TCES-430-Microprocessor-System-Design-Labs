@@ -1,0 +1,8 @@
+2026-10-14 12:57:29,962 [INFO] Activator:177 - 
+
+
+2026-10-14 12:57:29,968 [INFO] Activator:178 - !SESSION log4j initialized
+2026-10-14 12:57:32,732 [INFO] LogOutputStream:77 - [STDOUT_REDIRECT] 
+2026-10-14 12:57:32,853 [INFO] LogOutputStream:77 - [STDOUT_REDIRECT] Start the detection of the machine's architecture
+2026-10-14 12:57:32,865 [INFO] LogOutputStream:77 - [STDOUT_REDIRECT] use arm architecture
+2026-10-14 12:57:32,865 [INFO] LogOutputStream:77 - [STDOUT_REDIRECT] Architecture: Apple Silicon (ARM64)
