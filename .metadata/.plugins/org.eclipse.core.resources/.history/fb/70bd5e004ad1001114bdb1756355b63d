@@ -1,0 +1,374 @@
+#include "main.h"
+
+#define LED1 3U
+#define LED2 4U
+#define LED3 7U
+
+#define DB4  0U
+#define DB5  10U
+#define DB6  9U
+#define DB7  8U
+
+#define RS   6U
+#define E    7U
+
+#define SW1  1U
+#define SW2  2U
+
+/* LCD initialization nibbles */
+#define LCD_INIT_8BIT       0x03U  // Send 3 times
+#define LCD_INIT_4BIT       0x02U  // Switch to 4-bit mode
+
+/* LCD configuration commands */
+#define LCD_FUNCTION_SET    0x28U  // 4-bit, 2 lines, 5x8 font
+#define LCD_DISPLAY_OFF     0x08U  // Disable display
+#define LCD_DISPLAY_ON      0x0CU  // Display ON, cursor OFF
+#define LCD_CLEAR           0x01U  // Clear display
+#define LCD_ENTRY_MODE      0x06U  // Increment cursor, no shift
+
+/* LCD cursor positioning */
+#define LCD_LINE1           0x80U  // First line, position 0
+#define LCD_LINE2           0xC0U  // Second line, position 0
+
+
+#define LCD_PULSE_DELAY    500U
+#define LCD_STARTUP_DELAY  4000000U
+#define LCD_INIT_DELAY     500000U
+#define LCD_CMD_DELAY      5000U
+#define LCD_CLEAR_DELAY    200000U
+#define LED_BLINK_DELAY 800000U
+#define LCD_BYTE_DELAY  5000U
+
+
+void setup_lcd(void);
+void send_lcd_nibble(uint8_t nibble, uint8_t rs);
+
+void simpleDelay(uint32_t count) {
+	while (count--) {
+		__asm__("NOP");
+	}
+}
+
+
+void setup_leds(void) {
+
+	//Enable clocking.
+	 RCC->AHB1ENR |= (
+	        RCC_AHB1ENR_GPIOBEN |
+	        RCC_AHB1ENR_GPIOGEN |
+	        RCC_AHB1ENR_GPIOIEN
+	 );
+
+	 //Set the mode of the pins
+	 GPIOI->MODER &= ~(3U << (LED1 * 2));
+	 GPIOB->MODER &= ~(3U << (LED2 * 2));
+	 GPIOG->MODER &= ~(3U << (LED3 * 2));
+
+	 GPIOI->MODER |= (1U << (LED1 * 2));
+	 GPIOB->MODER |= (1U << (LED2 * 2));
+	 GPIOG->MODER |= (1U << (LED3 * 2));
+
+	 //Set output type
+	 GPIOI->OTYPER &= ~(1U << (LED1));
+	 GPIOB->OTYPER &= ~(1U << (LED2));
+	 GPIOG->OTYPER &= ~(1U << (LED3));
+
+}
+
+void setup_lcd_data_bus(void) {
+
+	//Enable clocking.
+		 RCC->AHB1ENR |= (
+		        RCC_AHB1ENR_GPIOAEN |
+		        RCC_AHB1ENR_GPIOFEN
+		 );
+
+		 //Set the mode of the pins
+		 GPIOA->MODER &= ~(3U << (DB4 * 2));
+		 GPIOF->MODER &= ~(3U << (DB5 * 2));
+		 GPIOF->MODER &= ~(3U << (DB6 * 2));
+		 GPIOF->MODER &= ~(3U << (DB7 * 2));
+		 GPIOF->MODER &= ~(3U << (RS * 2));
+		 GPIOF->MODER &= ~(3U << (E * 2));
+
+		 GPIOA->MODER |= (1U << (DB4 * 2));
+		 GPIOF->MODER |= (1U << (DB5 * 2));
+		 GPIOF->MODER |= (1U << (DB6 * 2));
+		 GPIOF->MODER |= (1U << (DB7 * 2));
+		 GPIOF->MODER |= (1U << (RS * 2));
+		 GPIOF->MODER |= (1U << (E * 2));
+
+		 //Set the output type of the pins
+		 GPIOA->OTYPER &= ~(1U << (DB4));
+		 GPIOF->OTYPER &= ~(1U << (DB5));
+		 GPIOF->OTYPER &= ~(1U << (DB6));
+		 GPIOF->OTYPER &= ~(1U << (DB7));
+		 GPIOF->OTYPER &= ~(1U << (RS));
+		 GPIOF->OTYPER &= ~(1U << (E));
+
+
+
+}
+
+void setup_switches(void) {
+	//Enable clocking.
+	RCC->AHB1ENR |= RCC_AHB1ENR_GPIOIEN;
+	RCC->APB2ENR |= RCC_APB2ENR_SYSCFGEN;
+
+	GPIOI->MODER &= ~(3U << (SW1 * 2));
+	GPIOI->MODER &= ~(3U << (SW2 * 2));
+
+	GPIOI->PUPDR &= ~(3U << (SW1 * 2));
+	GPIOI->PUPDR &= ~(3U << (SW2 * 2));
+
+	GPIOI->PUPDR |= (1U << (SW1 * 2));
+	GPIOI->PUPDR |= (1U << (SW2 * 2));
+
+
+	//Register the SW1 as an interupt
+	SYSCFG->EXTICR[0] &= ~(0xFUL << 4);
+	SYSCFG->EXTICR[0] |=  (0x8UL << 4);
+
+	//Register the SW2 as an interupt
+	SYSCFG->EXTICR[0] &= ~(0xFUL << 8);
+	SYSCFG->EXTICR[0] |=  (0x8UL << 8);
+
+	//Enable interrupt only on falling edge
+	EXTI->FTSR |= (3U << 1);
+
+	//Disables interrupt on rising edge
+	EXTI->RTSR &= ~(3U << 1);
+
+	EXTI->IMR |= (3U << 1);
+
+	//Label the interrupt ready to run
+	EXTI->PR = (3U << 1);
+
+	//Configures priority
+	NVIC->IP[7] = 0x20;
+	NVIC->IP[8] = 0x00;
+
+	//Turns on the interrupt
+	NVIC->ISER[0] = (3U << 7);
+
+
+
+}
+
+void setup_tim2(void) {
+    // Enable TIM2 clock
+    RCC->APB1ENR |= RCC_APB1ENR_TIM2EN;
+
+    // Configure timer
+    TIM2->PSC = 15999;
+    TIM2->ARR = 250;
+
+    // Load prescaler
+    TIM2->EGR = TIM_EGR_UG;
+
+    // Clear update flag
+    TIM2->SR &= ~TIM_SR_UIF;
+
+    // Start timer
+    TIM2->CR1 |= TIM_CR1_CEN;
+}
+
+void send_lcd_nibble(uint8_t nibble, uint8_t rs) {
+    // Clear all data pins and RS
+    GPIOA->BSRR = (1U << (DB4 + 16));
+
+    GPIOF->BSRR = (
+        (1U << (DB5 + 16)) |
+        (1U << (DB6 + 16)) |
+        (1U << (DB7 + 16)) |
+        (1U << (RS  + 16))
+    );
+
+    // Set pins corresponding to the nibble
+    GPIOA->BSRR = ((nibble & 1U) << DB4);
+
+    GPIOF->BSRR = (
+        (((nibble >> 1) & 1U) << DB5) |
+        (((nibble >> 2) & 1U) << DB6) |
+        (((nibble >> 3) & 1U) << DB7) |
+        ((rs & 1U) << RS)
+    );
+
+    // Pulse Enable
+    simpleDelay(LCD_PULSE_DELAY);
+    GPIOF->BSRR = (1U << E);
+    simpleDelay(LCD_PULSE_DELAY);
+    GPIOF->BSRR = (1U << (E + 16));
+    simpleDelay(LCD_PULSE_DELAY);
+}
+
+void setup_lcd(void) {
+    // Ensure Enable starts LOW
+    GPIOF->BSRR = (1U << (E + 16));
+
+    // Wait for LCD power-up
+    simpleDelay(LCD_STARTUP_DELAY);
+
+    // Establish known 8-bit state
+    send_lcd_nibble(LCD_INIT_8BIT, 0);
+    simpleDelay(LCD_INIT_DELAY);
+
+    send_lcd_nibble(LCD_INIT_8BIT, 0);
+    simpleDelay(LCD_INIT_DELAY);
+
+    send_lcd_nibble(LCD_INIT_8BIT, 0);
+    simpleDelay(LCD_INIT_DELAY);
+
+    // Switch to 4-bit mode
+    send_lcd_nibble(LCD_INIT_4BIT, 0);
+    simpleDelay(LCD_CMD_DELAY);
+
+    // Function set: 4-bit, 2 lines, 5x8 font
+    send_lcd_nibble(LCD_FUNCTION_SET >> 4, 0);
+    send_lcd_nibble(LCD_FUNCTION_SET & 0x0F, 0);
+    simpleDelay(LCD_CMD_DELAY);
+
+    // Display OFF
+    send_lcd_nibble(LCD_DISPLAY_OFF >> 4, 0);
+    send_lcd_nibble(LCD_DISPLAY_OFF & 0x0F, 0);
+    simpleDelay(LCD_CMD_DELAY);
+
+    // Clear display
+    send_lcd_nibble(LCD_CLEAR >> 4, 0);
+    send_lcd_nibble(LCD_CLEAR & 0x0F, 0);
+    simpleDelay(LCD_CLEAR_DELAY);
+
+    // Entry mode
+    send_lcd_nibble(LCD_ENTRY_MODE >> 4, 0);
+    send_lcd_nibble(LCD_ENTRY_MODE & 0x0F, 0);
+    simpleDelay(LCD_CMD_DELAY);
+
+    // Display ON, cursor OFF
+    send_lcd_nibble(LCD_DISPLAY_ON >> 4, 0);
+    send_lcd_nibble(LCD_DISPLAY_ON & 0x0F, 0);
+    simpleDelay(LCD_CMD_DELAY);
+
+}
+
+
+
+// Send a complete command or ASCII character
+void lcd_write(uint8_t value, uint8_t rs) {
+    send_lcd_nibble(value >> 4, rs);
+    send_lcd_nibble(value & 0x0F, rs);
+    simpleDelay(LCD_BYTE_DELAY);
+}
+
+void EXTI1_IRQHandler(void) {
+    if (EXTI->PR & (1U << SW1)) {
+        EXTI->PR = (1U << SW1);
+
+        // Display interrupt status
+        lcd_write(LCD_LINE1, 0);
+
+        const char *message = "INT1 -> GRN -> ";
+        while (*message) {
+            lcd_write(*message++, 1);
+        }
+
+        // Blink LED1 three times
+        for (uint8_t blink = 1; blink <= 3; blink++) {
+
+            // Update blink count at column 16
+            lcd_write(LCD_LINE1 + 15, 0);
+            lcd_write('0' + blink, 1);
+
+            GPIOI->BSRR = (1U << LED1);
+            simpleDelay(LED_BLINK_DELAY);
+
+            GPIOI->BSRR = (1U << (LED1 + 16));
+            simpleDelay(LED_BLINK_DELAY);
+        }
+    }
+}
+
+void EXTI2_IRQHandler(void) {
+    if (EXTI->PR & (1U << SW2)) {
+        EXTI->PR = (1U << SW2);
+
+        // Save LED3's previous state
+        uint32_t previous_state = GPIOG->ODR & (1U << LED3);
+
+        // Display interrupt status
+        lcd_write(LCD_LINE1, 0);
+
+        const char *message = "INT2 -> LGT -> ";
+        while (*message) {
+            lcd_write(*message++, 1);
+        }
+
+        // Blink LED3 five times
+        for (uint8_t blink = 1; blink <= 5; blink++) {
+
+            // Update blink count
+            lcd_write(LCD_LINE1 + 15, 0);
+            lcd_write('0' + blink, 1);
+
+            GPIOG->BSRR = (1U << LED3);
+            simpleDelay(LED_BLINK_DELAY);
+
+            GPIOG->BSRR = (1U << (LED3 + 16));
+            simpleDelay(LED_BLINK_DELAY);
+        }
+
+        // Restore LED3's previous state
+        GPIOG->BSRR = previous_state
+            ? (1U << LED3)
+            : (1U << (LED3 + 16));
+    }
+}
+int main(void) {
+
+	setup_leds();
+	setup_lcd_data_bus();
+	setup_lcd();
+	setup_tim2();
+	setup_switches();
+
+	uint8_t led2_toggle_count = 0;
+	uint8_t led3_toggle_count = 0;
+
+
+	while(1) {
+	    if (TIM2->SR & TIM_SR_UIF) {
+	        TIM2->SR &= ~TIM_SR_UIF;
+
+	        if (led2_toggle_count < 10) {
+
+	        	if(led2_toggle_count == 0) {
+	        		const char *message = "INT2 -> LGT -> ";
+	        		while (*message) {
+	        			lcd_write(*message++, 1);
+	        		}
+	        	}
+
+
+	        	if (GPIOB->ODR & (1U << LED2))
+	        		GPIOB->BSRR = (1U << (LED2 + 16));
+
+	        	else GPIOB->BSRR = (1U << LED2);
+
+	        	led2_toggle_count++;
+	        } else if (led3_toggle_count < 16) {
+	        	if (GPIOG->ODR & (1U << LED3))
+	        		GPIOG->BSRR = (1U << (LED3 + 16));
+
+	        	else GPIOG->BSRR = (1U << LED3);
+
+	        	led3_toggle_count++;
+	        } else {
+	        	led2_toggle_count = 0;
+	        	led3_toggle_count = 0;
+	        }
+	    }
+
+
+	}
+
+	return 0;
+}

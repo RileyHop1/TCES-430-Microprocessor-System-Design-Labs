@@ -1,0 +1,57 @@
+/* USER CODE BEGIN Header */
+/**
+  ******************************************************************************
+  * @file           : main.c
+  * @brief          : Main program body
+  ******************************************************************************
+  * @attention
+  *
+  * Copyright (c) 2026 STMicroelectronics.
+  * All rights reserved.
+  *
+  * This software is licensed under terms that can be found in the LICENSE file
+  * in the root directory of this software component.
+  * If no LICENSE file comes with this software, it is provided AS-IS.
+  *
+  ******************************************************************************
+  */
+/* USER CODE END Header */
+/* Includes ------------------------------------------------------------------*/
+#include "main.h"
+
+#define LED1 3
+#define LED2 4
+#define LED3 7
+
+
+
+
+void setup_leds(void) {
+
+	//Enable clocking.
+	 RCC->AHB1ENR |= (
+	        RCC_AHB1ENR_GPIOBEN |
+	        RCC_AHB1ENR_GPIOGEN |
+	        RCC_AHB1ENR_GPIOIEN
+	    );
+
+
+	 //Set the mode of the pins
+	 GPIOI->MODER |= (1U << (LED2 * 2));
+
+
+}
+
+void setup_lcd_data_bus(void) {
+
+}
+
+void setup_switches(void) {
+
+}
+
+
+int main(void) {
+
+	return 0;
+}

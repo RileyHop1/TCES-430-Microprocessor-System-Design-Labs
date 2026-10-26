@@ -14,11 +14,6 @@
 #define SEG_F (1U << 5)
 #define SEG_G (1U << 6)
 
-#define SW_ADD (1U << 0)
-#define SW_SUB (1U << 1)
-#define SW_MEM (1U << 2)
-#define SW_EQ  (1U << 3)
-
 
 /* ==================== TYPES & PIN MAPPING ==================== */
 
@@ -32,6 +27,13 @@ typedef enum {
     OP_ADD,
     OP_SUB
 } Operation;
+
+typedef enum {
+	SW_ADD,
+	SW_SUB,
+	SW_MEM,
+	SW_EQ
+} buttons;
 
 static const SegmentPin segments[7] = {
     {GPIOG, 6}, // A

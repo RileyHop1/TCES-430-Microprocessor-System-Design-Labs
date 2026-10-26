@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<section name="Workbench">
+	<section name="java.lang.Class">
+		<item key="replaceBarOpen" value="true"/>
+		<list key="findhistory">
+			<item value="clear"/>
+			<item value="light_display"/>
+			<item value="light"/>
+		</list>
+		<list key="replacehistory">
+			<item value="0"/>
+			<item value="edit_display"/>
+		</list>
+	</section>
+</section>

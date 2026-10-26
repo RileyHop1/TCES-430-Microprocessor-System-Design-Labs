@@ -1,0 +1,136 @@
+#include "main.h"
+
+#define LED1 3U
+#define LED2 4U
+#define LED3 7U
+
+#define DB4  0U
+#define DB5  10U
+#define DB6  9U
+#define DB7  8U
+
+#define RS   6U
+#define E    7U
+
+#define SW1  1U
+#define SW2  2U
+
+void simpleDelay(uint32_t count) {
+	while (count--) {
+		__asm__("NOP");
+	}
+}
+
+
+void setup_leds(void) {
+
+	//Enable clocking.
+	 RCC->AHB1ENR |= (
+	        RCC_AHB1ENR_GPIOBEN |
+	        RCC_AHB1ENR_GPIOGEN |
+	        RCC_AHB1ENR_GPIOIEN
+	 );
+
+	 //Set the mode of the pins
+	 GPIOI->MODER &= ~(3U << (LED1 * 2));
+	 GPIOB->MODER &= ~(3U << (LED2 * 2));
+	 GPIOG->MODER &= ~(3U << (LED3 * 2));
+
+	 GPIOI->MODER |= (1U << (LED1 * 2));
+	 GPIOB->MODER |= (1U << (LED2 * 2));
+	 GPIOG->MODER |= (1U << (LED3 * 2));
+
+	 //Set output type
+	 GPIOI->OTYPER &= ~(1U << (LED1));
+	 GPIOB->OTYPER &= ~(1U << (LED2));
+	 GPIOG->OTYPER &= ~(1U << (LED3));
+
+}
+
+void setup_lcd_data_bus(void) {
+
+	//Enable clocking.
+		 RCC->AHB1ENR |= (
+		        RCC_AHB1ENR_GPIOAEN |
+		        RCC_AHB1ENR_GPIOFEN
+		 );
+
+		 //Set the mode of the pins
+		 GPIOA->MODER &= ~(3U << (DB4 * 2));
+		 GPIOF->MODER &= ~(3U << (DB5 * 2));
+		 GPIOF->MODER &= ~(3U << (DB6 * 2));
+		 GPIOF->MODER &= ~(3U << (DB7 * 2));
+		 GPIOF->MODER &= ~(3U << (RS * 2));
+		 GPIOF->MODER &= ~(3U << (E * 2));
+
+		 GPIOA->MODER |= (1U << (DB4 * 2));
+		 GPIOF->MODER |= (1U << (DB5 * 2));
+		 GPIOF->MODER |= (1U << (DB6 * 2));
+		 GPIOF->MODER |= (1U << (DB7 * 2));
+		 GPIOF->MODER |= (1U << (RS * 2));
+		 GPIOF->MODER |= (1U << (E * 2));
+
+		 //Set the output type of the pins
+		 GPIOA->OTYPER &= ~(1U << (DB4));
+		 GPIOF->OTYPER &= ~(1U << (DB5));
+		 GPIOF->OTYPER &= ~(1U << (DB6));
+		 GPIOF->OTYPER &= ~(1U << (DB7));
+		 GPIOF->OTYPER &= ~(1U << (RS));
+		 GPIOF->OTYPER &= ~(1U << (E));
+
+
+
+}
+
+void setup_switches(void) {
+	//Enable clocking.
+	RCC->AHB1ENR |= RCC_AHB1ENR_GPIOIEN;
+	RCC->APB2ENR |= RCC_APB2ENR_SYSCFGEN;
+
+	GPIOI->MODER &= ~(3U << (SW1 * 2));
+	GPIOI->MODER &= ~(3U << (SW2 * 2));
+
+	GPIOI->PUPDR &= ~(3U << (SW1 * 2));
+	GPIOI->PUPDR &= ~(3U << (SW2 * 2));
+
+	GPIOI->PUPDR |= (1U << (SW1 * 2));
+	GPIOI->PUPDR |= (1U << (SW2 * 2));
+
+
+	//Register the SW1 as an interupt
+	SYSCFG->EXTICR[0] &= ~(0xFUL << 4);
+	SYSCFG->EXTICR[0] |=  (0x8UL << 4);
+
+	//Register the SW2 as an interupt
+	SYSCFG->EXTICR[0] &= ~(0xFUL << 8);
+	SYSCFG->EXTICR[0] |=  (0x8UL << 8);
+
+	//Enable interrupt only on falling edge
+	EXTI->FTSR |= (3U << 1);
+
+	EXTI->RTSR &= ~(3U << 1);
+
+	EXTI->IMR |= (3U << 1);
+
+	EXTI->PR = (3U << 1);
+
+	NVIC->ISER[0] = (3U << 7);
+
+	NVIC->IP[7] = 0x20;
+	NVIC->IP[8] = 0x00;
+
+}
+
+
+int main(void) {
+
+	setup_leds();
+	setup_lcd_data_bus();
+	setup_switches();
+
+
+	while(1) {
+
+	}
+	return 0;
+}

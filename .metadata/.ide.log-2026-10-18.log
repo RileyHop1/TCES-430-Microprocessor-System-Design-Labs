@@ -1,0 +1,20 @@
+2026-10-18 19:49:20,914 [INFO] Activator:177 - 
+
+
+2026-10-18 19:49:20,917 [INFO] Activator:178 - !SESSION log4j initialized
+2026-10-18 19:49:23,322 [INFO] LogOutputStream:77 - [STDOUT_REDIRECT] 
+2026-10-18 19:49:23,619 [INFO] LogOutputStream:77 - [STDOUT_REDIRECT] Start the detection of the machine's architecture
+2026-10-18 19:49:23,626 [INFO] LogOutputStream:77 - [STDOUT_REDIRECT] use arm architecture
+2026-10-18 19:49:23,626 [INFO] LogOutputStream:77 - [STDOUT_REDIRECT] Architecture: Apple Silicon (ARM64)
+2026-10-18 20:58:17,328 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] Oct 18, 2026 8:58:17 PM com.github.weisj.jsvg.nodes.container.BaseContainerNode isAcceptableType
+2026-10-18 20:58:17,329 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] WARNING: Element <g> not allowed in <clippath> (or not implemented)
+2026-10-18 20:58:17,329 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] 
+2026-10-18 20:58:17,331 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] Oct 18, 2026 8:58:17 PM com.github.weisj.jsvg.nodes.container.BaseContainerNode isAcceptableType
+2026-10-18 20:58:17,332 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] WARNING: Element <g> not allowed in <clippath> (or not implemented)
+2026-10-18 20:58:17,332 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] 
+2026-10-18 20:58:17,335 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] Oct 18, 2026 8:58:17 PM com.github.weisj.jsvg.nodes.container.BaseContainerNode isAcceptableType
+2026-10-18 20:58:17,335 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] WARNING: Element <g> not allowed in <clippath> (or not implemented)
+2026-10-18 20:58:17,335 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] 
+2026-10-18 20:58:17,336 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] Oct 18, 2026 8:58:17 PM com.github.weisj.jsvg.nodes.container.BaseContainerNode isAcceptableType
+2026-10-18 20:58:17,336 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] WARNING: Element <g> not allowed in <clippath> (or not implemented)
+2026-10-18 20:58:17,336 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] 
