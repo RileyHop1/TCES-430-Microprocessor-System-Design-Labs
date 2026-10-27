@@ -1,0 +1,23 @@
+11:39:41 **** Incremental Build of configuration Debug for project Lab3maybefixed ****
+make -j14 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m7 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F746xx -c -I../Core/Inc -I../Drivers/STM32F7xx_HAL_Driver/Inc -I../Drivers/STM32F7xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F7xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv5-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c:59:22: warning: 'db2' defined but not used [-Wunused-variable]
+   59 | static DebounceState db2 = {0};
+      |                      ^~~
+../Core/Src/main.c:57:22: warning: 'db1' defined but not used [-Wunused-variable]
+   57 | static DebounceState db1 = {0};
+      |                      ^~~
+arm-none-eabi-gcc -o "Lab3maybefixed.elf" @"objects.list"   -mcpu=cortex-m7 -T"/Users/rileyhopper/Programming/School/TCES-430/Lab3maybefixed/STM32F746NGHX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Lab3maybefixed.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv5-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: Lab3maybefixed.elf
+ 
+arm-none-eabi-size  Lab3maybefixed.elf 
+arm-none-eabi-objdump -h -S Lab3maybefixed.elf  > "Lab3maybefixed.list"
+   text	   data	    bss	    dec	    hex	filename
+   1960	      4	   1572	   3536	    dd0	Lab3maybefixed.elf
+Finished building: default.size.stdout
+ 
+Finished building: Lab3maybefixed.list
+ 
+
+11:39:41 Build Finished. 0 errors, 2 warnings. (took 249ms)
+
