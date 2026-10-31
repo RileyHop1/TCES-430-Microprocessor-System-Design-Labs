@@ -1,0 +1,25 @@
+#include "main.h"
+#include <stdint.h>
+
+#if !defined(__SOFT_FP__) && defined(__ARM_FP)
+	#warning "FPU is not initialized, but the project is compiling for an FPU. Please initialize the FPU before use."
+#endif
+
+
+// Arrays defined in assembly
+extern int32_t ARRAY_POSITIVE[10];
+extern int32_t ARRAY_NEGATIVE[10];
+
+// Assembly function accepts an array pointer
+extern int32_t part1(const int32_t *array);
+
+// Declare the external assembly function linkage mapping
+extern void compare_LED(void);
+
+
+int main(void) {
+
+	while(1) {
+		__asm("NOP");
+	}
+}

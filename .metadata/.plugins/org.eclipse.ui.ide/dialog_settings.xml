@@ -18,12 +18,16 @@
 		<item key="SmartImportRootWizardPage.STORE_NESTED_PROJECTS" value="true"/>
 		<item key="SmartImportRootWizardPage.STORE_CONFIGURE_NATURES" value="true"/>
 		<list key="org.eclipse.ui.internal.wizards.datatransfer.SmartImportRootWizardPage.knownSources">
+			<item value="/Users/rileyhopper/Programming/School/TCES-430/Lab4-part2"/>
+			<item value="/Users/rileyhopper/Programming/School"/>
+			<item value="/Users/rileyhopper/Programming/School/TCES-430/lab4"/>
+			<item value="/Users/rileyhopper/Programming/School/TCES-430/Lab4"/>
 			<item value="/Users/rileyhopper/Programming/School/TCES-430/Lab2"/>
 			<item value="/Users/rileyhopper/Programming/School/TCES-430/Lab_1"/>
 			<item value="/Users/rileyhopper/Programming/School/TCES-430/lab_1"/>
 		</list>
 		<section name="STSmartImportWizard.dialogBounds">
-			<item key="DIALOG_X_ORIGIN" value="463"/>
+			<item key="DIALOG_X_ORIGIN" value="171"/>
 			<item key="DIALOG_Y_ORIGIN" value="109"/>
 			<item key="DIALOG_WIDTH" value="880"/>
 			<item key="DIALOG_HEIGHT" value="619"/>

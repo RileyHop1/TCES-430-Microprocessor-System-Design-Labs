@@ -1,0 +1,42 @@
+
+.syntax unified
+.cpu cortex-m7
+.thumb
+
+
+.section .text
+.global part1
+.align 2
+.thumb_func
+
+part2:
+	PUSH {R4, R5, R6, LR}
+	MOVS R1, #1 	//i
+	MOVS R2, #0 	//j
+	MOVS R3, #-1 	//k
+	MOVS R4, #2 	//a
+	MOVS R5, #1 	//b
+
+
+	WHILE_START:
+		CMP R1, R2
+		BLE WHILE_END
+
+		ADD R1, R1 ,R4
+
+
+
+
+		IF_START:
+
+
+
+		IF_END:
+
+
+
+	WHILE_END:
+
+
+PART2_END:
+

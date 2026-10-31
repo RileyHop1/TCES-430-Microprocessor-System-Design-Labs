@@ -1,8 +1,19 @@
-2026-10-23 18:06:38,900 [INFO] Activator:177 - 
+2026-10-30 09:56:00,150 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] SLF4J: Failed to load class "org.slf4j.impl.StaticLoggerBinder".
+2026-10-30 09:56:00,151 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] SLF4J: Defaulting to no-operation (NOP) logger implementation
+2026-10-30 09:56:00,151 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] SLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further details.
+2026-10-30 09:56:48,239 [INFO] Activator:177 - 
 
 
-2026-10-23 18:06:38,905 [INFO] Activator:178 - !SESSION log4j initialized
-2026-10-23 18:06:41,841 [INFO] LogOutputStream:77 - [STDOUT_REDIRECT] 
-2026-10-23 18:06:41,958 [INFO] LogOutputStream:77 - [STDOUT_REDIRECT] Start the detection of the machine's architecture
-2026-10-23 18:06:41,966 [INFO] LogOutputStream:77 - [STDOUT_REDIRECT] use arm architecture
-2026-10-23 18:06:41,966 [INFO] LogOutputStream:77 - [STDOUT_REDIRECT] Architecture: Apple Silicon (ARM64)
+2026-10-30 09:56:48,240 [INFO] Activator:178 - !SESSION log4j initialized
+2026-10-30 09:56:50,401 [INFO] LogOutputStream:77 - [STDOUT_REDIRECT] 
+2026-10-30 09:56:50,705 [INFO] LogOutputStream:77 - [STDOUT_REDIRECT] Start the detection of the machine's architecture
+2026-10-30 09:56:50,711 [INFO] LogOutputStream:77 - [STDOUT_REDIRECT] use arm architecture
+2026-10-30 09:56:50,711 [INFO] LogOutputStream:77 - [STDOUT_REDIRECT] Architecture: Apple Silicon (ARM64)
+2026-10-30 13:08:06,004 [INFO] Activator:177 - 
+
+
+2026-10-30 13:08:06,004 [INFO] Activator:178 - !SESSION log4j initialized
+2026-10-30 13:08:08,069 [INFO] LogOutputStream:77 - [STDOUT_REDIRECT] 
+2026-10-30 13:08:08,146 [INFO] LogOutputStream:77 - [STDOUT_REDIRECT] Start the detection of the machine's architecture
+2026-10-30 13:08:08,152 [INFO] LogOutputStream:77 - [STDOUT_REDIRECT] use arm architecture
+2026-10-30 13:08:08,152 [INFO] LogOutputStream:77 - [STDOUT_REDIRECT] Architecture: Apple Silicon (ARM64)

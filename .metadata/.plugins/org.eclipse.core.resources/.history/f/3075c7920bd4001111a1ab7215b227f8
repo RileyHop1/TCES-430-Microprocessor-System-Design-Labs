@@ -1,0 +1,18 @@
+#include "main.h"
+#include <stdint.h>
+
+#if !defined(__SOFT_FP__) && defined(__ARM_FP)
+	#warning "FPU is not initialized, but the project is compiling for an FPU. Please initialize the FPU before use."
+#endif
+
+// Declare the external assembly function linkage mapping
+extern void compare_LED(void);
+
+int main(void) {
+	// Branch control over to native ARM assembly space
+	compare_LED();
+	// Trapping loop to hold system state indefinitely
+	while(1) {
+		__asm("NOP");
+	}
+}

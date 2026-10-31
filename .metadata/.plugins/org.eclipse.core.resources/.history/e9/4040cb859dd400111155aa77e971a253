@@ -1,0 +1,22 @@
+#include "main.h"
+#include <stdint.h>
+#include <stdio.h>
+
+extern void part2(int32_t *results);
+
+int main(void) {
+    int32_t results[3];
+
+    part2(results);
+
+    int32_t i = results[0];
+    int32_t j = results[1];
+    int32_t k = results[2];
+
+    printf("i = %d, j = %d, k = %d\r\n",
+               (int)i, (int)j, (int)k);
+
+    return 0;
+
+
+}

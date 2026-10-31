@@ -1,0 +1,102 @@
+.syntax unified
+.cpu cortex-m7
+.thumb
+
+
+.equ GPIO_MODER,   0x00
+.equ GPIO_ODR,     0x14
+
+.equ RCC_BASE,      0x40023800
+.equ RCC_AHB1ENR,   0x30
+.equ RCC_GPIOBEN,   (1 << 1)
+
+.equ GPIOB_BASE,    0x40020400
+.equ GPIO_BSRR,     0x18
+
+.equ RED_LED,       (1 << 0)  // PB0
+.equ YELLOW_LED,    (1 << 1)  // PB1
+
+.section .data
+.align 2
+
+.global ARRAY_POSITIVE
+.global ARRAY_NEGATIVE
+
+ARRAY_POSITIVE:
+    .word 45, -12, 87, -34, 16
+    .word -98, 120, 53, -7, 64
+
+ARRAY_NEGATIVE:
+    .word -45, -12, -87, -34, -16
+    .word -98, -120, -53, -7, -64
+
+.section .text
+.global part1
+.align 2
+
+.thumb_func
+
+part1:
+
+	PUSH {R4, R5, R6, LR}
+
+	LDR R1, [R0] //initalize R1 to 0. LARGEST
+	MOVS R2, #1 //Loop initeration.
+	MOVS R3, #4
+	MOVS R6, #10
+
+	PART1_LOOP:
+
+	CMP R2, R6
+	BGE PART1_LOOP_END
+
+	MUL R4, R2, R3
+	ADD R4, R4, R0
+	LDR R5,[R4] //Current value
+
+	CMP R5, R1
+
+	BLT PART1_ASSIGN_SKIP
+		MOV R1, R5
+	PART1_ASSIGN_SKIP:
+
+	ADDS R2, R2, #1
+
+	B PART1_LOOP
+	PART1_LOOP_END:
+
+	MOV R0, R1
+
+
+	//Enable Clocking
+	LDR R4, =RCC_BASE
+	LDR R5, [R4, #RCC_AHB1ENR]
+	ORR R5, R5, #RCC_GPIOBEN
+	STR R5, [R4, #RCC_AHB1ENR]
+
+	//enable general purpose out
+	LDR R4, =GPIOB_BASE
+	MOVS 5, #0x00
+	ORR R5, R5, #0x0003 //this should be pin 1 and 0
+	STR R5, [R4]
+
+	CMP R0, #0
+	BGE PART1_NEGATIVE
+		LDR R4, =GPIOB_BASE
+		LDR R5, [R4, #GPIO_BSRR]
+		ORR R5, R5, #RED_LED
+		STR R5, [R4, #GPIO_BSRR]
+
+	B PART1_END
+	PART1_NEGATIVE:
+
+		LDR R4, =GPIOB_BASE
+		LDR R5, [R4, #GPIO_BSRR]
+		ORR R5, R5, #YELLOW_LED
+		STR R5, [R4, #GPIO_BSRR]
+	PART1_END:
+	POP {R4, R5, R6, PC}
+
+
+
+
