@@ -1,0 +1,232 @@
+#include "main.h"
+
+
+// Matrix GPIOS
+
+//Columns
+#define M_COLUMN_PIN1 15U
+#define M_COLUMN_PIN2 14U
+#define M_COLUMN_PIN3 9U
+#define M_COLUMN_PIN4 8U
+
+
+// Rows
+#define M_ROW_PIN1 7U
+#define M_ROW_PIN2 8U
+#define M_ROW_PIN3 9U
+#define M_ROW_PIN4 10U
+
+
+
+
+
+int default_matrix_gpios() {
+	// We only want to turn on clocking once.
+	if (~((RCC->AHB1ENR && RCC_AHB1ENER_GPIOB)
+			|| (RCC->AHB1ENR && RCC_AHB1ENER_GPIOF))) {
+
+		//Turn On port clocking
+		RCC->AHB1ENR |= RCC_AHB1ENER_GPIOB;
+		RCC->AHB1ENR |= RCC_AHB1ENER_GPIOF;
+	}
+
+	//Set the mode of the pins
+	//Columns
+	GPIOB->MODER &= ~(
+			(3U << (2 * M_COLUMN_PIN1)) |
+			(3U << (2 * M_COLUMN_PIN2)) |
+			(3U << (2 * M_COLUMN_PIN3)) |
+			(3U << (2 * M_COLUMN_PIN4))
+	);
+
+	//Rows
+	GPIOF->MODER |= (
+			(1U << (2 * M_ROW_PIN1)) |
+			(1U << (2 * M_ROW_PIN2)) |
+			(1U << (2 * M_ROW_PIN3)) |
+			(1U << (2 * M_ROW_PIN4))
+	);
+
+	//Set the output type of the pins
+	GPIOB->OTYPER |= (
+			(1U << (M_COLUMN_PIN1)) |
+			(1U << (M_COLUMN_PIN2)) |
+			(1U << (M_COLUMN_PIN3)) |
+			(1U << (M_COLUMN_PIN4))
+	);
+
+	GPIOF->OTYPER &= ~(
+			(1U << (M_ROW_PIN1)) |
+			(1U << (M_ROW_PIN2)) |
+			(1U << (M_ROW_PIN3)) |
+			(1U << (M_ROW_PIN4))
+	);
+
+	//Add the pull-up resistors to B
+	GPIOB->PUPDR |= (
+			(1U << (2 * M_COLUMN_PIN1)) |
+			(1U << (2 * M_COLUMN_PIN2)) |
+			(1U << (2 * M_COLUMN_PIN3)) |
+			(1U << (2 * M_COLUMN_PIN4))
+	);
+
+	GPIOF->PUPDR &= ~(
+			(3U << (2 * M_ROW_PIN1)) |
+			(3U << (2 * M_ROW_PIN2)) |
+			(3U << (2 * M_ROW_PIN3)) |
+			(3U << (2 * M_ROW_PIN4))
+	);
+
+	//Just blanket reseting both doesn't really matter for open drain, it doesn't drive output
+	GPIOB->BSRR |= (
+			(1U << (M_COLUMN_PIN1 + 16)) |
+			(1U << (M_COLUMN_PIN2 + 16)) |
+			(1U << (M_COLUMN_PIN3 + 16)) |
+			(1U << (M_COLUMN_PIN4 + 16))
+	);
+
+	GPIOF->BSRR |= (
+			(3U << (M_ROW_PIN1 + 16)) |
+			(3U << (M_ROW_PIN2 + 16)) |
+			(3U << (M_ROW_PIN3 + 16)) |
+			(3U << (M_ROW_PIN4 + 16))
+	);
+}
+
+int alternate_matrix_gpios() {
+	// We only want to turn on clocking once.
+	if (~((RCC->AHB1ENR && RCC_AHB1ENER_GPIOB)
+			|| (RCC->AHB1ENR && RCC_AHB1ENER_GPIOF))) {
+
+		//Turn On port clocking
+		RCC->AHB1ENR |= RCC_AHB1ENER_GPIOB;
+		RCC->AHB1ENR |= RCC_AHB1ENER_GPIOF;
+	}
+
+	//Set the mode of the pins
+	//Columns
+	GPIOB->MODER |= (
+			(1U << (2 * M_COLUMN_PIN1)) |
+			(1U << (2 * M_COLUMN_PIN2)) |
+			(1U << (2 * M_COLUMN_PIN3)) |
+			(1U << (2 * M_COLUMN_PIN4))
+	);
+
+	//Rows
+	GPIOF->MODER &= ~(
+			(3U << (2 * M_ROW_PIN1)) |
+			(3U << (2 * M_ROW_PIN2)) |
+			(3U << (2 * M_ROW_PIN3)) |
+			(3U << (2 * M_ROW_PIN4))
+	);
+
+	//Set the output type of the pins
+	GPIOB->OTYPER &= ~(
+			(1U << (M_COLUMN_PIN1)) |
+			(1U << (M_COLUMN_PIN2)) |
+			(1U << (M_COLUMN_PIN3)) |
+			(1U << (M_COLUMN_PIN4))
+	);
+
+	GPIOF->OTYPER |= (
+			(1U << (M_ROW_PIN1)) |
+			(1U << (M_ROW_PIN2)) |
+			(1U << (M_ROW_PIN3)) |
+			(1U << (M_ROW_PIN4))
+	);
+
+	//Add the pull-up resistors to B
+	GPIOB->PUPDR &= ~(
+			(3U << (2 * M_COLUMN_PIN1)) |
+			(3U << (2 * M_COLUMN_PIN2)) |
+			(3U << (2 * M_COLUMN_PIN3)) |
+			(3U << (2 * M_COLUMN_PIN4))
+	);
+
+	GPIOF->PUPDR |= (
+			(1U << (2 * M_ROW_PIN1)) |
+			(1U << (2 * M_ROW_PIN2)) |
+			(1U << (2 * M_ROW_PIN3)) |
+			(1U << (2 * M_ROW_PIN4))
+	);
+
+	//Just blanket reseting both doesn't really matter for open drain, it doesn't drive output
+	GPIOB->BSRR |= (
+			(1U << (M_COLUMN_PIN1 + 16)) |
+			(1U << (M_COLUMN_PIN2 + 16)) |
+			(1U << (M_COLUMN_PIN3 + 16)) |
+			(1U << (M_COLUMN_PIN4 + 16))
+	);
+
+	GPIOF->BSRR |= (
+			(3U << (M_ROW_PIN1 + 16)) |
+			(3U << (M_ROW_PIN2 + 16)) |
+			(3U << (M_ROW_PIN3 + 16)) |
+			(3U << (M_ROW_PIN4 + 16))
+	);
+
+}
+int configure_matrix_interrupts() {
+
+	//Enable clocking
+	RCC->APB2ENR |= RCC_APB2ENR_SYSCFGEN;
+
+	SYSCFG->EXTICR[2] |= (
+			(1U << (4 * 0)) | //EXTI 8
+			(1U << (4 * 1))   //EXTI 9
+	);
+
+	SYSCFG->EXTICR[3] |= (
+			(1U << (4 * 2)) | //EXTI 14
+			(1U << (4 * 3))   //EXTI 15
+	);
+
+	EXTI->IMR &= ~(
+			(M_COLUMN_PIN1) |
+			(M_COLUMN_PIN2) |
+			(M_COLUMN_PIN3) |
+			(M_COLUMN_PIN4)
+	);
+
+	EXTI->RTSR &= ~(
+			(M_COLUMN_PIN1) |
+			(M_COLUMN_PIN2) |
+			(M_COLUMN_PIN3) |
+			(M_COLUMN_PIN4)
+	);
+
+	EXTI->FTSR |= (
+			(M_COLUMN_PIN1) |
+			(M_COLUMN_PIN2) |
+			(M_COLUMN_PIN3) |
+			(M_COLUMN_PIN4)
+	);
+
+	EXTI->PR |= (
+			(M_COLUMN_PIN1) |
+			(M_COLUMN_PIN2) |
+			(M_COLUMN_PIN3) |
+			(M_COLUMN_PIN4)
+	);
+
+	NVIC_SetPriority(EXTI2_IRQn, 10U);
+	NVIC_SetPriority(EXTI3_IRQn, 10U);
+
+	NVIC_ClearPending(EXTI2_IRQn);
+	NVIC_ClearPending(EXTI3_IRQn);
+
+	NVIC_EnableIRQ(EXTI2_IRQn);
+	NVIC_EnableIRQ(EXTI3_IRQn);
+
+
+
+
+
+
+
+}
+
+
+int main(void) {
+	return 0;
+}

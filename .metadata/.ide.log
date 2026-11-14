@@ -1,19 +1,20 @@
-2026-10-30 09:56:00,150 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] SLF4J: Failed to load class "org.slf4j.impl.StaticLoggerBinder".
-2026-10-30 09:56:00,151 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] SLF4J: Defaulting to no-operation (NOP) logger implementation
-2026-10-30 09:56:00,151 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] SLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further details.
-2026-10-30 09:56:48,239 [INFO] Activator:177 - 
+2026-11-14 10:09:43,483 [INFO] Activator:177 - 
 
 
-2026-10-30 09:56:48,240 [INFO] Activator:178 - !SESSION log4j initialized
-2026-10-30 09:56:50,401 [INFO] LogOutputStream:77 - [STDOUT_REDIRECT] 
-2026-10-30 09:56:50,705 [INFO] LogOutputStream:77 - [STDOUT_REDIRECT] Start the detection of the machine's architecture
-2026-10-30 09:56:50,711 [INFO] LogOutputStream:77 - [STDOUT_REDIRECT] use arm architecture
-2026-10-30 09:56:50,711 [INFO] LogOutputStream:77 - [STDOUT_REDIRECT] Architecture: Apple Silicon (ARM64)
-2026-10-30 13:08:06,004 [INFO] Activator:177 - 
-
-
-2026-10-30 13:08:06,004 [INFO] Activator:178 - !SESSION log4j initialized
-2026-10-30 13:08:08,069 [INFO] LogOutputStream:77 - [STDOUT_REDIRECT] 
-2026-10-30 13:08:08,146 [INFO] LogOutputStream:77 - [STDOUT_REDIRECT] Start the detection of the machine's architecture
-2026-10-30 13:08:08,152 [INFO] LogOutputStream:77 - [STDOUT_REDIRECT] use arm architecture
-2026-10-30 13:08:08,152 [INFO] LogOutputStream:77 - [STDOUT_REDIRECT] Architecture: Apple Silicon (ARM64)
+2026-11-14 10:09:43,488 [INFO] Activator:178 - !SESSION log4j initialized
+2026-11-14 10:09:46,417 [INFO] LogOutputStream:77 - [STDOUT_REDIRECT] 
+2026-11-14 10:09:46,588 [INFO] LogOutputStream:77 - [STDOUT_REDIRECT] Start the detection of the machine's architecture
+2026-11-14 10:09:46,600 [INFO] LogOutputStream:77 - [STDOUT_REDIRECT] use arm architecture
+2026-11-14 10:09:46,601 [INFO] LogOutputStream:77 - [STDOUT_REDIRECT] Architecture: Apple Silicon (ARM64)
+2026-11-14 13:06:09,178 [ERROR] ConfigurationRetriever:142 - IOException on connection: Read timed out
+2026-11-14 13:06:11,229 [ERROR] ConfigurationRetriever:142 - IOException on connection: Read timed out
+2026-11-14 13:06:14,664 [ERROR] ConfigurationRetriever:142 - IOException on connection: Read timed out
+2026-11-14 13:06:44,743 [ERROR] ConfigurationRetriever:142 - IOException on connection: Read timed out
+2026-11-14 13:06:47,954 [ERROR] ConfigurationRetriever:142 - IOException on connection: Read timed out
+2026-11-14 13:06:50,986 [ERROR] ConfigurationRetriever:142 - IOException on connection: Read timed out
+2026-11-14 13:07:02,048 [ERROR] ConfigurationRetriever:142 - IOException on connection: Read timed out
+2026-11-14 13:07:04,375 [ERROR] ConfigurationRetriever:142 - IOException on connection: Read timed out
+2026-11-14 13:07:06,499 [ERROR] ConfigurationRetriever:142 - IOException on connection: Read timed out
+2026-11-14 13:07:34,926 [ERROR] ConfigurationRetriever:142 - IOException on connection: Read timed out
+2026-11-14 13:07:37,971 [ERROR] ConfigurationRetriever:142 - IOException on connection: Read timed out
+2026-11-14 13:07:41,036 [ERROR] ConfigurationRetriever:142 - IOException on connection: Read timed out
