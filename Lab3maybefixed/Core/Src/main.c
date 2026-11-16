@@ -1,457 +1,460 @@
+/*
+ * Lab 5 - Keypad + LCD Integration (partial application)
+ * STM32F746G-DISCO, bare-metal register-level C / CMSIS
+ *
+ * LCD DRIVER: Reused from previous lab, including its existing GPIO wiring,
+ *             4-bit nibble writer, initialization sequence, and delays.
+ * KEYPAD:     Existing EXTI + matrix scanner, with keypad ROWS reassigned
+ *             to GPIOB to avoid conflicts with LCD PF6-PF10.
+ * TIMER:      Existing polled TIM2 millisecond counter and release debounce.
+ *
+ * Still TODO: process PIN, buzzer, failed-attempt counter, lockout display.
+ *
+ * NOTE: This uses the reset clock assumption of a 16 MHz TIM2 input clock.
+ *       Verify this against your actual clock configuration.
+ * NOTE: Check the A4/A5 solder-bridge routing and PI1/LD1 onboard circuitry
+ *       for your specific board revision before making physical connections.
+ */
+
 #include "main.h"
+#include <stdint.h>
 
-#define LED1                  3U
-#define LED2                  4U
-#define LED3                  7U
+// ============================================================
+// KEYPAD PINS - COLUMNS: GPIOI PI0-PI3 (EXTI0-EXTI3)
+// ============================================================
+#define M_COLUMN_PIN1  0U
+#define M_COLUMN_PIN2  1U
+#define M_COLUMN_PIN3  2U
+#define M_COLUMN_PIN4  3U
 
-#define DB4                   0U
-#define DB5                   10U
-#define DB6                   9U
-#define DB7                   8U
+// KEYPAD PINS - ROWS: GPIOB, avoiding the LCD's PF6-PF10
+// PB8=D15, PB9=D14, PB14=D12, PB15=D11 (Arduino header)
+#define M_ROW_PIN1     8U
+#define M_ROW_PIN2     9U
+#define M_ROW_PIN3    14U
+#define M_ROW_PIN4    15U
 
-#define RS                    6U
-#define E                     7U
+#define COLUMN_MASK  0x000FU
+#define ROW_MASK     0xC300U  // PB8, PB9, PB14, PB15
 
-#define SW1                   1U
-#define SW2                   2U
+#define ROW_MODE_MASK ( \
+    (3U << (2U * M_ROW_PIN1)) | \
+    (3U << (2U * M_ROW_PIN2)) | \
+    (3U << (2U * M_ROW_PIN3)) | \
+    (3U << (2U * M_ROW_PIN4)) )
 
-/* LCD initialization nibbles */
-#define LCD_INIT_8BIT         0x03U  // Send 3 times
-#define LCD_INIT_4BIT         0x02U  // Switch to 4-bit mode
+#define ROW_OUTPUT_MODE ( \
+    (1U << (2U * M_ROW_PIN1)) | \
+    (1U << (2U * M_ROW_PIN2)) | \
+    (1U << (2U * M_ROW_PIN3)) | \
+    (1U << (2U * M_ROW_PIN4)) )
 
-/* LCD configuration commands */
-#define LCD_FUNCTION_SET      0x28U  // 4-bit, 2 lines, 5x8 font
-#define LCD_DISPLAY_OFF       0x08U  // Disable display
-#define LCD_DISPLAY_ON        0x0CU  // Display ON, cursor OFF
-#define LCD_CLEAR             0x01U  // Clear display
-#define LCD_ENTRY_MODE        0x06U  // Increment cursor, no shift
+// ============================================================
+// LCD PINS - ORIGINAL LAB WIRING (UNCHANGED)
+// ============================================================
+// LCD D4 -> PA0; D5 -> PF10; D6 -> PF9; D7 -> PF8
+// LCD RS -> PF6; E -> PF7; R/W -> GND
+#define DB4  0U
+#define DB5 10U
+#define DB6  9U
+#define DB7  8U
+#define RS   6U
+#define E    7U
 
-/* LCD cursor positioning */
-#define LCD_LINE1             0x80U  // First line, position 0
-#define LCD_LINE2             0xC0U  // Second line, position 0
+// HD44780-style 4-bit LCD commands from the previous lab
+#define LCD_INIT_8BIT     0x03U
+#define LCD_INIT_4BIT     0x02U
+#define LCD_FUNCTION_SET  0x28U
+#define LCD_DISPLAY_OFF   0x08U
+#define LCD_DISPLAY_ON    0x0CU
+#define LCD_CLEAR         0x01U
+#define LCD_ENTRY_MODE    0x06U
+#define LCD_LINE1         0x80U
+#define LCD_LINE2         0xC0U
 
-#define LCD_PULSE_DELAY       500U
-#define LCD_STARTUP_DELAY     4000000U
-#define LCD_INIT_DELAY        500000U
-#define LCD_CMD_DELAY         5000U
-#define LCD_CLEAR_DELAY       200000U
-#define LED_BLINK_DELAY       800000U
-#define LCD_BYTE_DELAY        5000U
+// Preserve the previous lab's software delay counts.
+// These are approximate busy-loop delays, NOT calibrated microseconds.
+#define LCD_PULSE_DELAY   500U
+#define LCD_STARTUP_DELAY 4000000U
+#define LCD_INIT_DELAY    500000U
+#define LCD_CMD_DELAY     5000U
+#define LCD_CLEAR_DELAY   200000U
+#define LCD_BYTE_DELAY    5000U
 
-typedef enum {
-    NOR_LED2,
-    NOR_LED3,
-    INT1,
-    INT2
-} DisplayMode;
+// ============================================================
+// GLOBAL KEYPAD EVENT STATE (ISR PRODUCER, MAIN CONSUMER)
+// ============================================================
+volatile uint8_t key_ready = 0U;
+volatile uint8_t keypad_locked = 0U;
+volatile uint8_t last_row = 10U;
+volatile uint8_t last_col = 10U;
+volatile char last_key = '\0';
 
-typedef struct {
-    uint8_t timing;
-    uint32_t start;
-} DebounceState;
+static const char key_table[4][4] = {
+    {'1', '2', '3', 'A'},
+    {'4', '5', '6', 'B'},
+    {'7', '8', '9', 'C'},
+    {'*', '0', '#', 'D'}
+};
 
-static volatile DisplayMode current_mode = NOR_LED2;
+#define PASS_CODE "1234"
+#define ENTER_KEY '#'
 
-static volatile uint8_t current_blink = 0;
 
-static DebounceState db1 = {0};
+char entered_pin[5] = {0};
+uint8_t pin_index = 0;
 
-static DebounceState db2 = {0};
-
-static volatile uint8_t rearm_sw1 = 0;
-
-static volatile uint8_t rearm_sw2 = 0;
-
-void setup_lcd(void);
-
-void send_lcd_nibble(uint8_t nibble, uint8_t rs);
-
+// ============================================================
+// LCD DRIVER - REUSED FROM YOUR PREVIOUS LAB
+// ============================================================
 void simpleDelay(uint32_t count) {
     while (count--) {
-        __asm__("NOP");
+        __NOP();
     }
 }
 
-void setup_leds(void) {
-    // Enable clocking.
-    RCC->AHB1ENR |= (
-        RCC_AHB1ENR_GPIOBEN |
-        RCC_AHB1ENR_GPIOGEN |
-        RCC_AHB1ENR_GPIOIEN
-    );
-
-    // Set the mode of the pins
-    GPIOI->MODER &= ~(3U << (LED1 * 2));
-    GPIOB->MODER &= ~(3U << (LED2 * 2));
-    GPIOG->MODER &= ~(3U << (LED3 * 2));
-    GPIOI->MODER |= (1U << (LED1 * 2));
-    GPIOB->MODER |= (1U << (LED2 * 2));
-    GPIOG->MODER |= (1U << (LED3 * 2));
-
-    // Set output type
-    GPIOI->OTYPER &= ~(1U << (LED1));
-    GPIOB->OTYPER &= ~(1U << (LED2));
-    GPIOG->OTYPER &= ~(1U << (LED3));
-}
-
 void setup_lcd_data_bus(void) {
-    // Enable clocking.
-    RCC->AHB1ENR |= (
-        RCC_AHB1ENR_GPIOAEN |
-        RCC_AHB1ENR_GPIOFEN
-    );
+    // RCC clocks for GPIOA and GPIOF are enabled in main().
+    // Make PA0 and PF6-PF10 GPIO outputs.
+    GPIOA->MODER &= ~(3U << (DB4 * 2U));
+    GPIOF->MODER &= ~(3U << (DB5 * 2U));
+    GPIOF->MODER &= ~(3U << (DB6 * 2U));
+    GPIOF->MODER &= ~(3U << (DB7 * 2U));
+    GPIOF->MODER &= ~(3U << (RS  * 2U));
+    GPIOF->MODER &= ~(3U << (E   * 2U));
 
-    // Set the mode of the pins
-    GPIOA->MODER &= ~(3U << (DB4 * 2));
-    GPIOF->MODER &= ~(3U << (DB5 * 2));
-    GPIOF->MODER &= ~(3U << (DB6 * 2));
-    GPIOF->MODER &= ~(3U << (DB7 * 2));
-    GPIOF->MODER &= ~(3U << (RS * 2));
-    GPIOF->MODER &= ~(3U << (E * 2));
-    GPIOA->MODER |= (1U << (DB4 * 2));
-    GPIOF->MODER |= (1U << (DB5 * 2));
-    GPIOF->MODER |= (1U << (DB6 * 2));
-    GPIOF->MODER |= (1U << (DB7 * 2));
-    GPIOF->MODER |= (1U << (RS * 2));
-    GPIOF->MODER |= (1U << (E * 2));
+    GPIOA->MODER |= (1U << (DB4 * 2U));
+    GPIOF->MODER |= (1U << (DB5 * 2U));
+    GPIOF->MODER |= (1U << (DB6 * 2U));
+    GPIOF->MODER |= (1U << (DB7 * 2U));
+    GPIOF->MODER |= (1U << (RS  * 2U));
+    GPIOF->MODER |= (1U << (E   * 2U));
 
-    // Set the output type of the pins
-    GPIOA->OTYPER &= ~(1U << (DB4));
-    GPIOF->OTYPER &= ~(1U << (DB5));
-    GPIOF->OTYPER &= ~(1U << (DB6));
-    GPIOF->OTYPER &= ~(1U << (DB7));
-    GPIOF->OTYPER &= ~(1U << (RS));
-    GPIOF->OTYPER &= ~(1U << (E));
-}
-
-void setup_switches(void) {
-    // Enable clocking.
-    RCC->AHB1ENR |= RCC_AHB1ENR_GPIOIEN;
-    RCC->APB2ENR |= RCC_APB2ENR_SYSCFGEN;
-    GPIOI->MODER &= ~(3U << (SW1 * 2));
-    GPIOI->MODER &= ~(3U << (SW2 * 2));
-    GPIOI->PUPDR &= ~(3U << (SW1 * 2));
-    GPIOI->PUPDR &= ~(3U << (SW2 * 2));
-    GPIOI->PUPDR |= (1U << (SW1 * 2));
-    GPIOI->PUPDR |= (1U << (SW2 * 2));
-
-    // Register the SW1 as an interupt
-    SYSCFG->EXTICR[0] &= ~(0xFUL << 4);
-    SYSCFG->EXTICR[0] |=  (0x8UL << 4);
-
-    // Register the SW2 as an interupt
-    SYSCFG->EXTICR[0] &= ~(0xFUL << 8);
-    SYSCFG->EXTICR[0] |=  (0x8UL << 8);
-
-    // Enable interrupt only on falling edge
-    EXTI->FTSR |= (3U << 1);
-
-    // Disables interrupt on rising edge
-    EXTI->RTSR &= ~(3U << 1);
-    EXTI->IMR |= (3U << 1);
-
-    // Label the interrupt ready to run
-    EXTI->PR = (3U << 1);
-
-    // Configures priority
-    NVIC->IP[7] = 0x20;
-    NVIC->IP[8] = 0x00;
-
-    // Turns on the interrupt
-    NVIC->ISER[0] = (3U << 7);
-}
-
-void setup_tim2(void) {
-    // Enable TIM2 clock
-    RCC->APB1ENR |= RCC_APB1ENR_TIM2EN;
-
-    // Configure timer
-    TIM2->PSC = 15999;
-    TIM2->ARR = 250;
-
-    // Load prescaler
-    TIM2->EGR = TIM_EGR_UG;
-
-    // Clear update flag
-    TIM2->SR &= ~TIM_SR_UIF;
-
-    // Start timer
-    TIM2->CR1 |= TIM_CR1_CEN;
+    // Push-pull outputs, matching your previous LCD wiring.
+    GPIOA->OTYPER &= ~(1U << DB4);
+    GPIOF->OTYPER &= ~(1U << DB5);
+    GPIOF->OTYPER &= ~(1U << DB6);
+    GPIOF->OTYPER &= ~(1U << DB7);
+    GPIOF->OTYPER &= ~(1U << RS);
+    GPIOF->OTYPER &= ~(1U << E);
 }
 
 void send_lcd_nibble(uint8_t nibble, uint8_t rs) {
-    // Clear all data pins and RS
-    GPIOA->BSRR = (1U << (DB4 + 16));
-    GPIOF->BSRR = (
-        (1U << (DB5 + 16)) |
-        (1U << (DB6 + 16)) |
-        (1U << (DB7 + 16)) |
-        (1U << (RS  + 16))
-    );
+    // Clear all four data pins and RS.
+    GPIOA->BSRR = (1U << (DB4 + 16U));
+    GPIOF->BSRR =
+        (1U << (DB5 + 16U)) |
+        (1U << (DB6 + 16U)) |
+        (1U << (DB7 + 16U)) |
+        (1U << (RS  + 16U));
 
-    // Set pins corresponding to the nibble
+    // Place the nibble on D4-D7; RS selects command/data register.
     GPIOA->BSRR = ((nibble & 1U) << DB4);
-    GPIOF->BSRR = (
-        (((nibble >> 1) & 1U) << DB5) |
-        (((nibble >> 2) & 1U) << DB6) |
-        (((nibble >> 3) & 1U) << DB7) |
-        ((rs & 1U) << RS)
-    );
+    GPIOF->BSRR =
+        (((nibble >> 1U) & 1U) << DB5) |
+        (((nibble >> 2U) & 1U) << DB6) |
+        (((nibble >> 3U) & 1U) << DB7) |
+        ((rs & 1U) << RS);
 
-    // Pulse Enable
+    // HD44780 accepts the nibble on E's falling edge.
     simpleDelay(LCD_PULSE_DELAY);
     GPIOF->BSRR = (1U << E);
     simpleDelay(LCD_PULSE_DELAY);
-    GPIOF->BSRR = (1U << (E + 16));
+    GPIOF->BSRR = (1U << (E + 16U));
     simpleDelay(LCD_PULSE_DELAY);
 }
 
 void setup_lcd(void) {
-    // Ensure Enable starts LOW
-    GPIOF->BSRR = (1U << (E + 16));
-
-    // Wait for LCD power-up
+    GPIOF->BSRR = (1U << (E + 16U));
     simpleDelay(LCD_STARTUP_DELAY);
 
-    // Establish known 8-bit state
-    send_lcd_nibble(LCD_INIT_8BIT, 0);
+    // Synchronize LCD into known 8-bit startup state.
+    send_lcd_nibble(LCD_INIT_8BIT, 0U);
     simpleDelay(LCD_INIT_DELAY);
-    send_lcd_nibble(LCD_INIT_8BIT, 0);
+    send_lcd_nibble(LCD_INIT_8BIT, 0U);
     simpleDelay(LCD_INIT_DELAY);
-    send_lcd_nibble(LCD_INIT_8BIT, 0);
+    send_lcd_nibble(LCD_INIT_8BIT, 0U);
     simpleDelay(LCD_INIT_DELAY);
 
-    // Switch to 4-bit mode
-    send_lcd_nibble(LCD_INIT_4BIT, 0);
+    // Switch to four-bit transactions.
+    send_lcd_nibble(LCD_INIT_4BIT, 0U);
     simpleDelay(LCD_CMD_DELAY);
 
-    // Function set: 4-bit, 2 lines, 5x8 font
-    send_lcd_nibble(LCD_FUNCTION_SET >> 4, 0);
-    send_lcd_nibble(LCD_FUNCTION_SET & 0x0F, 0);
+    // Preserve your previous lab's sequence.
+    send_lcd_nibble(LCD_FUNCTION_SET >> 4U, 0U);
+    send_lcd_nibble(LCD_FUNCTION_SET & 0x0FU, 0U);
     simpleDelay(LCD_CMD_DELAY);
 
-    // Display OFF
-    send_lcd_nibble(LCD_DISPLAY_OFF >> 4, 0);
-    send_lcd_nibble(LCD_DISPLAY_OFF & 0x0F, 0);
+    send_lcd_nibble(LCD_DISPLAY_OFF >> 4U, 0U);
+    send_lcd_nibble(LCD_DISPLAY_OFF & 0x0FU, 0U);
     simpleDelay(LCD_CMD_DELAY);
 
-    // Clear display
-    send_lcd_nibble(LCD_CLEAR >> 4, 0);
-    send_lcd_nibble(LCD_CLEAR & 0x0F, 0);
+    send_lcd_nibble(LCD_CLEAR >> 4U, 0U);
+    send_lcd_nibble(LCD_CLEAR & 0x0FU, 0U);
     simpleDelay(LCD_CLEAR_DELAY);
 
-    // Entry mode
-    send_lcd_nibble(LCD_ENTRY_MODE >> 4, 0);
-    send_lcd_nibble(LCD_ENTRY_MODE & 0x0F, 0);
+    send_lcd_nibble(LCD_ENTRY_MODE >> 4U, 0U);
+    send_lcd_nibble(LCD_ENTRY_MODE & 0x0FU, 0U);
     simpleDelay(LCD_CMD_DELAY);
 
-    // Display ON, cursor OFF
-    send_lcd_nibble(LCD_DISPLAY_ON >> 4, 0);
-    send_lcd_nibble(LCD_DISPLAY_ON & 0x0F, 0);
+    send_lcd_nibble(LCD_DISPLAY_ON >> 4U, 0U);
+    send_lcd_nibble(LCD_DISPLAY_ON & 0x0FU, 0U);
     simpleDelay(LCD_CMD_DELAY);
 }
 
-// Send a complete command or ASCII character
 void lcd_write(uint8_t value, uint8_t rs) {
-    send_lcd_nibble(value >> 4, rs);
-    send_lcd_nibble(value & 0x0F, rs);
+    send_lcd_nibble(value >> 4U, rs);
+    send_lcd_nibble(value & 0x0FU, rs);
     simpleDelay(LCD_BYTE_DELAY);
 }
 
-void lcd_show_status(const char *message, uint8_t blink) {
-    uint32_t saved_mask = __get_PRIMASK();
-    __disable_irq();
-
-    // Move cursor to beginning
-    lcd_write(LCD_LINE1, 0);
-
-    // Write the message
-    while (*message) {
-        lcd_write(*message++, 1);
+// Small adapter so the existing LCD driver can display a startup prompt.
+void lcd_print(const char *message) {
+    while (*message != '\0') {
+        lcd_write((uint8_t)*message++, 1U);
     }
-
-    // Write blink number in column 16
-    lcd_write(LCD_LINE1 + 15, 0);
-    lcd_write('0' + blink, 1);
-    __set_PRIMASK(saved_mask);
 }
 
-void restore_lcd(void) {
-    const char *msg;
-    switch (current_mode) {
-        case NOR_LED3:
-            msg = "NOR -> BLU -> ";
-            break;
-        case INT1:
-            msg = "INT1 -> GRN -> ";
-            break;
-        case INT2:
-            msg = "INT2 -> BLU -> ";
-            break;
-        case NOR_LED2:
-        default:
-            msg = "NOR -> ORG -> ";
-            break;
-    }
+// ============================================================
+// KEYPAD GPIO MODES: DEFAULT = ROWS LOW / COLUMNS PULL-UP
+// ============================================================
+void default_matrix_gpios(void) {
+    // GPIOB row output latches LOW, GPIOI column latches LOW.
+    GPIOB->BSRR = ROW_MASK << 16U;
+    GPIOI->BSRR = COLUMN_MASK << 16U;
 
-    lcd_show_status(msg, current_blink);
+    GPIOB->OTYPER &= ~ROW_MASK;
+    GPIOB->MODER =
+        (GPIOB->MODER & ~ROW_MODE_MASK) | ROW_OUTPUT_MODE;
+    GPIOB->PUPDR &= ~ROW_MODE_MASK;
+
+    // Restore columns to pull-up inputs after rows become LOW outputs.
+    GPIOI->OTYPER &= ~COLUMN_MASK;
+    GPIOI->PUPDR =
+        (GPIOI->PUPDR & ~0xFFU) | 0x55U;
+    GPIOI->MODER &= ~0xFFU;
 }
 
-void check_debounce(
-    uint32_t sw,
-    volatile uint8_t *rearm,
-    DebounceState *db
-) {
-    if (!*rearm) return;
-
-    // Switch still pressed (LOW)
-    if (!(GPIOI->IDR & (1U << sw))) {
-        db->timing = 0;
+void alternate_matrix_gpios(uint8_t col) {
+    // Protect against an invalid column index.
+    if (col > 3U) {
         return;
     }
 
-    // Switch released (HIGH): start timing
-    uint32_t now = TIM2->CNT;
-    if (!db->timing) {
-        db->start = now;
-        db->timing = 1;
+    // Enable row pull-ups BEFORE switching them into input mode.
+    GPIOB->PUPDR =
+        (GPIOB->PUPDR & ~ROW_MODE_MASK) | ROW_OUTPUT_MODE;
+    GPIOB->MODER &= ~ROW_MODE_MASK;
+
+    // Only the EXTI-triggering column is driven LOW.
+    GPIOI->BSRR = (1U << (col + 16U));
+    GPIOI->OTYPER &= ~(1U << col);
+    GPIOI->PUPDR &= ~(3U << (2U * col));
+    GPIOI->MODER =
+        (GPIOI->MODER & ~(3U << (2U * col))) |
+        (1U << (2U * col));
+}
+
+void configure_matrix_interrupts(void) {
+    // EXTI0-3 are sourced from port I (port selector 8).
+    SYSCFG->EXTICR[0] = 0x8888U;
+
+    EXTI->IMR &= ~COLUMN_MASK;
+    EXTI->RTSR &= ~COLUMN_MASK;
+    EXTI->FTSR |= COLUMN_MASK;
+    EXTI->PR = COLUMN_MASK;
+
+    NVIC_SetPriority(EXTI0_IRQn, 10U);
+    NVIC_SetPriority(EXTI1_IRQn, 10U);
+    NVIC_SetPriority(EXTI2_IRQn, 10U);
+    NVIC_SetPriority(EXTI3_IRQn, 10U);
+
+    NVIC_ClearPendingIRQ(EXTI0_IRQn);
+    NVIC_ClearPendingIRQ(EXTI1_IRQn);
+    NVIC_ClearPendingIRQ(EXTI2_IRQn);
+    NVIC_ClearPendingIRQ(EXTI3_IRQn);
+
+    NVIC_EnableIRQ(EXTI0_IRQn);
+    NVIC_EnableIRQ(EXTI1_IRQn);
+    NVIC_EnableIRQ(EXTI2_IRQn);
+    NVIC_EnableIRQ(EXTI3_IRQn);
+
+    EXTI->IMR |= COLUMN_MASK;
+    __enable_irq();
+}
+
+// ============================================================
+// EXISTING POLLED TIM2 1 ms TIMEBASE
+// ============================================================
+void configure_timer(void) {
+    RCC->APB1ENR |= RCC_APB1ENR_TIM2EN;
+    TIM2->CR1 &= ~TIM_CR1_CEN;
+
+    // Assumes TIM2 clock = 16 MHz; (16 * 1000) / 16MHz = 1 ms.
+    TIM2->PSC = 15U;
+    TIM2->ARR = 999U;
+    TIM2->EGR = TIM_EGR_UG;
+    TIM2->CNT = 0U;
+    TIM2->SR = 0U;
+    TIM2->CR1 |= TIM_CR1_CEN;
+}
+
+// ============================================================
+// KEYPAD ISR SCAN + SINGLE EVENT PUBLICATION
+// ============================================================
+void keypad_interrupt_handler(uint8_t col) {
+    if (keypad_locked) {
         return;
     }
 
-    // Account for TIM2 wrapping at ARR
-    uint32_t period = TIM2->ARR + 1U;
-    uint32_t elapsed = (now + period - db->start) % period;
-    if (elapsed >= 20U) {
-        // Released and stable for about 20 ms
-        EXTI->PR = (1U << sw);
-        EXTI->IMR |= (1U << sw);
-        *rearm = 0;
-        db->timing = 0;
+    keypad_locked = 1U;
+    EXTI->IMR &= ~COLUMN_MASK;
+
+    uint8_t row = 10U;  // Invalid row until a LOW input is found.
+    alternate_matrix_gpios(col);
+
+    // Short settle delay (not the 20 ms mechanical debounce interval).
+    for (volatile uint32_t i = 0U; i < 300U; ++i) {
+        __NOP();
+    }
+
+    uint32_t row_states = GPIOB->IDR;
+    if ((row_states & (1U << M_ROW_PIN1)) == 0U) {
+        row = 0U;
+    } else if ((row_states & (1U << M_ROW_PIN2)) == 0U) {
+        row = 1U;
+    } else if ((row_states & (1U << M_ROW_PIN3)) == 0U) {
+        row = 2U;
+    } else if ((row_states & (1U << M_ROW_PIN4)) == 0U) {
+        row = 3U;
+    }
+
+    default_matrix_gpios();
+    if (row == 10U) {
+        return;  // Main will unlock after a stable keypad release.
+    }
+
+    last_row = row;
+    last_col = col;
+    last_key = key_table[row][col];
+    key_ready = 1U;
+}
+
+void EXTI0_IRQHandler(void) {
+    if (EXTI->PR & (1U << M_COLUMN_PIN1)) {
+        keypad_interrupt_handler(M_COLUMN_PIN1);
+        EXTI->PR = (1U << M_COLUMN_PIN1);
     }
 }
 
 void EXTI1_IRQHandler(void) {
-    if (EXTI->PR & (1U << SW1)) {
-        EXTI->IMR &= ~(1U << SW1);
-        EXTI->PR = (1U << SW1);
-        rearm_sw1 = 1;
-        volatile DisplayMode previous_mode = current_mode;
-        current_mode = INT1;
-        uint8_t prev_blink = current_blink;
-        current_blink = 0;
-        lcd_show_status("INT1 -> GRN -> ", current_blink);
-
-        // Blink LED1 three times
-        for (uint8_t blink = 1; blink <= 3; blink++) {
-            current_blink = blink;
-            lcd_show_status("INT1 -> GRN -> ", current_blink);
-            ;
-            GPIOI->BSRR = (1U << LED1);
-            simpleDelay(LED_BLINK_DELAY);
-            GPIOI->BSRR = (1U << (LED1 + 16));
-            simpleDelay(LED_BLINK_DELAY);
-        }
-
-        current_mode = previous_mode;
-        current_blink = prev_blink;
-        restore_lcd();
+    if (EXTI->PR & (1U << M_COLUMN_PIN2)) {
+        keypad_interrupt_handler(M_COLUMN_PIN2);
+        EXTI->PR = (1U << M_COLUMN_PIN2);
     }
 }
 
 void EXTI2_IRQHandler(void) {
-    if (EXTI->PR & (1U << SW2)) {
-        EXTI->IMR &= ~(1U << SW2);
-        EXTI->PR = (1U << SW2);
-        rearm_sw2 = 1;
-        volatile DisplayMode previous_mode = current_mode;
-        current_mode = INT2;
-        uint8_t prev_blink = current_blink;
-        current_blink = 0;
+    if (EXTI->PR & (1U << M_COLUMN_PIN3)) {
+        keypad_interrupt_handler(M_COLUMN_PIN3);
+        EXTI->PR = (1U << M_COLUMN_PIN3);
+    }
+}
 
-        // Save LED3's previous state
-        uint32_t previous_state = GPIOG->ODR & (1U << LED3);
-        lcd_show_status("INT2 -> BLU -> ", current_blink);
+void EXTI3_IRQHandler(void) {
+    if (EXTI->PR & (1U << M_COLUMN_PIN4)) {
+        keypad_interrupt_handler(M_COLUMN_PIN4);
+        EXTI->PR = (1U << M_COLUMN_PIN4);
+    }
+}
 
-        // Blink LED3 five times
-        for (uint8_t blink = 1; blink <= 5; blink++) {
-            current_blink = blink;
-            lcd_show_status("INT2 -> BLU -> ", current_blink);
-            GPIOG->BSRR = (1U << LED3);
-            simpleDelay(LED_BLINK_DELAY);
-            GPIOG->BSRR = (1U << (LED3 + 16));
-            simpleDelay(LED_BLINK_DELAY);
+// ============================================================
+// APPLICATION LOGIC - STILL TO BE IMPLEMENTED
+// ============================================================
+void handle_key(char key) {
+
+
+    if (key >= '0' && key <= '9' && pin_index < 4U) {
+    	entered_pin[pin_index] = key;
+    	pin_index++;
+
+        // Display masked character
+        lcd_write('*', 1U);
+    }
+
+    if (pin_index == 4U) {
+        if (strcmp(entered_pin, PASS_CODE) == 0) {
+            // Access granted
+
+        	lcd_write(LCD_LINE2, 0U);
+        	lcd_print("Access Granted");
+        } else {
+            // Incorrect PIN
+        	lcd_write(LCD_LINE2, 0U);
+        	lcd_print("Incorrect pin");
         }
+        	entered_pin[0] = 0;
+            entered_pin[1] = 0;
+            entered_pin[2] = 0;
+            entered_pin[3] = 0;
+           	pin_index = 0;
 
-        // Restore LED3's previous state
-        GPIOG->BSRR = previous_state
-            ? (1U << LED3)
-            : (1U << (LED3 + 16));
-        current_mode = previous_mode;
-        current_blink = prev_blink;
-        restore_lcd();
     }
 }
 
 int main(void) {
-    setup_leds();
+    // Enable clocks for the previous LCD wiring and reassigned keypad rows.
+    RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN |
+                    RCC_AHB1ENR_GPIOBEN |
+                    RCC_AHB1ENR_GPIOFEN |
+                    RCC_AHB1ENR_GPIOIEN;
+    RCC->APB2ENR |= RCC_APB2ENR_SYSCFGEN;
+
+    // LCD setup uses blocking delays; do it BEFORE starting TIM2.
     setup_lcd_data_bus();
     setup_lcd();
-    setup_tim2();
-    setup_switches();
+    lcd_write(LCD_LINE1, 0U);
+    lcd_print("Enter PIN:");
 
-    uint8_t led2_toggle_count = 0;
-    uint8_t led3_toggle_count = 0;
-    uint8_t pause_ticks = 0;
+    default_matrix_gpios();
+    configure_timer();
+    configure_matrix_interrupts();
+
+    // Existing nonblocking release-debounce structure.
+    uint8_t release_started = 0U;
+    uint32_t release_time = 0U;
+    uint32_t now_ms = 0U;
 
     while (1) {
-        check_debounce(SW1, &rearm_sw1, &db1);
-        check_debounce(SW2, &rearm_sw2, &db2);
-
+        // TIM2 generates a 1 ms update flag (with 16 MHz timer input).
         if (TIM2->SR & TIM_SR_UIF) {
             TIM2->SR &= ~TIM_SR_UIF;
-            if (led2_toggle_count < 10) {
-                if (led2_toggle_count == 0) {
-                    current_blink = (led2_toggle_count / 2) + 1;
-                    current_mode = NOR_LED2;
-                    lcd_show_status("NOR -> ORG -> ", current_blink);
-                }
+            now_ms++;
+        }
 
-                if (GPIOB->ODR & (1U << LED2))
-                    GPIOB->BSRR = (1U << (LED2 + 16));
-                else {
-                    GPIOB->BSRR = (1U << LED2);
-                    current_blink = (led2_toggle_count / 2) + 1;
-                    lcd_show_status("NOR -> ORG -> ", current_blink);
-                }
+        // Consume the one-character event from the EXTI handler.
+        if (key_ready) {
+            char key = last_key;
+            key_ready = 0U;
+            handle_key(key);
+        }
 
-                led2_toggle_count++;
-            } else if (led3_toggle_count < 16) {
-                if (led3_toggle_count == 0) {
-                    current_blink = (led3_toggle_count / 2) + 1;
-                    current_mode = NOR_LED3;
-                    lcd_write(LCD_LINE1, 0);
-                    lcd_show_status("NOR -> BLU -> ", current_blink);
+        // Wait until all columns stay HIGH for at least 20 ms.
+        if (keypad_locked) {
+            if ((GPIOI->IDR & COLUMN_MASK) == COLUMN_MASK) {
+                if (!release_started) {
+                    release_started = 1U;
+                    release_time = now_ms;
+                } else if (((uint32_t)(now_ms - release_time) >= 20U) &&
+                           !key_ready) {
+                    EXTI->PR = COLUMN_MASK;
+                    keypad_locked = 0U;
+                    EXTI->IMR |= COLUMN_MASK;
+                    release_started = 0U;
                 }
-
-                if (GPIOG->ODR & (1U << LED3))
-                    GPIOG->BSRR = (1U << (LED3 + 16));
-                else {
-                    GPIOG->BSRR = (1U << LED3);
-                    current_blink = (led3_toggle_count / 2) + 1;
-                    lcd_show_status("NOR -> BLU -> ", current_blink);
-                }
-
-                led3_toggle_count++;
             } else {
-                pause_ticks++;
-                if (pause_ticks >= 8) {
-                    pause_ticks = 0;
-                    led2_toggle_count = 0;
-                    led3_toggle_count = 0;
-                }
+                release_started = 0U;
             }
         }
     }
-
-    return 0;
 }

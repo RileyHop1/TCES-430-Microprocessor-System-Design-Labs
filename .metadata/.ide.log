@@ -1,20 +1,12 @@
-2026-11-14 10:09:43,483 [INFO] Activator:177 - 
-
-
-2026-11-14 10:09:43,488 [INFO] Activator:178 - !SESSION log4j initialized
-2026-11-14 10:09:46,417 [INFO] LogOutputStream:77 - [STDOUT_REDIRECT] 
-2026-11-14 10:09:46,588 [INFO] LogOutputStream:77 - [STDOUT_REDIRECT] Start the detection of the machine's architecture
-2026-11-14 10:09:46,600 [INFO] LogOutputStream:77 - [STDOUT_REDIRECT] use arm architecture
-2026-11-14 10:09:46,601 [INFO] LogOutputStream:77 - [STDOUT_REDIRECT] Architecture: Apple Silicon (ARM64)
-2026-11-14 13:06:09,178 [ERROR] ConfigurationRetriever:142 - IOException on connection: Read timed out
-2026-11-14 13:06:11,229 [ERROR] ConfigurationRetriever:142 - IOException on connection: Read timed out
-2026-11-14 13:06:14,664 [ERROR] ConfigurationRetriever:142 - IOException on connection: Read timed out
-2026-11-14 13:06:44,743 [ERROR] ConfigurationRetriever:142 - IOException on connection: Read timed out
-2026-11-14 13:06:47,954 [ERROR] ConfigurationRetriever:142 - IOException on connection: Read timed out
-2026-11-14 13:06:50,986 [ERROR] ConfigurationRetriever:142 - IOException on connection: Read timed out
-2026-11-14 13:07:02,048 [ERROR] ConfigurationRetriever:142 - IOException on connection: Read timed out
-2026-11-14 13:07:04,375 [ERROR] ConfigurationRetriever:142 - IOException on connection: Read timed out
-2026-11-14 13:07:06,499 [ERROR] ConfigurationRetriever:142 - IOException on connection: Read timed out
-2026-11-14 13:07:34,926 [ERROR] ConfigurationRetriever:142 - IOException on connection: Read timed out
-2026-11-14 13:07:37,971 [ERROR] ConfigurationRetriever:142 - IOException on connection: Read timed out
-2026-11-14 13:07:41,036 [ERROR] ConfigurationRetriever:142 - IOException on connection: Read timed out
+2026-11-15 10:51:06,477 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] Nov 15, 2026 10:51:06 AM com.github.weisj.jsvg.nodes.container.BaseContainerNode isAcceptableType
+2026-11-15 10:51:06,478 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] WARNING: Element <g> not allowed in <clippath> (or not implemented)
+2026-11-15 10:51:06,478 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] 
+2026-11-15 10:51:06,479 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] Nov 15, 2026 10:51:06 AM com.github.weisj.jsvg.nodes.container.BaseContainerNode isAcceptableType
+2026-11-15 10:51:06,479 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] WARNING: Element <g> not allowed in <clippath> (or not implemented)
+2026-11-15 10:51:06,479 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] 
+2026-11-15 10:51:06,481 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] Nov 15, 2026 10:51:06 AM com.github.weisj.jsvg.nodes.container.BaseContainerNode isAcceptableType
+2026-11-15 10:51:06,481 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] WARNING: Element <g> not allowed in <clippath> (or not implemented)
+2026-11-15 10:51:06,482 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] 
+2026-11-15 10:51:06,482 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] Nov 15, 2026 10:51:06 AM com.github.weisj.jsvg.nodes.container.BaseContainerNode isAcceptableType
+2026-11-15 10:51:06,482 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] WARNING: Element <g> not allowed in <clippath> (or not implemented)
+2026-11-15 10:51:06,482 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] 

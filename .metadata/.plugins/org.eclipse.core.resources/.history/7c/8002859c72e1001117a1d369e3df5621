@@ -1,0 +1,433 @@
+
+#include "main.h"
+
+// ============================================================
+// MATRIX GPIO DEFINITIONS
+// ============================================================
+
+// Columns - GPIOI
+#define M_COLUMN_PIN1 0U
+#define M_COLUMN_PIN2 1U
+#define M_COLUMN_PIN3 2U
+#define M_COLUMN_PIN4 3U
+
+// Rows - GPIOF
+#define M_ROW_PIN1 7U
+#define M_ROW_PIN2 8U
+#define M_ROW_PIN3 9U
+#define M_ROW_PIN4 10U
+
+// ============================================================
+// GLOBAL VARIABLES
+// ============================================================
+
+volatile uint8_t key_ready = 0U;
+volatile uint8_t keypad_locked = 0U;
+
+volatile uint8_t last_row = 10U;
+volatile uint8_t last_col = 10U;
+volatile char last_key = '\0';
+
+// ============================================================
+// KEYPAD LOOKUP TABLE
+// ============================================================
+
+static const char key_table[4][4] = {
+    {'1', '2', '3', 'A'},
+    {'4', '5', '6', 'B'},
+    {'7', '8', '9', 'C'},
+    {'*', '0', '#', 'D'}
+};
+
+// ============================================================
+// DEFAULT MATRIX GPIO CONFIGURATION
+// Rows: Outputs LOW
+// Columns: Inputs with pull-ups
+// ============================================================
+
+void default_matrix_gpios(void) {
+
+    // Reset output registers
+    GPIOI->BSRR = 0x000F0000U;
+    GPIOF->BSRR = 0x07800000U;
+
+    // Configure rows as outputs
+    GPIOF->MODER &= ~(
+        (3U << (2 * M_ROW_PIN1)) |
+        (3U << (2 * M_ROW_PIN2)) |
+        (3U << (2 * M_ROW_PIN3)) |
+        (3U << (2 * M_ROW_PIN4))
+    );
+
+    GPIOF->MODER |= (
+        (1U << (2 * M_ROW_PIN1)) |
+        (1U << (2 * M_ROW_PIN2)) |
+        (1U << (2 * M_ROW_PIN3)) |
+        (1U << (2 * M_ROW_PIN4))
+    );
+
+    // Configure columns as inputs
+    GPIOI->MODER &= ~(
+        (3U << (2 * M_COLUMN_PIN1)) |
+        (3U << (2 * M_COLUMN_PIN2)) |
+        (3U << (2 * M_COLUMN_PIN3)) |
+        (3U << (2 * M_COLUMN_PIN4))
+    );
+
+    // Configure output types
+    GPIOI->OTYPER &= ~(
+        (1U << M_COLUMN_PIN1) |
+        (1U << M_COLUMN_PIN2) |
+        (1U << M_COLUMN_PIN3) |
+        (1U << M_COLUMN_PIN4)
+    );
+
+    GPIOF->OTYPER &= ~(
+        (1U << M_ROW_PIN1) |
+        (1U << M_ROW_PIN2) |
+        (1U << M_ROW_PIN3) |
+        (1U << M_ROW_PIN4)
+    );
+
+    // Enable pull-ups on columns
+    GPIOI->PUPDR &= ~(
+        (3U << (2 * M_COLUMN_PIN1)) |
+        (3U << (2 * M_COLUMN_PIN2)) |
+        (3U << (2 * M_COLUMN_PIN3)) |
+        (3U << (2 * M_COLUMN_PIN4))
+    );
+
+    GPIOI->PUPDR |= (
+        (1U << (2 * M_COLUMN_PIN1)) |
+        (1U << (2 * M_COLUMN_PIN2)) |
+        (1U << (2 * M_COLUMN_PIN3)) |
+        (1U << (2 * M_COLUMN_PIN4))
+    );
+
+    // Disable pull-ups/pull-downs on rows
+    GPIOF->PUPDR &= ~(
+        (3U << (2 * M_ROW_PIN1)) |
+        (3U << (2 * M_ROW_PIN2)) |
+        (3U << (2 * M_ROW_PIN3)) |
+        (3U << (2 * M_ROW_PIN4))
+    );
+}
+
+// ============================================================
+// ALTERNATE MATRIX GPIO CONFIGURATION
+// Rows: Inputs with pull-ups
+// Selected column: Output LOW
+// ============================================================
+
+void alternate_matrix_gpios(uint8_t col) {
+
+    // Enable pull-ups on rows
+    GPIOF->PUPDR &= ~(
+        (3U << (2 * M_ROW_PIN1)) |
+        (3U << (2 * M_ROW_PIN2)) |
+        (3U << (2 * M_ROW_PIN3)) |
+        (3U << (2 * M_ROW_PIN4))
+    );
+
+    GPIOF->PUPDR |= (
+        (1U << (2 * M_ROW_PIN1)) |
+        (1U << (2 * M_ROW_PIN2)) |
+        (1U << (2 * M_ROW_PIN3)) |
+        (1U << (2 * M_ROW_PIN4))
+    );
+
+    // Change rows to inputs
+    GPIOF->MODER &= ~(
+        (3U << (2 * M_ROW_PIN1)) |
+        (3U << (2 * M_ROW_PIN2)) |
+        (3U << (2 * M_ROW_PIN3)) |
+        (3U << (2 * M_ROW_PIN4))
+    );
+
+    // Preload selected column LOW
+    GPIOI->BSRR = (1U << (col + 16U));
+
+    // Configure selected column as push-pull
+    GPIOI->OTYPER &= ~(1U << col);
+
+    // Disable pull-up on selected column
+    GPIOI->PUPDR &= ~(3U << (2U * col));
+
+    // Change selected column to output
+    GPIOI->MODER &= ~(3U << (2U * col));
+    GPIOI->MODER |=  (1U << (2U * col));
+}
+
+// ============================================================
+// MATRIX INTERRUPT CONFIGURATION
+// ============================================================
+
+void configure_matrix_interrupts(void) {
+
+    // Route EXTI0-EXTI3 to GPIOI
+    SYSCFG->EXTICR[0] = 0x8888U;
+
+    // Mask interrupts during configuration
+    EXTI->IMR &= ~0xFU;
+
+    // Disable rising-edge triggers
+    EXTI->RTSR &= ~0xFU;
+
+    // Enable falling-edge triggers
+    EXTI->FTSR |= 0xFU;
+
+    // Clear pending interrupt flags
+    EXTI->PR = 0xFU;
+
+    // Configure interrupt priorities
+    NVIC_SetPriority(EXTI0_IRQn, 10U);
+    NVIC_SetPriority(EXTI1_IRQn, 10U);
+    NVIC_SetPriority(EXTI2_IRQn, 10U);
+    NVIC_SetPriority(EXTI3_IRQn, 10U);
+
+    // Clear NVIC pending flags
+    NVIC_ClearPendingIRQ(EXTI0_IRQn);
+    NVIC_ClearPendingIRQ(EXTI1_IRQn);
+    NVIC_ClearPendingIRQ(EXTI2_IRQn);
+    NVIC_ClearPendingIRQ(EXTI3_IRQn);
+
+    // Enable interrupts
+    NVIC_EnableIRQ(EXTI0_IRQn);
+    NVIC_EnableIRQ(EXTI1_IRQn);
+    NVIC_EnableIRQ(EXTI2_IRQn);
+    NVIC_EnableIRQ(EXTI3_IRQn);
+
+    // Unmask EXTI0-EXTI3
+    EXTI->IMR |= 0xFU;
+
+    __enable_irq();
+}
+
+
+
+void configure_timer(void) {
+
+    // Enable TIM2 clock on APB1
+    RCC->APB1ENR |= RCC_APB1ENR_TIM2EN;
+
+    // Stop timer during configuration
+    TIM2->CR1 &= ~TIM_CR1_CEN;
+
+    // Divide 16 MHz by 16 = 1 MHz
+    TIM2->PSC = 15U;
+
+    // 1000 counter ticks = 1 millisecond
+    TIM2->ARR = 999U;
+
+    // Load prescaler and auto-reload
+    TIM2->EGR = TIM_EGR_UG;
+
+    // Clear counter and update flag
+    TIM2->CNT = 0U;
+    TIM2->SR = 0U;
+
+    // Start timer
+    TIM2->CR1 |= TIM_CR1_CEN;
+}
+
+
+// ============================================================
+// KEYPAD INTERRUPT HANDLER
+// ============================================================
+
+void keypad_interrupt_handler(uint8_t col) {
+
+    // Ignore input if keypad is locked
+    if (keypad_locked) {
+        return;
+    }
+
+    // Lock keypad and mask interrupts
+    keypad_locked = 1U;
+    EXTI->IMR &= ~0xFU;
+
+    uint8_t row = 10U; // Invalid row
+
+    // Switch GPIO configuration
+    alternate_matrix_gpios(col);
+
+    // Allow GPIO signals to settle
+    for (volatile uint32_t i = 0U; i < 300U; i++) {
+        __NOP();
+    }
+
+    // Read row inputs
+    uint32_t row_states = GPIOF->IDR;
+
+    // Identify the first detected row
+    if ((row_states & (1U << M_ROW_PIN1)) == 0U) {
+        row = 0U;
+    }
+    else if ((row_states & (1U << M_ROW_PIN2)) == 0U) {
+        row = 1U;
+    }
+    else if ((row_states & (1U << M_ROW_PIN3)) == 0U) {
+        row = 2U;
+    }
+    else if ((row_states & (1U << M_ROW_PIN4)) == 0U) {
+        row = 3U;
+    }
+
+    // Restore default GPIO configuration
+    default_matrix_gpios();
+
+    // Ignore invalid row
+    if (row == 10U) {
+        return;
+    }
+
+    // Store detected coordinates
+    last_col = col;
+    last_row = row;
+
+    // Decode character
+    char key = key_table[row][col];
+
+    // Publish keypress to main
+    last_key = key;
+    key_ready = 1U;
+}
+
+// ============================================================
+// EXTI INTERRUPT SERVICE ROUTINES
+// ============================================================
+
+void EXTI0_IRQHandler(void) {
+
+    if ((EXTI->PR & (1U << M_COLUMN_PIN1)) != 0U) {
+
+        keypad_interrupt_handler(M_COLUMN_PIN1);
+
+        EXTI->PR = (1U << M_COLUMN_PIN1);
+    }
+}
+
+void EXTI1_IRQHandler(void) {
+
+    if ((EXTI->PR & (1U << M_COLUMN_PIN2)) != 0U) {
+
+        keypad_interrupt_handler(M_COLUMN_PIN2);
+
+        EXTI->PR = (1U << M_COLUMN_PIN2);
+    }
+}
+
+void EXTI2_IRQHandler(void) {
+
+    if ((EXTI->PR & (1U << M_COLUMN_PIN3)) != 0U) {
+
+        keypad_interrupt_handler(M_COLUMN_PIN3);
+
+        EXTI->PR = (1U << M_COLUMN_PIN3);
+    }
+}
+
+void EXTI3_IRQHandler(void) {
+
+    if ((EXTI->PR & (1U << M_COLUMN_PIN4)) != 0U) {
+
+        keypad_interrupt_handler(M_COLUMN_PIN4);
+
+        EXTI->PR = (1U << M_COLUMN_PIN4);
+    }
+}
+
+
+
+// ============================================================
+// KEY PROCESSING
+// ============================================================
+
+void handle_key(char key) {
+
+    // TODO: Implement key processing
+}
+
+// ============================================================
+// MAIN
+// ============================================================
+
+int main(void) {
+
+    // Enable GPIO and SYSCFG clocks
+    RCC->AHB1ENR |= RCC_AHB1ENR_GPIOIEN;
+    RCC->AHB1ENR |= RCC_AHB1ENR_GPIOFEN;
+    RCC->APB2ENR |= RCC_APB2ENR_SYSCFGEN;
+
+    // Initialize keypad
+    default_matrix_gpios();
+    configure_matrix_interrupts();
+
+    // Persistent debounce state
+    uint8_t release_started = 0U;
+    uint32_t release_time = 0U;
+
+    while (1) {
+
+
+        if (TIM2->SR & TIM_SR_UIF) {
+
+            // Clear the update flag
+            TIM2->SR &= ~TIM_SR_UIF;
+
+            // One millisecond has elapsed
+            now_ms++;
+        }
+
+
+        if (key_ready) {
+
+            char key = last_key;
+            key_ready = 0U;
+
+            handle_key(key);
+        }
+
+        // ----------------------------------------
+
+        if (keypad_locked) {
+
+            // Check whether all columns are HIGH
+            if ((GPIOI->IDR & 0xFU) == 0xFU) {
+
+                // Start release timing
+                if (!release_started) {
+
+                    release_started = 1U;
+                    release_time = now_ms;
+                }
+
+                // Unlock after 20 ms of stable release
+                else if (
+                    (uint32_t)(now_ms - release_time) >= 20U &&
+                    !key_ready
+                ) {
+
+                    // Clear stale interrupts
+                    EXTI->PR = 0xFU;
+
+                    // Unlock keypad
+                    keypad_locked = 0U;
+
+                    // Re-enable keypad interrupts
+                    EXTI->IMR |= 0xFU;
+
+                    // Reset debounce state
+                    release_started = 0U;
+                }
+            }
+            else {
+
+                // Key still pressed or contacts bounced
+                release_started = 0U;
+            }
+        }
+    }
+
+    return 0;
+}

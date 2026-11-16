@@ -29,6 +29,7 @@ extern "C" {
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f7xx_hal.h"
 #include <stdint.h>
+#include <string.h>
 
 
 
