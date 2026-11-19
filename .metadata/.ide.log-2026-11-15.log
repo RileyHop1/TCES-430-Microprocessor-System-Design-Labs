@@ -1,0 +1,12 @@
+2026-11-15 10:51:06,477 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] Nov 15, 2026 10:51:06 AM com.github.weisj.jsvg.nodes.container.BaseContainerNode isAcceptableType
+2026-11-15 10:51:06,478 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] WARNING: Element <g> not allowed in <clippath> (or not implemented)
+2026-11-15 10:51:06,478 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] 
+2026-11-15 10:51:06,479 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] Nov 15, 2026 10:51:06 AM com.github.weisj.jsvg.nodes.container.BaseContainerNode isAcceptableType
+2026-11-15 10:51:06,479 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] WARNING: Element <g> not allowed in <clippath> (or not implemented)
+2026-11-15 10:51:06,479 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] 
+2026-11-15 10:51:06,481 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] Nov 15, 2026 10:51:06 AM com.github.weisj.jsvg.nodes.container.BaseContainerNode isAcceptableType
+2026-11-15 10:51:06,481 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] WARNING: Element <g> not allowed in <clippath> (or not implemented)
+2026-11-15 10:51:06,482 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] 
+2026-11-15 10:51:06,482 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] Nov 15, 2026 10:51:06 AM com.github.weisj.jsvg.nodes.container.BaseContainerNode isAcceptableType
+2026-11-15 10:51:06,482 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] WARNING: Element <g> not allowed in <clippath> (or not implemented)
+2026-11-15 10:51:06,482 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] 

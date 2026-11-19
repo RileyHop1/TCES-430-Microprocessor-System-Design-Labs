@@ -5,47 +5,47 @@ Sections:
 Idx Name          Size      VMA       LMA       File off  Algn
   0 .isr_vector   000001c8  08000000  08000000  00001000  2**0
                   CONTENTS, ALLOC, LOAD, READONLY, DATA
-  1 .text         00000dac  080001c8  080001c8  000011c8  2**2
+  1 .text         00000fe0  080001c8  080001c8  000011c8  2**2
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  2 .rodata       0000004c  08000f74  08000f74  00001f74  2**2
+  2 .rodata       0000006c  080011a8  080011a8  000021a8  2**2
                   CONTENTS, ALLOC, LOAD, READONLY, DATA
-  3 .ARM.extab    00000000  08000fc0  08000fc0  00002004  2**0
+  3 .ARM.extab    00000000  08001214  08001214  0000300c  2**0
                   CONTENTS, READONLY
-  4 .ARM          00000008  08000fc0  08000fc0  00001fc0  2**2
+  4 .ARM          00000008  08001214  08001214  00002214  2**2
                   CONTENTS, ALLOC, LOAD, READONLY, DATA
-  5 .preinit_array 00000000  08000fc8  08000fc8  00002004  2**0
+  5 .preinit_array 00000000  0800121c  0800121c  0000300c  2**0
                   CONTENTS, ALLOC, LOAD, DATA
-  6 .init_array   00000004  08000fc8  08000fc8  00001fc8  2**2
+  6 .init_array   00000004  0800121c  0800121c  0000221c  2**2
                   CONTENTS, ALLOC, LOAD, READONLY, DATA
-  7 .fini_array   00000004  08000fcc  08000fcc  00001fcc  2**2
+  7 .fini_array   00000004  08001220  08001220  00002220  2**2
                   CONTENTS, ALLOC, LOAD, READONLY, DATA
-  8 .data         00000004  20000000  08000fd0  00002000  2**0
+  8 .data         0000000c  20000000  08001224  00003000  2**2
                   CONTENTS, ALLOC, LOAD, DATA
-  9 .bss          0000004c  20000004  08000fd4  00002004  2**2
+  9 .bss          00000058  2000000c  08001230  0000300c  2**2
                   ALLOC
- 10 ._user_heap_stack 00000600  20000050  08000fd4  00002050  2**0
+ 10 ._user_heap_stack 00000604  20000064  08001230  00003064  2**0
                   ALLOC
- 11 .ARM.attributes 00000030  00000000  00000000  00002004  2**0
+ 11 .ARM.attributes 00000030  00000000  00000000  0000300c  2**0
                   CONTENTS, READONLY
- 12 .debug_info   000023f5  00000000  00000000  00002034  2**0
+ 12 .debug_info   000025ad  00000000  00000000  0000303c  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 13 .debug_abbrev 000006e5  00000000  00000000  00004429  2**0
+ 13 .debug_abbrev 000006e4  00000000  00000000  000055e9  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 14 .debug_aranges 00000288  00000000  00000000  00004b10  2**3
+ 14 .debug_aranges 000002e8  00000000  00000000  00005cd0  2**3
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 15 .debug_rnglists 000001d8  00000000  00000000  00004d98  2**0
+ 15 .debug_rnglists 00000223  00000000  00000000  00005fb8  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 16 .debug_macro  00023578  00000000  00000000  00004f70  2**0
+ 16 .debug_macro  00023596  00000000  00000000  000061db  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 17 .debug_line   00002892  00000000  00000000  000284e8  2**0
+ 17 .debug_line   00002a0c  00000000  00000000  00029771  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 18 .debug_str    000dd8cb  00000000  00000000  0002ad7a  2**0
+ 18 .debug_str    000ddac3  00000000  00000000  0002c17d  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 19 .comment      00000043  00000000  00000000  00108645  2**0
+ 19 .comment      00000043  00000000  00000000  00109c40  2**0
                   CONTENTS, READONLY
- 20 .debug_frame  000007f4  00000000  00000000  00108688  2**2
+ 20 .debug_frame  0000098c  00000000  00000000  00109c84  2**2
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 21 .debug_line_str 00000062  00000000  00000000  00108e7c  2**0
+ 21 .debug_line_str 00000062  00000000  00000000  0010a610  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
 
 Disassembly of section .text:
@@ -62,9 +62,9 @@ Disassembly of section .text:
  80001da:	2301      	movs	r3, #1
  80001dc:	7023      	strb	r3, [r4, #0]
  80001de:	bd10      	pop	{r4, pc}
- 80001e0:	20000004 	.word	0x20000004
+ 80001e0:	2000000c 	.word	0x2000000c
  80001e4:	00000000 	.word	0x00000000
- 80001e8:	08000f5c 	.word	0x08000f5c
+ 80001e8:	08001190 	.word	0x08001190
 
 080001ec <frame_dummy>:
  80001ec:	b508      	push	{r3, lr}
@@ -75,8 +75,8 @@ Disassembly of section .text:
  80001f6:	f3af 8000 	nop.w
  80001fa:	bd08      	pop	{r3, pc}
  80001fc:	00000000 	.word	0x00000000
- 8000200:	20000008 	.word	0x20000008
- 8000204:	08000f5c 	.word	0x08000f5c
+ 8000200:	20000010 	.word	0x20000010
+ 8000204:	08001190 	.word	0x08001190
 
 08000208 <strcmp>:
  8000208:	f810 2b01 	ldrb.w	r2, [r0], #1
@@ -635,50 +635,51 @@ void lcd_print(const char *message) {
 	...
 
 080005dc <setup_buzzer>:
-
 // ============================================================
 // ACTIVE BUZZER - GPIOB PB0 (HIGH = ON)
 // ============================================================
+
+
 void setup_buzzer(void) {
  80005dc:	b480      	push	{r7}
  80005de:	af00      	add	r7, sp, #0
-    RCC->AHB1ENR |= RCC_AHB1ENR_GPIOBEN;
+    RCC->AHB1ENR |= RCC_AHB1ENR_GPIOGEN;
  80005e0:	4b13      	ldr	r3, [pc, #76]	@ (8000630 <setup_buzzer+0x54>)
  80005e2:	6b1b      	ldr	r3, [r3, #48]	@ 0x30
  80005e4:	4a12      	ldr	r2, [pc, #72]	@ (8000630 <setup_buzzer+0x54>)
- 80005e6:	f043 0302 	orr.w	r3, r3, #2
+ 80005e6:	f043 0340 	orr.w	r3, r3, #64	@ 0x40
  80005ea:	6313      	str	r3, [r2, #48]	@ 0x30
 
-    // General-purpose output, push-pull, no pull-up or pull-down.
-    GPIOB->MODER &= ~(3U << (BUZZER_PIN * 2U));
+    GPIOG->BSRR = (1U << (BUZZER_PIN + 16U));
  80005ec:	4b11      	ldr	r3, [pc, #68]	@ (8000634 <setup_buzzer+0x58>)
- 80005ee:	681b      	ldr	r3, [r3, #0]
- 80005f0:	4a10      	ldr	r2, [pc, #64]	@ (8000634 <setup_buzzer+0x58>)
- 80005f2:	f023 0303 	bic.w	r3, r3, #3
- 80005f6:	6013      	str	r3, [r2, #0]
-    GPIOB->MODER |=  (1U << (BUZZER_PIN * 2U));
- 80005f8:	4b0e      	ldr	r3, [pc, #56]	@ (8000634 <setup_buzzer+0x58>)
- 80005fa:	681b      	ldr	r3, [r3, #0]
- 80005fc:	4a0d      	ldr	r2, [pc, #52]	@ (8000634 <setup_buzzer+0x58>)
- 80005fe:	f043 0301 	orr.w	r3, r3, #1
- 8000602:	6013      	str	r3, [r2, #0]
-    GPIOB->OTYPER &= ~(1U << BUZZER_PIN);
- 8000604:	4b0b      	ldr	r3, [pc, #44]	@ (8000634 <setup_buzzer+0x58>)
- 8000606:	685b      	ldr	r3, [r3, #4]
- 8000608:	4a0a      	ldr	r2, [pc, #40]	@ (8000634 <setup_buzzer+0x58>)
- 800060a:	f023 0301 	bic.w	r3, r3, #1
- 800060e:	6053      	str	r3, [r2, #4]
-    GPIOB->PUPDR &= ~(3U << (BUZZER_PIN * 2U));
- 8000610:	4b08      	ldr	r3, [pc, #32]	@ (8000634 <setup_buzzer+0x58>)
- 8000612:	68db      	ldr	r3, [r3, #12]
- 8000614:	4a07      	ldr	r2, [pc, #28]	@ (8000634 <setup_buzzer+0x58>)
- 8000616:	f023 0303 	bic.w	r3, r3, #3
- 800061a:	60d3      	str	r3, [r2, #12]
+ 80005ee:	f44f 0280 	mov.w	r2, #4194304	@ 0x400000
+ 80005f2:	619a      	str	r2, [r3, #24]
 
-    GPIOB->BSRR = (1U << (BUZZER_PIN + 16U)); // Begin OFF.
- 800061c:	4b05      	ldr	r3, [pc, #20]	@ (8000634 <setup_buzzer+0x58>)
- 800061e:	f44f 3280 	mov.w	r2, #65536	@ 0x10000
- 8000622:	619a      	str	r2, [r3, #24]
+    GPIOG->MODER &= ~(3U << (BUZZER_PIN * 2U));
+ 80005f4:	4b0f      	ldr	r3, [pc, #60]	@ (8000634 <setup_buzzer+0x58>)
+ 80005f6:	681b      	ldr	r3, [r3, #0]
+ 80005f8:	4a0e      	ldr	r2, [pc, #56]	@ (8000634 <setup_buzzer+0x58>)
+ 80005fa:	f423 5340 	bic.w	r3, r3, #12288	@ 0x3000
+ 80005fe:	6013      	str	r3, [r2, #0]
+    GPIOG->MODER |=  (1U << (BUZZER_PIN * 2U));
+ 8000600:	4b0c      	ldr	r3, [pc, #48]	@ (8000634 <setup_buzzer+0x58>)
+ 8000602:	681b      	ldr	r3, [r3, #0]
+ 8000604:	4a0b      	ldr	r2, [pc, #44]	@ (8000634 <setup_buzzer+0x58>)
+ 8000606:	f443 5380 	orr.w	r3, r3, #4096	@ 0x1000
+ 800060a:	6013      	str	r3, [r2, #0]
+
+    GPIOG->OTYPER &= ~(1U << BUZZER_PIN);
+ 800060c:	4b09      	ldr	r3, [pc, #36]	@ (8000634 <setup_buzzer+0x58>)
+ 800060e:	685b      	ldr	r3, [r3, #4]
+ 8000610:	4a08      	ldr	r2, [pc, #32]	@ (8000634 <setup_buzzer+0x58>)
+ 8000612:	f023 0340 	bic.w	r3, r3, #64	@ 0x40
+ 8000616:	6053      	str	r3, [r2, #4]
+    GPIOG->PUPDR &= ~(3U << (BUZZER_PIN * 2U));
+ 8000618:	4b06      	ldr	r3, [pc, #24]	@ (8000634 <setup_buzzer+0x58>)
+ 800061a:	68db      	ldr	r3, [r3, #12]
+ 800061c:	4a05      	ldr	r2, [pc, #20]	@ (8000634 <setup_buzzer+0x58>)
+ 800061e:	f423 5340 	bic.w	r3, r3, #12288	@ 0x3000
+ 8000622:	60d3      	str	r3, [r2, #12]
 }
  8000624:	bf00      	nop
  8000626:	46bd      	mov	sp, r7
@@ -686,32 +687,32 @@ void setup_buzzer(void) {
  800062c:	4770      	bx	lr
  800062e:	bf00      	nop
  8000630:	40023800 	.word	0x40023800
- 8000634:	40020400 	.word	0x40020400
+ 8000634:	40021800 	.word	0x40021800
 
 08000638 <buzzer_on>:
 
 void buzzer_on(void) {
  8000638:	b480      	push	{r7}
  800063a:	af00      	add	r7, sp, #0
-    GPIOB->BSRR = (1U << BUZZER_PIN);
+    GPIOG->BSRR = (1U << BUZZER_PIN);
  800063c:	4b03      	ldr	r3, [pc, #12]	@ (800064c <buzzer_on+0x14>)
- 800063e:	2201      	movs	r2, #1
+ 800063e:	2240      	movs	r2, #64	@ 0x40
  8000640:	619a      	str	r2, [r3, #24]
 }
  8000642:	bf00      	nop
  8000644:	46bd      	mov	sp, r7
  8000646:	f85d 7b04 	ldr.w	r7, [sp], #4
  800064a:	4770      	bx	lr
- 800064c:	40020400 	.word	0x40020400
+ 800064c:	40021800 	.word	0x40021800
 
 08000650 <buzzer_off>:
 
 void buzzer_off(void) {
  8000650:	b480      	push	{r7}
  8000652:	af00      	add	r7, sp, #0
-    GPIOB->BSRR = (1U << (BUZZER_PIN + 16U));
+    GPIOG->BSRR = (1U << (BUZZER_PIN + 16U));
  8000654:	4b04      	ldr	r3, [pc, #16]	@ (8000668 <buzzer_off+0x18>)
- 8000656:	f44f 3280 	mov.w	r2, #65536	@ 0x10000
+ 8000656:	f44f 0280 	mov.w	r2, #4194304	@ 0x400000
  800065a:	619a      	str	r2, [r3, #24]
 }
  800065c:	bf00      	nop
@@ -719,9 +720,10 @@ void buzzer_off(void) {
  8000660:	f85d 7b04 	ldr.w	r7, [sp], #4
  8000664:	4770      	bx	lr
  8000666:	bf00      	nop
- 8000668:	40020400 	.word	0x40020400
+ 8000668:	40021800 	.word	0x40021800
 
 0800066c <default_matrix_gpios>:
+
 
 // ============================================================
 // KEYPAD GPIO MODES: DEFAULT = ROWS LOW / COLUMNS PULL-UP
@@ -996,22 +998,17 @@ __STATIC_FORCEINLINE void __enable_irq(void)
 08000834 <configure_timer>:
 
 // ============================================================
-// EXISTING POLLED TIM2 1 ms TIMEBASE
+// POLLED TIM2: FREE-RUNNING 32-BIT MILLISECOND COUNTER
 // ============================================================
-
 void configure_timer(void) {
  8000834:	b480      	push	{r7}
  8000836:	af00      	add	r7, sp, #0
-
-    // Enable TIM2 peripheral clock
     RCC->APB1ENR |= RCC_APB1ENR_TIM2EN;
  8000838:	4b18      	ldr	r3, [pc, #96]	@ (800089c <configure_timer+0x68>)
  800083a:	6c1b      	ldr	r3, [r3, #64]	@ 0x40
  800083c:	4a17      	ldr	r2, [pc, #92]	@ (800089c <configure_timer+0x68>)
  800083e:	f043 0301 	orr.w	r3, r3, #1
  8000842:	6413      	str	r3, [r2, #64]	@ 0x40
-
-    // Stop timer during configuration
     TIM2->CR1 &= ~TIM_CR1_CEN;
  8000844:	f04f 4380 	mov.w	r3, #1073741824	@ 0x40000000
  8000848:	681b      	ldr	r3, [r3, #0]
@@ -1019,27 +1016,20 @@ void configure_timer(void) {
  800084e:	f023 0301 	bic.w	r3, r3, #1
  8000852:	6013      	str	r3, [r2, #0]
 
-    // Assuming a 16 MHz timer input:
-    // 16,000,000 / (15999 + 1) = 1000 Hz
-    // Therefore, one counter increment = 1 ms
+    // Assumes TIM2's input clock is 16 MHz.
+    // 16,000,000 / (15999 + 1) = 1000 counter ticks per second.
     TIM2->PSC = 15999U;
  8000854:	f04f 4380 	mov.w	r3, #1073741824	@ 0x40000000
  8000858:	f643 627f 	movw	r2, #15999	@ 0x3e7f
  800085c:	629a      	str	r2, [r3, #40]	@ 0x28
-
-    // Allow the full 32-bit counting range
     TIM2->ARR = 0xFFFFFFFFU;
  800085e:	f04f 4380 	mov.w	r3, #1073741824	@ 0x40000000
  8000862:	f04f 32ff 	mov.w	r2, #4294967295	@ 0xffffffff
  8000866:	62da      	str	r2, [r3, #44]	@ 0x2c
-
-    // Load prescaler
-    TIM2->EGR = TIM_EGR_UG;
+    TIM2->EGR = TIM_EGR_UG;  // Load the new prescaler.
  8000868:	f04f 4380 	mov.w	r3, #1073741824	@ 0x40000000
  800086c:	2201      	movs	r2, #1
  800086e:	615a      	str	r2, [r3, #20]
-
-    // Reset counter and status flags
     TIM2->CNT = 0U;
  8000870:	f04f 4380 	mov.w	r3, #1073741824	@ 0x40000000
  8000874:	2200      	movs	r2, #0
@@ -1048,8 +1038,6 @@ void configure_timer(void) {
  8000878:	f04f 4380 	mov.w	r3, #1073741824	@ 0x40000000
  800087c:	2200      	movs	r2, #0
  800087e:	611a      	str	r2, [r3, #16]
-
-    // Start timer
     TIM2->CR1 |= TIM_CR1_CEN;
  8000880:	f04f 4380 	mov.w	r3, #1073741824	@ 0x40000000
  8000884:	681b      	ldr	r3, [r3, #0]
@@ -1065,7 +1053,6 @@ void configure_timer(void) {
  800089c:	40023800 	.word	0x40023800
 
 080008a0 <keypad_interrupt_handler>:
-
 
 // ============================================================
 // KEYPAD ISR SCAN + SINGLE EVENT PUBLICATION
@@ -1196,14 +1183,14 @@ void keypad_interrupt_handler(uint8_t col) {
  8000962:	3718      	adds	r7, #24
  8000964:	46bd      	mov	sp, r7
  8000966:	bd80      	pop	{r7, pc}
- 8000968:	20000021 	.word	0x20000021
+ 8000968:	20000029 	.word	0x20000029
  800096c:	40013c00 	.word	0x40013c00
  8000970:	40020400 	.word	0x40020400
  8000974:	20000000 	.word	0x20000000
  8000978:	20000001 	.word	0x20000001
- 800097c:	08000fb0 	.word	0x08000fb0
- 8000980:	20000022 	.word	0x20000022
- 8000984:	20000020 	.word	0x20000020
+ 800097c:	08001204 	.word	0x08001204
+ 8000980:	2000002a 	.word	0x2000002a
+ 8000984:	20000028 	.word	0x20000028
 
 08000988 <EXTI0_IRQHandler>:
 
@@ -1301,1004 +1288,1318 @@ void EXTI3_IRQHandler(void) {
  8000a12:	bd80      	pop	{r7, pc}
  8000a14:	40013c00 	.word	0x40013c00
 
-08000a18 <number_to_string>:
+08000a18 <lcd_clear_screen>:
 
+// ============================================================
+// LCD APPLICATION HELPERS
+// ============================================================
+void lcd_clear_screen(void) {
+ 8000a18:	b580      	push	{r7, lr}
+ 8000a1a:	af00      	add	r7, sp, #0
+    lcd_write(LCD_CLEAR, 0U);
+ 8000a1c:	2100      	movs	r1, #0
+ 8000a1e:	2001      	movs	r0, #1
+ 8000a20:	f7ff fda4 	bl	800056c <lcd_write>
+    simpleDelay(LCD_CLEAR_DELAY);
+ 8000a24:	4802      	ldr	r0, [pc, #8]	@ (8000a30 <lcd_clear_screen+0x18>)
+ 8000a26:	f7ff fc5f 	bl	80002e8 <simpleDelay>
+}
+ 8000a2a:	bf00      	nop
+ 8000a2c:	bd80      	pop	{r7, pc}
+ 8000a2e:	bf00      	nop
+ 8000a30:	00030d40 	.word	0x00030d40
+
+08000a34 <lcd_show_pin_prompt>:
+
+void lcd_show_pin_prompt(void) {
+ 8000a34:	b580      	push	{r7, lr}
+ 8000a36:	af00      	add	r7, sp, #0
+    lcd_clear_screen();
+ 8000a38:	f7ff ffee 	bl	8000a18 <lcd_clear_screen>
+    lcd_write(LCD_LINE1, 0U);
+ 8000a3c:	2100      	movs	r1, #0
+ 8000a3e:	2080      	movs	r0, #128	@ 0x80
+ 8000a40:	f7ff fd94 	bl	800056c <lcd_write>
+    lcd_print("Enter PIN:");
+ 8000a44:	4804      	ldr	r0, [pc, #16]	@ (8000a58 <lcd_show_pin_prompt+0x24>)
+ 8000a46:	f7ff fdb2 	bl	80005ae <lcd_print>
+    lcd_write(LCD_LINE2, 0U);
+ 8000a4a:	2100      	movs	r1, #0
+ 8000a4c:	20c0      	movs	r0, #192	@ 0xc0
+ 8000a4e:	f7ff fd8d 	bl	800056c <lcd_write>
+}
+ 8000a52:	bf00      	nop
+ 8000a54:	bd80      	pop	{r7, pc}
+ 8000a56:	bf00      	nop
+ 8000a58:	080011a8 	.word	0x080011a8
+
+08000a5c <lcd_show_result>:
+
+void lcd_show_result(const char *message) {
+ 8000a5c:	b580      	push	{r7, lr}
+ 8000a5e:	b082      	sub	sp, #8
+ 8000a60:	af00      	add	r7, sp, #0
+ 8000a62:	6078      	str	r0, [r7, #4]
+    // Overwrite any masked digits or older result text on line two.
+    lcd_write(LCD_LINE2, 0U);
+ 8000a64:	2100      	movs	r1, #0
+ 8000a66:	20c0      	movs	r0, #192	@ 0xc0
+ 8000a68:	f7ff fd80 	bl	800056c <lcd_write>
+    lcd_print("                ");
+ 8000a6c:	4806      	ldr	r0, [pc, #24]	@ (8000a88 <lcd_show_result+0x2c>)
+ 8000a6e:	f7ff fd9e 	bl	80005ae <lcd_print>
+    lcd_write(LCD_LINE2, 0U);
+ 8000a72:	2100      	movs	r1, #0
+ 8000a74:	20c0      	movs	r0, #192	@ 0xc0
+ 8000a76:	f7ff fd79 	bl	800056c <lcd_write>
+    lcd_print(message);
+ 8000a7a:	6878      	ldr	r0, [r7, #4]
+ 8000a7c:	f7ff fd97 	bl	80005ae <lcd_print>
+}
+ 8000a80:	bf00      	nop
+ 8000a82:	3708      	adds	r7, #8
+ 8000a84:	46bd      	mov	sp, r7
+ 8000a86:	bd80      	pop	{r7, pc}
+ 8000a88:	080011b4 	.word	0x080011b4
+
+08000a8c <number_to_string>:
+
+// Caller supplies >= 11 bytes for any uint32_t value.
 void number_to_string(uint32_t number, char *buffer) {
- 8000a18:	b480      	push	{r7}
- 8000a1a:	b085      	sub	sp, #20
- 8000a1c:	af00      	add	r7, sp, #0
- 8000a1e:	6078      	str	r0, [r7, #4]
- 8000a20:	6039      	str	r1, [r7, #0]
-
+ 8000a8c:	b480      	push	{r7}
+ 8000a8e:	b085      	sub	sp, #20
+ 8000a90:	af00      	add	r7, sp, #0
+ 8000a92:	6078      	str	r0, [r7, #4]
+ 8000a94:	6039      	str	r1, [r7, #0]
     uint32_t temp = number;
- 8000a22:	687b      	ldr	r3, [r7, #4]
- 8000a24:	60fb      	str	r3, [r7, #12]
+ 8000a96:	687b      	ldr	r3, [r7, #4]
+ 8000a98:	60fb      	str	r3, [r7, #12]
     uint8_t digits = 0U;
- 8000a26:	2300      	movs	r3, #0
- 8000a28:	72fb      	strb	r3, [r7, #11]
+ 8000a9a:	2300      	movs	r3, #0
+ 8000a9c:	72fb      	strb	r3, [r7, #11]
 
-    // Count the digits
     do {
-        digits++;
- 8000a2a:	7afb      	ldrb	r3, [r7, #11]
- 8000a2c:	3301      	adds	r3, #1
- 8000a2e:	72fb      	strb	r3, [r7, #11]
+        ++digits;
+ 8000a9e:	7afb      	ldrb	r3, [r7, #11]
+ 8000aa0:	3301      	adds	r3, #1
+ 8000aa2:	72fb      	strb	r3, [r7, #11]
         temp /= 10U;
- 8000a30:	68fb      	ldr	r3, [r7, #12]
- 8000a32:	4a1b      	ldr	r2, [pc, #108]	@ (8000aa0 <number_to_string+0x88>)
- 8000a34:	fba2 2303 	umull	r2, r3, r2, r3
- 8000a38:	08db      	lsrs	r3, r3, #3
- 8000a3a:	60fb      	str	r3, [r7, #12]
-    } while (temp > 0U);
- 8000a3c:	68fb      	ldr	r3, [r7, #12]
- 8000a3e:	2b00      	cmp	r3, #0
- 8000a40:	d1f3      	bne.n	8000a2a <number_to_string+0x12>
+ 8000aa4:	68fb      	ldr	r3, [r7, #12]
+ 8000aa6:	4a1b      	ldr	r2, [pc, #108]	@ (8000b14 <number_to_string+0x88>)
+ 8000aa8:	fba2 2303 	umull	r2, r3, r2, r3
+ 8000aac:	08db      	lsrs	r3, r3, #3
+ 8000aae:	60fb      	str	r3, [r7, #12]
+    } while (temp != 0U);
+ 8000ab0:	68fb      	ldr	r3, [r7, #12]
+ 8000ab2:	2b00      	cmp	r3, #0
+ 8000ab4:	d1f3      	bne.n	8000a9e <number_to_string+0x12>
 
-    // Add null terminator
     buffer[digits] = '\0';
- 8000a42:	7afb      	ldrb	r3, [r7, #11]
- 8000a44:	683a      	ldr	r2, [r7, #0]
- 8000a46:	4413      	add	r3, r2
- 8000a48:	2200      	movs	r2, #0
- 8000a4a:	701a      	strb	r2, [r3, #0]
-
-    // Extract digits from right to left
-    for (uint8_t i = digits; i > 0U; i--) {
- 8000a4c:	7afb      	ldrb	r3, [r7, #11]
- 8000a4e:	72bb      	strb	r3, [r7, #10]
- 8000a50:	e01c      	b.n	8000a8c <number_to_string+0x74>
-
-        uint8_t digit = number % 10U;
- 8000a52:	6879      	ldr	r1, [r7, #4]
- 8000a54:	4b12      	ldr	r3, [pc, #72]	@ (8000aa0 <number_to_string+0x88>)
- 8000a56:	fba3 2301 	umull	r2, r3, r3, r1
- 8000a5a:	08da      	lsrs	r2, r3, #3
- 8000a5c:	4613      	mov	r3, r2
- 8000a5e:	009b      	lsls	r3, r3, #2
- 8000a60:	4413      	add	r3, r2
- 8000a62:	005b      	lsls	r3, r3, #1
- 8000a64:	1aca      	subs	r2, r1, r3
- 8000a66:	4613      	mov	r3, r2
- 8000a68:	727b      	strb	r3, [r7, #9]
-
-        // Convert digit to ASCII
-        buffer[i - 1U] = '0' + digit;
- 8000a6a:	7abb      	ldrb	r3, [r7, #10]
- 8000a6c:	3b01      	subs	r3, #1
- 8000a6e:	683a      	ldr	r2, [r7, #0]
- 8000a70:	4413      	add	r3, r2
- 8000a72:	7a7a      	ldrb	r2, [r7, #9]
- 8000a74:	3230      	adds	r2, #48	@ 0x30
- 8000a76:	b2d2      	uxtb	r2, r2
- 8000a78:	701a      	strb	r2, [r3, #0]
-
+ 8000ab6:	7afb      	ldrb	r3, [r7, #11]
+ 8000ab8:	683a      	ldr	r2, [r7, #0]
+ 8000aba:	4413      	add	r3, r2
+ 8000abc:	2200      	movs	r2, #0
+ 8000abe:	701a      	strb	r2, [r3, #0]
+    for (uint8_t i = digits; i > 0U; --i) {
+ 8000ac0:	7afb      	ldrb	r3, [r7, #11]
+ 8000ac2:	72bb      	strb	r3, [r7, #10]
+ 8000ac4:	e01c      	b.n	8000b00 <number_to_string+0x74>
+        uint8_t digit = (uint8_t)(number % 10U);
+ 8000ac6:	6879      	ldr	r1, [r7, #4]
+ 8000ac8:	4b12      	ldr	r3, [pc, #72]	@ (8000b14 <number_to_string+0x88>)
+ 8000aca:	fba3 2301 	umull	r2, r3, r3, r1
+ 8000ace:	08da      	lsrs	r2, r3, #3
+ 8000ad0:	4613      	mov	r3, r2
+ 8000ad2:	009b      	lsls	r3, r3, #2
+ 8000ad4:	4413      	add	r3, r2
+ 8000ad6:	005b      	lsls	r3, r3, #1
+ 8000ad8:	1aca      	subs	r2, r1, r3
+ 8000ada:	4613      	mov	r3, r2
+ 8000adc:	727b      	strb	r3, [r7, #9]
+        buffer[i - 1U] = (char)('0' + digit);
+ 8000ade:	7abb      	ldrb	r3, [r7, #10]
+ 8000ae0:	3b01      	subs	r3, #1
+ 8000ae2:	683a      	ldr	r2, [r7, #0]
+ 8000ae4:	4413      	add	r3, r2
+ 8000ae6:	7a7a      	ldrb	r2, [r7, #9]
+ 8000ae8:	3230      	adds	r2, #48	@ 0x30
+ 8000aea:	b2d2      	uxtb	r2, r2
+ 8000aec:	701a      	strb	r2, [r3, #0]
         number /= 10U;
- 8000a7a:	687b      	ldr	r3, [r7, #4]
- 8000a7c:	4a08      	ldr	r2, [pc, #32]	@ (8000aa0 <number_to_string+0x88>)
- 8000a7e:	fba2 2303 	umull	r2, r3, r2, r3
- 8000a82:	08db      	lsrs	r3, r3, #3
- 8000a84:	607b      	str	r3, [r7, #4]
-    for (uint8_t i = digits; i > 0U; i--) {
- 8000a86:	7abb      	ldrb	r3, [r7, #10]
- 8000a88:	3b01      	subs	r3, #1
- 8000a8a:	72bb      	strb	r3, [r7, #10]
- 8000a8c:	7abb      	ldrb	r3, [r7, #10]
- 8000a8e:	2b00      	cmp	r3, #0
- 8000a90:	d1df      	bne.n	8000a52 <number_to_string+0x3a>
+ 8000aee:	687b      	ldr	r3, [r7, #4]
+ 8000af0:	4a08      	ldr	r2, [pc, #32]	@ (8000b14 <number_to_string+0x88>)
+ 8000af2:	fba2 2303 	umull	r2, r3, r2, r3
+ 8000af6:	08db      	lsrs	r3, r3, #3
+ 8000af8:	607b      	str	r3, [r7, #4]
+    for (uint8_t i = digits; i > 0U; --i) {
+ 8000afa:	7abb      	ldrb	r3, [r7, #10]
+ 8000afc:	3b01      	subs	r3, #1
+ 8000afe:	72bb      	strb	r3, [r7, #10]
+ 8000b00:	7abb      	ldrb	r3, [r7, #10]
+ 8000b02:	2b00      	cmp	r3, #0
+ 8000b04:	d1df      	bne.n	8000ac6 <number_to_string+0x3a>
     }
 }
- 8000a92:	bf00      	nop
- 8000a94:	bf00      	nop
- 8000a96:	3714      	adds	r7, #20
- 8000a98:	46bd      	mov	sp, r7
- 8000a9a:	f85d 7b04 	ldr.w	r7, [sp], #4
- 8000a9e:	4770      	bx	lr
- 8000aa0:	cccccccd 	.word	0xcccccccd
+ 8000b06:	bf00      	nop
+ 8000b08:	bf00      	nop
+ 8000b0a:	3714      	adds	r7, #20
+ 8000b0c:	46bd      	mov	sp, r7
+ 8000b0e:	f85d 7b04 	ldr.w	r7, [sp], #4
+ 8000b12:	4770      	bx	lr
+ 8000b14:	cccccccd 	.word	0xcccccccd
 
-08000aa4 <handle_key>:
+08000b18 <lcd_show_lockout_time>:
+
+void lcd_show_lockout_time(uint32_t remaining_seconds) {
+ 8000b18:	b580      	push	{r7, lr}
+ 8000b1a:	b086      	sub	sp, #24
+ 8000b1c:	af00      	add	r7, sp, #0
+ 8000b1e:	6078      	str	r0, [r7, #4]
+    char time_string[12];
+    number_to_string(remaining_seconds, time_string);
+ 8000b20:	f107 030c 	add.w	r3, r7, #12
+ 8000b24:	4619      	mov	r1, r3
+ 8000b26:	6878      	ldr	r0, [r7, #4]
+ 8000b28:	f7ff ffb0 	bl	8000a8c <number_to_string>
+
+    lcd_write(LCD_LINE2, 0U);
+ 8000b2c:	2100      	movs	r1, #0
+ 8000b2e:	20c0      	movs	r0, #192	@ 0xc0
+ 8000b30:	f7ff fd1c 	bl	800056c <lcd_write>
+    lcd_print("Time: ");
+ 8000b34:	4807      	ldr	r0, [pc, #28]	@ (8000b54 <lcd_show_lockout_time+0x3c>)
+ 8000b36:	f7ff fd3a 	bl	80005ae <lcd_print>
+    lcd_print(time_string);
+ 8000b3a:	f107 030c 	add.w	r3, r7, #12
+ 8000b3e:	4618      	mov	r0, r3
+ 8000b40:	f7ff fd35 	bl	80005ae <lcd_print>
+    lcd_print("  ");  // Clear old digit when changing 10 -> 9.
+ 8000b44:	4804      	ldr	r0, [pc, #16]	@ (8000b58 <lcd_show_lockout_time+0x40>)
+ 8000b46:	f7ff fd32 	bl	80005ae <lcd_print>
+}
+ 8000b4a:	bf00      	nop
+ 8000b4c:	3718      	adds	r7, #24
+ 8000b4e:	46bd      	mov	sp, r7
+ 8000b50:	bd80      	pop	{r7, pc}
+ 8000b52:	bf00      	nop
+ 8000b54:	080011c8 	.word	0x080011c8
+ 8000b58:	080011d0 	.word	0x080011d0
+
+08000b5c <start_normal_beep>:
+
+// ============================================================
+// BUZZER TIMING AND SECURITY STATE
+// ============================================================
+void start_normal_beep(uint32_t duration_ms) {
+ 8000b5c:	b580      	push	{r7, lr}
+ 8000b5e:	b082      	sub	sp, #8
+ 8000b60:	af00      	add	r7, sp, #0
+ 8000b62:	6078      	str	r0, [r7, #4]
+    buzzer_on();
+ 8000b64:	f7ff fd68 	bl	8000638 <buzzer_on>
+    buzzer_start_ms = TIM2->CNT;
+ 8000b68:	f04f 4380 	mov.w	r3, #1073741824	@ 0x40000000
+ 8000b6c:	6a5b      	ldr	r3, [r3, #36]	@ 0x24
+ 8000b6e:	4a06      	ldr	r2, [pc, #24]	@ (8000b88 <start_normal_beep+0x2c>)
+ 8000b70:	6013      	str	r3, [r2, #0]
+    buzzer_duration_ms = duration_ms;
+ 8000b72:	4a06      	ldr	r2, [pc, #24]	@ (8000b8c <start_normal_beep+0x30>)
+ 8000b74:	687b      	ldr	r3, [r7, #4]
+ 8000b76:	6013      	str	r3, [r2, #0]
+    buzzer_active = 1U;
+ 8000b78:	4b05      	ldr	r3, [pc, #20]	@ (8000b90 <start_normal_beep+0x34>)
+ 8000b7a:	2201      	movs	r2, #1
+ 8000b7c:	701a      	strb	r2, [r3, #0]
+}
+ 8000b7e:	bf00      	nop
+ 8000b80:	3708      	adds	r7, #8
+ 8000b82:	46bd      	mov	sp, r7
+ 8000b84:	bd80      	pop	{r7, pc}
+ 8000b86:	bf00      	nop
+ 8000b88:	20000034 	.word	0x20000034
+ 8000b8c:	20000038 	.word	0x20000038
+ 8000b90:	2000003c 	.word	0x2000003c
+
+08000b94 <show_result_for>:
+
+void show_result_for(const char *message, uint32_t duration_ms) {
+ 8000b94:	b580      	push	{r7, lr}
+ 8000b96:	b082      	sub	sp, #8
+ 8000b98:	af00      	add	r7, sp, #0
+ 8000b9a:	6078      	str	r0, [r7, #4]
+ 8000b9c:	6039      	str	r1, [r7, #0]
+    EXTI->IMR &= ~COLUMN_MASK;  // Ignore additional keys during result.
+ 8000b9e:	4b0c      	ldr	r3, [pc, #48]	@ (8000bd0 <show_result_for+0x3c>)
+ 8000ba0:	681b      	ldr	r3, [r3, #0]
+ 8000ba2:	4a0b      	ldr	r2, [pc, #44]	@ (8000bd0 <show_result_for+0x3c>)
+ 8000ba4:	f023 030f 	bic.w	r3, r3, #15
+ 8000ba8:	6013      	str	r3, [r2, #0]
+    result_message_active = 1U;
+ 8000baa:	4b0a      	ldr	r3, [pc, #40]	@ (8000bd4 <show_result_for+0x40>)
+ 8000bac:	2201      	movs	r2, #1
+ 8000bae:	701a      	strb	r2, [r3, #0]
+    result_message_start_ms = TIM2->CNT;
+ 8000bb0:	f04f 4380 	mov.w	r3, #1073741824	@ 0x40000000
+ 8000bb4:	6a5b      	ldr	r3, [r3, #36]	@ 0x24
+ 8000bb6:	4a08      	ldr	r2, [pc, #32]	@ (8000bd8 <show_result_for+0x44>)
+ 8000bb8:	6013      	str	r3, [r2, #0]
+    result_message_duration_ms = duration_ms;
+ 8000bba:	4a08      	ldr	r2, [pc, #32]	@ (8000bdc <show_result_for+0x48>)
+ 8000bbc:	683b      	ldr	r3, [r7, #0]
+ 8000bbe:	6013      	str	r3, [r2, #0]
+    lcd_show_result(message);
+ 8000bc0:	6878      	ldr	r0, [r7, #4]
+ 8000bc2:	f7ff ff4b 	bl	8000a5c <lcd_show_result>
+}
+ 8000bc6:	bf00      	nop
+ 8000bc8:	3708      	adds	r7, #8
+ 8000bca:	46bd      	mov	sp, r7
+ 8000bcc:	bd80      	pop	{r7, pc}
+ 8000bce:	bf00      	nop
+ 8000bd0:	40013c00 	.word	0x40013c00
+ 8000bd4:	20000046 	.word	0x20000046
+ 8000bd8:	20000048 	.word	0x20000048
+ 8000bdc:	2000004c 	.word	0x2000004c
+
+08000be0 <start_security_lockout>:
+
+void start_security_lockout(void) {
+ 8000be0:	b580      	push	{r7, lr}
+ 8000be2:	af00      	add	r7, sp, #0
+    EXTI->IMR &= ~COLUMN_MASK;
+ 8000be4:	4b19      	ldr	r3, [pc, #100]	@ (8000c4c <start_security_lockout+0x6c>)
+ 8000be6:	681b      	ldr	r3, [r3, #0]
+ 8000be8:	4a18      	ldr	r2, [pc, #96]	@ (8000c4c <start_security_lockout+0x6c>)
+ 8000bea:	f023 030f 	bic.w	r3, r3, #15
+ 8000bee:	6013      	str	r3, [r2, #0]
+    key_ready = 0U;
+ 8000bf0:	4b17      	ldr	r3, [pc, #92]	@ (8000c50 <start_security_lockout+0x70>)
+ 8000bf2:	2200      	movs	r2, #0
+ 8000bf4:	701a      	strb	r2, [r3, #0]
+    keypad_rearm_pending = 0U;
+ 8000bf6:	4b17      	ldr	r3, [pc, #92]	@ (8000c54 <start_security_lockout+0x74>)
+ 8000bf8:	2200      	movs	r2, #0
+ 8000bfa:	701a      	strb	r2, [r3, #0]
+    result_message_active = 0U;
+ 8000bfc:	4b16      	ldr	r3, [pc, #88]	@ (8000c58 <start_security_lockout+0x78>)
+ 8000bfe:	2200      	movs	r2, #0
+ 8000c00:	701a      	strb	r2, [r3, #0]
+    fail_count = 0U;
+ 8000c02:	4b16      	ldr	r3, [pc, #88]	@ (8000c5c <start_security_lockout+0x7c>)
+ 8000c04:	2200      	movs	r2, #0
+ 8000c06:	701a      	strb	r2, [r3, #0]
+
+    lockout_active = 1U;
+ 8000c08:	4b15      	ldr	r3, [pc, #84]	@ (8000c60 <start_security_lockout+0x80>)
+ 8000c0a:	2201      	movs	r2, #1
+ 8000c0c:	701a      	strb	r2, [r3, #0]
+    lockout_start_ms = TIM2->CNT;
+ 8000c0e:	f04f 4380 	mov.w	r3, #1073741824	@ 0x40000000
+ 8000c12:	6a5b      	ldr	r3, [r3, #36]	@ 0x24
+ 8000c14:	4a13      	ldr	r2, [pc, #76]	@ (8000c64 <start_security_lockout+0x84>)
+ 8000c16:	6013      	str	r3, [r2, #0]
+    last_displayed_second = UINT32_MAX;
+ 8000c18:	4b13      	ldr	r3, [pc, #76]	@ (8000c68 <start_security_lockout+0x88>)
+ 8000c1a:	f04f 32ff 	mov.w	r2, #4294967295	@ 0xffffffff
+ 8000c1e:	601a      	str	r2, [r3, #0]
+
+    buzzer_on();
+ 8000c20:	f7ff fd0a 	bl	8000638 <buzzer_on>
+    buzzer_active = 1U;
+ 8000c24:	4b11      	ldr	r3, [pc, #68]	@ (8000c6c <start_security_lockout+0x8c>)
+ 8000c26:	2201      	movs	r2, #1
+ 8000c28:	701a      	strb	r2, [r3, #0]
+
+    lcd_clear_screen();
+ 8000c2a:	f7ff fef5 	bl	8000a18 <lcd_clear_screen>
+    lcd_write(LCD_LINE1, 0U);
+ 8000c2e:	2100      	movs	r1, #0
+ 8000c30:	2080      	movs	r0, #128	@ 0x80
+ 8000c32:	f7ff fc9b 	bl	800056c <lcd_write>
+    lcd_print("LOCKED!");
+ 8000c36:	480e      	ldr	r0, [pc, #56]	@ (8000c70 <start_security_lockout+0x90>)
+ 8000c38:	f7ff fcb9 	bl	80005ae <lcd_print>
+    lcd_show_lockout_time(30U);
+ 8000c3c:	201e      	movs	r0, #30
+ 8000c3e:	f7ff ff6b 	bl	8000b18 <lcd_show_lockout_time>
+    last_displayed_second = 30U;
+ 8000c42:	4b09      	ldr	r3, [pc, #36]	@ (8000c68 <start_security_lockout+0x88>)
+ 8000c44:	221e      	movs	r2, #30
+ 8000c46:	601a      	str	r2, [r3, #0]
+}
+ 8000c48:	bf00      	nop
+ 8000c4a:	bd80      	pop	{r7, pc}
+ 8000c4c:	40013c00 	.word	0x40013c00
+ 8000c50:	20000028 	.word	0x20000028
+ 8000c54:	20000050 	.word	0x20000050
+ 8000c58:	20000046 	.word	0x20000046
+ 8000c5c:	20000045 	.word	0x20000045
+ 8000c60:	20000044 	.word	0x20000044
+ 8000c64:	20000040 	.word	0x20000040
+ 8000c68:	20000004 	.word	0x20000004
+ 8000c6c:	2000003c 	.word	0x2000003c
+ 8000c70:	080011d4 	.word	0x080011d4
+
+08000c74 <handle_key>:
 
 // ============================================================
 // PIN INPUT AND AUTHENTICATION
 // ============================================================
 void handle_key(char key) {
- 8000aa4:	b580      	push	{r7, lr}
- 8000aa6:	b082      	sub	sp, #8
- 8000aa8:	af00      	add	r7, sp, #0
- 8000aaa:	4603      	mov	r3, r0
- 8000aac:	71fb      	strb	r3, [r7, #7]
-    // Accept at most four numeric digits.
-    if (key >= '0' && key <= '9' && pin_index < 4U) {
- 8000aae:	79fb      	ldrb	r3, [r7, #7]
- 8000ab0:	2b2f      	cmp	r3, #47	@ 0x2f
- 8000ab2:	d928      	bls.n	8000b06 <handle_key+0x62>
- 8000ab4:	79fb      	ldrb	r3, [r7, #7]
- 8000ab6:	2b39      	cmp	r3, #57	@ 0x39
- 8000ab8:	d825      	bhi.n	8000b06 <handle_key+0x62>
- 8000aba:	4b34      	ldr	r3, [pc, #208]	@ (8000b8c <handle_key+0xe8>)
- 8000abc:	781b      	ldrb	r3, [r3, #0]
- 8000abe:	2b03      	cmp	r3, #3
- 8000ac0:	d821      	bhi.n	8000b06 <handle_key+0x62>
-        entered_pin[pin_index] = key;
- 8000ac2:	4b32      	ldr	r3, [pc, #200]	@ (8000b8c <handle_key+0xe8>)
- 8000ac4:	781b      	ldrb	r3, [r3, #0]
- 8000ac6:	4619      	mov	r1, r3
- 8000ac8:	4a31      	ldr	r2, [pc, #196]	@ (8000b90 <handle_key+0xec>)
- 8000aca:	79fb      	ldrb	r3, [r7, #7]
- 8000acc:	5453      	strb	r3, [r2, r1]
-        pin_index++;
- 8000ace:	4b2f      	ldr	r3, [pc, #188]	@ (8000b8c <handle_key+0xe8>)
- 8000ad0:	781b      	ldrb	r3, [r3, #0]
- 8000ad2:	3301      	adds	r3, #1
- 8000ad4:	b2da      	uxtb	r2, r3
- 8000ad6:	4b2d      	ldr	r3, [pc, #180]	@ (8000b8c <handle_key+0xe8>)
- 8000ad8:	701a      	strb	r2, [r3, #0]
-        entered_pin[pin_index] = '\0';
- 8000ada:	4b2c      	ldr	r3, [pc, #176]	@ (8000b8c <handle_key+0xe8>)
- 8000adc:	781b      	ldrb	r3, [r3, #0]
- 8000ade:	461a      	mov	r2, r3
- 8000ae0:	4b2b      	ldr	r3, [pc, #172]	@ (8000b90 <handle_key+0xec>)
- 8000ae2:	2100      	movs	r1, #0
- 8000ae4:	5499      	strb	r1, [r3, r2]
+ 8000c74:	b580      	push	{r7, lr}
+ 8000c76:	b082      	sub	sp, #8
+ 8000c78:	af00      	add	r7, sp, #0
+ 8000c7a:	4603      	mov	r3, r0
+ 8000c7c:	71fb      	strb	r3, [r7, #7]
+    // The lab calls for brief feedback on every physical keypress.
+    start_normal_beep(KEY_BEEP_MS);
+ 8000c7e:	2064      	movs	r0, #100	@ 0x64
+ 8000c80:	f7ff ff6c 	bl	8000b5c <start_normal_beep>
 
-        lcd_write('*', 1U);
- 8000ae6:	2101      	movs	r1, #1
- 8000ae8:	202a      	movs	r0, #42	@ 0x2a
- 8000aea:	f7ff fd3f 	bl	800056c <lcd_write>
-
-        // Short keypress beep (100 ms).
-        buzzer_on();
- 8000aee:	f7ff fda3 	bl	8000638 <buzzer_on>
-        buzzer_start_ms = now_ms;
- 8000af2:	4b28      	ldr	r3, [pc, #160]	@ (8000b94 <handle_key+0xf0>)
- 8000af4:	681b      	ldr	r3, [r3, #0]
- 8000af6:	4a28      	ldr	r2, [pc, #160]	@ (8000b98 <handle_key+0xf4>)
- 8000af8:	6013      	str	r3, [r2, #0]
-        buzzer_duration_ms = 100U;
- 8000afa:	4b28      	ldr	r3, [pc, #160]	@ (8000b9c <handle_key+0xf8>)
- 8000afc:	2264      	movs	r2, #100	@ 0x64
- 8000afe:	601a      	str	r2, [r3, #0]
-        buzzer_active = 1U;
- 8000b00:	4b27      	ldr	r3, [pc, #156]	@ (8000ba0 <handle_key+0xfc>)
- 8000b02:	2201      	movs	r2, #1
- 8000b04:	701a      	strb	r2, [r3, #0]
+    // Non-numeric keys are ignored by the PIN-entry mechanism.
+    if (key < '0' || key > '9' || pin_index >= PIN_LENGTH) {
+ 8000c84:	79fb      	ldrb	r3, [r7, #7]
+ 8000c86:	2b2f      	cmp	r3, #47	@ 0x2f
+ 8000c88:	d94f      	bls.n	8000d2a <handle_key+0xb6>
+ 8000c8a:	79fb      	ldrb	r3, [r7, #7]
+ 8000c8c:	2b39      	cmp	r3, #57	@ 0x39
+ 8000c8e:	d84c      	bhi.n	8000d2a <handle_key+0xb6>
+ 8000c90:	4b28      	ldr	r3, [pc, #160]	@ (8000d34 <handle_key+0xc0>)
+ 8000c92:	781b      	ldrb	r3, [r3, #0]
+ 8000c94:	2b03      	cmp	r3, #3
+ 8000c96:	d848      	bhi.n	8000d2a <handle_key+0xb6>
+        return;
     }
 
-    if (pin_index == 4U) {
- 8000b06:	4b21      	ldr	r3, [pc, #132]	@ (8000b8c <handle_key+0xe8>)
- 8000b08:	781b      	ldrb	r3, [r3, #0]
- 8000b0a:	2b04      	cmp	r3, #4
- 8000b0c:	d13a      	bne.n	8000b84 <handle_key+0xe0>
+    entered_pin[pin_index] = key;
+ 8000c98:	4b26      	ldr	r3, [pc, #152]	@ (8000d34 <handle_key+0xc0>)
+ 8000c9a:	781b      	ldrb	r3, [r3, #0]
+ 8000c9c:	4619      	mov	r1, r3
+ 8000c9e:	4a26      	ldr	r2, [pc, #152]	@ (8000d38 <handle_key+0xc4>)
+ 8000ca0:	79fb      	ldrb	r3, [r7, #7]
+ 8000ca2:	5453      	strb	r3, [r2, r1]
+    ++pin_index;
+ 8000ca4:	4b23      	ldr	r3, [pc, #140]	@ (8000d34 <handle_key+0xc0>)
+ 8000ca6:	781b      	ldrb	r3, [r3, #0]
+ 8000ca8:	3301      	adds	r3, #1
+ 8000caa:	b2da      	uxtb	r2, r3
+ 8000cac:	4b21      	ldr	r3, [pc, #132]	@ (8000d34 <handle_key+0xc0>)
+ 8000cae:	701a      	strb	r2, [r3, #0]
+    entered_pin[pin_index] = '\0';
+ 8000cb0:	4b20      	ldr	r3, [pc, #128]	@ (8000d34 <handle_key+0xc0>)
+ 8000cb2:	781b      	ldrb	r3, [r3, #0]
+ 8000cb4:	461a      	mov	r2, r3
+ 8000cb6:	4b20      	ldr	r3, [pc, #128]	@ (8000d38 <handle_key+0xc4>)
+ 8000cb8:	2100      	movs	r1, #0
+ 8000cba:	5499      	strb	r1, [r3, r2]
+    lcd_write('*', 1U);
+ 8000cbc:	2101      	movs	r1, #1
+ 8000cbe:	202a      	movs	r0, #42	@ 0x2a
+ 8000cc0:	f7ff fc54 	bl	800056c <lcd_write>
+
+    if (pin_index == PIN_LENGTH) {
+ 8000cc4:	4b1b      	ldr	r3, [pc, #108]	@ (8000d34 <handle_key+0xc0>)
+ 8000cc6:	781b      	ldrb	r3, [r3, #0]
+ 8000cc8:	2b04      	cmp	r3, #4
+ 8000cca:	d12f      	bne.n	8000d2c <handle_key+0xb8>
         if (strcmp(entered_pin, PASS_CODE) == 0) {
- 8000b0e:	4925      	ldr	r1, [pc, #148]	@ (8000ba4 <handle_key+0x100>)
- 8000b10:	481f      	ldr	r0, [pc, #124]	@ (8000b90 <handle_key+0xec>)
- 8000b12:	f7ff fb79 	bl	8000208 <strcmp>
- 8000b16:	4603      	mov	r3, r0
- 8000b18:	2b00      	cmp	r3, #0
- 8000b1a:	d117      	bne.n	8000b4c <handle_key+0xa8>
-            lcd_write(LCD_LINE2, 0U);
- 8000b1c:	2100      	movs	r1, #0
- 8000b1e:	20c0      	movs	r0, #192	@ 0xc0
- 8000b20:	f7ff fd24 	bl	800056c <lcd_write>
-            lcd_print("Access Granted");
- 8000b24:	4820      	ldr	r0, [pc, #128]	@ (8000ba8 <handle_key+0x104>)
- 8000b26:	f7ff fd42 	bl	80005ae <lcd_print>
-
-            // Override the last keypress beep with a 2-second tone.
-            buzzer_on();
- 8000b2a:	f7ff fd85 	bl	8000638 <buzzer_on>
-            buzzer_start_ms = now_ms;
- 8000b2e:	4b19      	ldr	r3, [pc, #100]	@ (8000b94 <handle_key+0xf0>)
- 8000b30:	681b      	ldr	r3, [r3, #0]
- 8000b32:	4a19      	ldr	r2, [pc, #100]	@ (8000b98 <handle_key+0xf4>)
- 8000b34:	6013      	str	r3, [r2, #0]
-            buzzer_duration_ms = 2000U;
- 8000b36:	4b19      	ldr	r3, [pc, #100]	@ (8000b9c <handle_key+0xf8>)
- 8000b38:	f44f 62fa 	mov.w	r2, #2000	@ 0x7d0
- 8000b3c:	601a      	str	r2, [r3, #0]
-            buzzer_active = 1U;
- 8000b3e:	4b18      	ldr	r3, [pc, #96]	@ (8000ba0 <handle_key+0xfc>)
- 8000b40:	2201      	movs	r2, #1
- 8000b42:	701a      	strb	r2, [r3, #0]
-
-            fail_count = 0U;  // Successful PIN resets consecutive failures.
- 8000b44:	4b19      	ldr	r3, [pc, #100]	@ (8000bac <handle_key+0x108>)
- 8000b46:	2200      	movs	r2, #0
- 8000b48:	701a      	strb	r2, [r3, #0]
- 8000b4a:	e00c      	b.n	8000b66 <handle_key+0xc2>
+ 8000ccc:	491b      	ldr	r1, [pc, #108]	@ (8000d3c <handle_key+0xc8>)
+ 8000cce:	481a      	ldr	r0, [pc, #104]	@ (8000d38 <handle_key+0xc4>)
+ 8000cd0:	f7ff fa9a 	bl	8000208 <strcmp>
+ 8000cd4:	4603      	mov	r3, r0
+ 8000cd6:	2b00      	cmp	r3, #0
+ 8000cd8:	d10c      	bne.n	8000cf4 <handle_key+0x80>
+            fail_count = 0U;
+ 8000cda:	4b19      	ldr	r3, [pc, #100]	@ (8000d40 <handle_key+0xcc>)
+ 8000cdc:	2200      	movs	r2, #0
+ 8000cde:	701a      	strb	r2, [r3, #0]
+            start_normal_beep(SUCCESS_BEEP_MS); // Overrides 100 ms beep.
+ 8000ce0:	f44f 60fa 	mov.w	r0, #2000	@ 0x7d0
+ 8000ce4:	f7ff ff3a 	bl	8000b5c <start_normal_beep>
+            show_result_for("Access Granted", SUCCESS_MESSAGE_MS);
+ 8000ce8:	f44f 61fa 	mov.w	r1, #2000	@ 0x7d0
+ 8000cec:	4815      	ldr	r0, [pc, #84]	@ (8000d44 <handle_key+0xd0>)
+ 8000cee:	f7ff ff51 	bl	8000b94 <show_result_for>
+ 8000cf2:	e011      	b.n	8000d18 <handle_key+0xa4>
         } else {
-            lcd_write(LCD_LINE2, 0U);
- 8000b4c:	2100      	movs	r1, #0
- 8000b4e:	20c0      	movs	r0, #192	@ 0xc0
- 8000b50:	f7ff fd0c 	bl	800056c <lcd_write>
-            lcd_print("Incorrect pin");
- 8000b54:	4816      	ldr	r0, [pc, #88]	@ (8000bb0 <handle_key+0x10c>)
- 8000b56:	f7ff fd2a 	bl	80005ae <lcd_print>
-            fail_count++;
- 8000b5a:	4b14      	ldr	r3, [pc, #80]	@ (8000bac <handle_key+0x108>)
- 8000b5c:	781b      	ldrb	r3, [r3, #0]
- 8000b5e:	3301      	adds	r3, #1
- 8000b60:	b2da      	uxtb	r2, r3
- 8000b62:	4b12      	ldr	r3, [pc, #72]	@ (8000bac <handle_key+0x108>)
- 8000b64:	701a      	strb	r2, [r3, #0]
+            ++fail_count;
+ 8000cf4:	4b12      	ldr	r3, [pc, #72]	@ (8000d40 <handle_key+0xcc>)
+ 8000cf6:	781b      	ldrb	r3, [r3, #0]
+ 8000cf8:	3301      	adds	r3, #1
+ 8000cfa:	b2da      	uxtb	r2, r3
+ 8000cfc:	4b10      	ldr	r3, [pc, #64]	@ (8000d40 <handle_key+0xcc>)
+ 8000cfe:	701a      	strb	r2, [r3, #0]
+            if (fail_count >= 3U) {
+ 8000d00:	4b0f      	ldr	r3, [pc, #60]	@ (8000d40 <handle_key+0xcc>)
+ 8000d02:	781b      	ldrb	r3, [r3, #0]
+ 8000d04:	2b02      	cmp	r3, #2
+ 8000d06:	d902      	bls.n	8000d0e <handle_key+0x9a>
+                start_security_lockout();
+ 8000d08:	f7ff ff6a 	bl	8000be0 <start_security_lockout>
+ 8000d0c:	e004      	b.n	8000d18 <handle_key+0xa4>
+            } else {
+                show_result_for("Incorrect PIN", ERROR_MESSAGE_MS);
+ 8000d0e:	f44f 717a 	mov.w	r1, #1000	@ 0x3e8
+ 8000d12:	480d      	ldr	r0, [pc, #52]	@ (8000d48 <handle_key+0xd4>)
+ 8000d14:	f7ff ff3e 	bl	8000b94 <show_result_for>
+            }
         }
 
-        // Clear the previous PIN for another entry.
-        entered_pin[0] = '\0';
- 8000b66:	4b0a      	ldr	r3, [pc, #40]	@ (8000b90 <handle_key+0xec>)
- 8000b68:	2200      	movs	r2, #0
- 8000b6a:	701a      	strb	r2, [r3, #0]
-        entered_pin[1] = '\0';
- 8000b6c:	4b08      	ldr	r3, [pc, #32]	@ (8000b90 <handle_key+0xec>)
- 8000b6e:	2200      	movs	r2, #0
- 8000b70:	705a      	strb	r2, [r3, #1]
-        entered_pin[2] = '\0';
- 8000b72:	4b07      	ldr	r3, [pc, #28]	@ (8000b90 <handle_key+0xec>)
- 8000b74:	2200      	movs	r2, #0
- 8000b76:	709a      	strb	r2, [r3, #2]
-        entered_pin[3] = '\0';
- 8000b78:	4b05      	ldr	r3, [pc, #20]	@ (8000b90 <handle_key+0xec>)
- 8000b7a:	2200      	movs	r2, #0
- 8000b7c:	70da      	strb	r2, [r3, #3]
+        // Reset PIN buffer while retaining the result/lockout display.
+        memset(entered_pin, 0, sizeof(entered_pin));
+ 8000d18:	2205      	movs	r2, #5
+ 8000d1a:	2100      	movs	r1, #0
+ 8000d1c:	4806      	ldr	r0, [pc, #24]	@ (8000d38 <handle_key+0xc4>)
+ 8000d1e:	f000 fa0b 	bl	8001138 <memset>
         pin_index = 0U;
- 8000b7e:	4b03      	ldr	r3, [pc, #12]	@ (8000b8c <handle_key+0xe8>)
- 8000b80:	2200      	movs	r2, #0
- 8000b82:	701a      	strb	r2, [r3, #0]
+ 8000d22:	4b04      	ldr	r3, [pc, #16]	@ (8000d34 <handle_key+0xc0>)
+ 8000d24:	2200      	movs	r2, #0
+ 8000d26:	701a      	strb	r2, [r3, #0]
+ 8000d28:	e000      	b.n	8000d2c <handle_key+0xb8>
+        return;
+ 8000d2a:	bf00      	nop
     }
 }
- 8000b84:	bf00      	nop
- 8000b86:	3708      	adds	r7, #8
- 8000b88:	46bd      	mov	sp, r7
- 8000b8a:	bd80      	pop	{r7, pc}
- 8000b8c:	20000029 	.word	0x20000029
- 8000b90:	20000024 	.word	0x20000024
- 8000b94:	20000040 	.word	0x20000040
- 8000b98:	2000002c 	.word	0x2000002c
- 8000b9c:	20000030 	.word	0x20000030
- 8000ba0:	20000034 	.word	0x20000034
- 8000ba4:	08000f74 	.word	0x08000f74
- 8000ba8:	08000f7c 	.word	0x08000f7c
- 8000bac:	2000003d 	.word	0x2000003d
- 8000bb0:	08000f8c 	.word	0x08000f8c
+ 8000d2c:	3708      	adds	r7, #8
+ 8000d2e:	46bd      	mov	sp, r7
+ 8000d30:	bd80      	pop	{r7, pc}
+ 8000d32:	bf00      	nop
+ 8000d34:	20000031 	.word	0x20000031
+ 8000d38:	2000002c 	.word	0x2000002c
+ 8000d3c:	080011dc 	.word	0x080011dc
+ 8000d40:	20000045 	.word	0x20000045
+ 8000d44:	080011e4 	.word	0x080011e4
+ 8000d48:	080011f4 	.word	0x080011f4
 
-08000bb4 <main>:
+08000d4c <update_release_debounce>:
 
 // ============================================================
-// MAIN: INITIALIZATION AND POLLED STATE MACHINE
+// MAIN-LOOP STATE UPDATES
+// ============================================================
+void update_release_debounce(void) {
+ 8000d4c:	b480      	push	{r7}
+ 8000d4e:	af00      	add	r7, sp, #0
+    if (!keypad_locked) {
+ 8000d50:	4b18      	ldr	r3, [pc, #96]	@ (8000db4 <update_release_debounce+0x68>)
+ 8000d52:	781b      	ldrb	r3, [r3, #0]
+ 8000d54:	b2db      	uxtb	r3, r3
+ 8000d56:	2b00      	cmp	r3, #0
+ 8000d58:	d026      	beq.n	8000da8 <update_release_debounce+0x5c>
+        return;
+    }
+
+    if ((GPIOI->IDR & COLUMN_MASK) != COLUMN_MASK) {
+ 8000d5a:	4b17      	ldr	r3, [pc, #92]	@ (8000db8 <update_release_debounce+0x6c>)
+ 8000d5c:	691b      	ldr	r3, [r3, #16]
+ 8000d5e:	f003 030f 	and.w	r3, r3, #15
+ 8000d62:	2b0f      	cmp	r3, #15
+ 8000d64:	d003      	beq.n	8000d6e <update_release_debounce+0x22>
+        release_started = 0U;
+ 8000d66:	4b15      	ldr	r3, [pc, #84]	@ (8000dbc <update_release_debounce+0x70>)
+ 8000d68:	2200      	movs	r2, #0
+ 8000d6a:	701a      	strb	r2, [r3, #0]
+        return;
+ 8000d6c:	e01d      	b.n	8000daa <update_release_debounce+0x5e>
+    }
+
+    if (!release_started) {
+ 8000d6e:	4b13      	ldr	r3, [pc, #76]	@ (8000dbc <update_release_debounce+0x70>)
+ 8000d70:	781b      	ldrb	r3, [r3, #0]
+ 8000d72:	2b00      	cmp	r3, #0
+ 8000d74:	d107      	bne.n	8000d86 <update_release_debounce+0x3a>
+        release_started = 1U;
+ 8000d76:	4b11      	ldr	r3, [pc, #68]	@ (8000dbc <update_release_debounce+0x70>)
+ 8000d78:	2201      	movs	r2, #1
+ 8000d7a:	701a      	strb	r2, [r3, #0]
+        release_time = now_ms;
+ 8000d7c:	4b10      	ldr	r3, [pc, #64]	@ (8000dc0 <update_release_debounce+0x74>)
+ 8000d7e:	681b      	ldr	r3, [r3, #0]
+ 8000d80:	4a10      	ldr	r2, [pc, #64]	@ (8000dc4 <update_release_debounce+0x78>)
+ 8000d82:	6013      	str	r3, [r2, #0]
+ 8000d84:	e011      	b.n	8000daa <update_release_debounce+0x5e>
+    } else if ((uint32_t)(now_ms - release_time) >= 20U) {
+ 8000d86:	4b0e      	ldr	r3, [pc, #56]	@ (8000dc0 <update_release_debounce+0x74>)
+ 8000d88:	681a      	ldr	r2, [r3, #0]
+ 8000d8a:	4b0e      	ldr	r3, [pc, #56]	@ (8000dc4 <update_release_debounce+0x78>)
+ 8000d8c:	681b      	ldr	r3, [r3, #0]
+ 8000d8e:	1ad3      	subs	r3, r2, r3
+ 8000d90:	2b13      	cmp	r3, #19
+ 8000d92:	d90a      	bls.n	8000daa <update_release_debounce+0x5e>
+        keypad_locked = 0U;
+ 8000d94:	4b07      	ldr	r3, [pc, #28]	@ (8000db4 <update_release_debounce+0x68>)
+ 8000d96:	2200      	movs	r2, #0
+ 8000d98:	701a      	strb	r2, [r3, #0]
+        release_started = 0U;
+ 8000d9a:	4b08      	ldr	r3, [pc, #32]	@ (8000dbc <update_release_debounce+0x70>)
+ 8000d9c:	2200      	movs	r2, #0
+ 8000d9e:	701a      	strb	r2, [r3, #0]
+        keypad_rearm_pending = 1U;
+ 8000da0:	4b09      	ldr	r3, [pc, #36]	@ (8000dc8 <update_release_debounce+0x7c>)
+ 8000da2:	2201      	movs	r2, #1
+ 8000da4:	701a      	strb	r2, [r3, #0]
+ 8000da6:	e000      	b.n	8000daa <update_release_debounce+0x5e>
+        return;
+ 8000da8:	bf00      	nop
+    }
+}
+ 8000daa:	46bd      	mov	sp, r7
+ 8000dac:	f85d 7b04 	ldr.w	r7, [sp], #4
+ 8000db0:	4770      	bx	lr
+ 8000db2:	bf00      	nop
+ 8000db4:	20000029 	.word	0x20000029
+ 8000db8:	40022000 	.word	0x40022000
+ 8000dbc:	20000058 	.word	0x20000058
+ 8000dc0:	20000054 	.word	0x20000054
+ 8000dc4:	2000005c 	.word	0x2000005c
+ 8000dc8:	20000050 	.word	0x20000050
+
+08000dcc <update_normal_buzzer>:
+
+void update_normal_buzzer(void) {
+ 8000dcc:	b580      	push	{r7, lr}
+ 8000dce:	af00      	add	r7, sp, #0
+    if (!lockout_active && buzzer_active &&
+ 8000dd0:	4b0b      	ldr	r3, [pc, #44]	@ (8000e00 <update_normal_buzzer+0x34>)
+ 8000dd2:	781b      	ldrb	r3, [r3, #0]
+ 8000dd4:	2b00      	cmp	r3, #0
+ 8000dd6:	d111      	bne.n	8000dfc <update_normal_buzzer+0x30>
+ 8000dd8:	4b0a      	ldr	r3, [pc, #40]	@ (8000e04 <update_normal_buzzer+0x38>)
+ 8000dda:	781b      	ldrb	r3, [r3, #0]
+ 8000ddc:	2b00      	cmp	r3, #0
+ 8000dde:	d00d      	beq.n	8000dfc <update_normal_buzzer+0x30>
+        (uint32_t)(now_ms - buzzer_start_ms) >= buzzer_duration_ms) {
+ 8000de0:	4b09      	ldr	r3, [pc, #36]	@ (8000e08 <update_normal_buzzer+0x3c>)
+ 8000de2:	681a      	ldr	r2, [r3, #0]
+ 8000de4:	4b09      	ldr	r3, [pc, #36]	@ (8000e0c <update_normal_buzzer+0x40>)
+ 8000de6:	681b      	ldr	r3, [r3, #0]
+ 8000de8:	1ad2      	subs	r2, r2, r3
+ 8000dea:	4b09      	ldr	r3, [pc, #36]	@ (8000e10 <update_normal_buzzer+0x44>)
+ 8000dec:	681b      	ldr	r3, [r3, #0]
+    if (!lockout_active && buzzer_active &&
+ 8000dee:	429a      	cmp	r2, r3
+ 8000df0:	d304      	bcc.n	8000dfc <update_normal_buzzer+0x30>
+        buzzer_off();
+ 8000df2:	f7ff fc2d 	bl	8000650 <buzzer_off>
+        buzzer_active = 0U;
+ 8000df6:	4b03      	ldr	r3, [pc, #12]	@ (8000e04 <update_normal_buzzer+0x38>)
+ 8000df8:	2200      	movs	r2, #0
+ 8000dfa:	701a      	strb	r2, [r3, #0]
+    }
+}
+ 8000dfc:	bf00      	nop
+ 8000dfe:	bd80      	pop	{r7, pc}
+ 8000e00:	20000044 	.word	0x20000044
+ 8000e04:	2000003c 	.word	0x2000003c
+ 8000e08:	20000054 	.word	0x20000054
+ 8000e0c:	20000034 	.word	0x20000034
+ 8000e10:	20000038 	.word	0x20000038
+
+08000e14 <update_result_message>:
+
+void update_result_message(void) {
+ 8000e14:	b580      	push	{r7, lr}
+ 8000e16:	af00      	add	r7, sp, #0
+    if (result_message_active &&
+ 8000e18:	4b0b      	ldr	r3, [pc, #44]	@ (8000e48 <update_result_message+0x34>)
+ 8000e1a:	781b      	ldrb	r3, [r3, #0]
+ 8000e1c:	2b00      	cmp	r3, #0
+ 8000e1e:	d010      	beq.n	8000e42 <update_result_message+0x2e>
+        (uint32_t)(now_ms - result_message_start_ms) >=
+ 8000e20:	4b0a      	ldr	r3, [pc, #40]	@ (8000e4c <update_result_message+0x38>)
+ 8000e22:	681a      	ldr	r2, [r3, #0]
+ 8000e24:	4b0a      	ldr	r3, [pc, #40]	@ (8000e50 <update_result_message+0x3c>)
+ 8000e26:	681b      	ldr	r3, [r3, #0]
+ 8000e28:	1ad2      	subs	r2, r2, r3
+ 8000e2a:	4b0a      	ldr	r3, [pc, #40]	@ (8000e54 <update_result_message+0x40>)
+ 8000e2c:	681b      	ldr	r3, [r3, #0]
+    if (result_message_active &&
+ 8000e2e:	429a      	cmp	r2, r3
+ 8000e30:	d307      	bcc.n	8000e42 <update_result_message+0x2e>
+            result_message_duration_ms) {
+        result_message_active = 0U;
+ 8000e32:	4b05      	ldr	r3, [pc, #20]	@ (8000e48 <update_result_message+0x34>)
+ 8000e34:	2200      	movs	r2, #0
+ 8000e36:	701a      	strb	r2, [r3, #0]
+        lcd_show_pin_prompt();
+ 8000e38:	f7ff fdfc 	bl	8000a34 <lcd_show_pin_prompt>
+        keypad_rearm_pending = 1U;
+ 8000e3c:	4b06      	ldr	r3, [pc, #24]	@ (8000e58 <update_result_message+0x44>)
+ 8000e3e:	2201      	movs	r2, #1
+ 8000e40:	701a      	strb	r2, [r3, #0]
+    }
+}
+ 8000e42:	bf00      	nop
+ 8000e44:	bd80      	pop	{r7, pc}
+ 8000e46:	bf00      	nop
+ 8000e48:	20000046 	.word	0x20000046
+ 8000e4c:	20000054 	.word	0x20000054
+ 8000e50:	20000048 	.word	0x20000048
+ 8000e54:	2000004c 	.word	0x2000004c
+ 8000e58:	20000050 	.word	0x20000050
+
+08000e5c <update_security_lockout>:
+
+void update_security_lockout(void) {
+ 8000e5c:	b580      	push	{r7, lr}
+ 8000e5e:	b084      	sub	sp, #16
+ 8000e60:	af00      	add	r7, sp, #0
+    if (!lockout_active) {
+ 8000e62:	4b29      	ldr	r3, [pc, #164]	@ (8000f08 <update_security_lockout+0xac>)
+ 8000e64:	781b      	ldrb	r3, [r3, #0]
+ 8000e66:	2b00      	cmp	r3, #0
+ 8000e68:	d04a      	beq.n	8000f00 <update_security_lockout+0xa4>
+        return;
+    }
+
+    uint32_t elapsed_ms = (uint32_t)(now_ms - lockout_start_ms);
+ 8000e6a:	4b28      	ldr	r3, [pc, #160]	@ (8000f0c <update_security_lockout+0xb0>)
+ 8000e6c:	681a      	ldr	r2, [r3, #0]
+ 8000e6e:	4b28      	ldr	r3, [pc, #160]	@ (8000f10 <update_security_lockout+0xb4>)
+ 8000e70:	681b      	ldr	r3, [r3, #0]
+ 8000e72:	1ad3      	subs	r3, r2, r3
+ 8000e74:	60fb      	str	r3, [r7, #12]
+    if (elapsed_ms >= LOCKOUT_DURATION_MS) {
+ 8000e76:	68fb      	ldr	r3, [r7, #12]
+ 8000e78:	f247 522f 	movw	r2, #29999	@ 0x752f
+ 8000e7c:	4293      	cmp	r3, r2
+ 8000e7e:	d90d      	bls.n	8000e9c <update_security_lockout+0x40>
+        buzzer_off();
+ 8000e80:	f7ff fbe6 	bl	8000650 <buzzer_off>
+        buzzer_active = 0U;
+ 8000e84:	4b23      	ldr	r3, [pc, #140]	@ (8000f14 <update_security_lockout+0xb8>)
+ 8000e86:	2200      	movs	r2, #0
+ 8000e88:	701a      	strb	r2, [r3, #0]
+        lockout_active = 0U;
+ 8000e8a:	4b1f      	ldr	r3, [pc, #124]	@ (8000f08 <update_security_lockout+0xac>)
+ 8000e8c:	2200      	movs	r2, #0
+ 8000e8e:	701a      	strb	r2, [r3, #0]
+        lcd_show_pin_prompt();
+ 8000e90:	f7ff fdd0 	bl	8000a34 <lcd_show_pin_prompt>
+        keypad_rearm_pending = 1U;
+ 8000e94:	4b20      	ldr	r3, [pc, #128]	@ (8000f18 <update_security_lockout+0xbc>)
+ 8000e96:	2201      	movs	r2, #1
+ 8000e98:	701a      	strb	r2, [r3, #0]
+        return;
+ 8000e9a:	e032      	b.n	8000f02 <update_security_lockout+0xa6>
+    }
+
+    // Alternating seconds: 1 s ON, 1 s OFF, repeated.
+    uint8_t should_sound = ((elapsed_ms / 1000U) % 2U) == 0U;
+ 8000e9c:	68fb      	ldr	r3, [r7, #12]
+ 8000e9e:	4a1f      	ldr	r2, [pc, #124]	@ (8000f1c <update_security_lockout+0xc0>)
+ 8000ea0:	fba2 2303 	umull	r2, r3, r2, r3
+ 8000ea4:	099b      	lsrs	r3, r3, #6
+ 8000ea6:	f003 0301 	and.w	r3, r3, #1
+ 8000eaa:	2b00      	cmp	r3, #0
+ 8000eac:	bf0c      	ite	eq
+ 8000eae:	2301      	moveq	r3, #1
+ 8000eb0:	2300      	movne	r3, #0
+ 8000eb2:	b2db      	uxtb	r3, r3
+ 8000eb4:	72fb      	strb	r3, [r7, #11]
+    if (should_sound != buzzer_active) {
+ 8000eb6:	4b17      	ldr	r3, [pc, #92]	@ (8000f14 <update_security_lockout+0xb8>)
+ 8000eb8:	781b      	ldrb	r3, [r3, #0]
+ 8000eba:	7afa      	ldrb	r2, [r7, #11]
+ 8000ebc:	429a      	cmp	r2, r3
+ 8000ebe:	d00a      	beq.n	8000ed6 <update_security_lockout+0x7a>
+        if (should_sound) {
+ 8000ec0:	7afb      	ldrb	r3, [r7, #11]
+ 8000ec2:	2b00      	cmp	r3, #0
+ 8000ec4:	d002      	beq.n	8000ecc <update_security_lockout+0x70>
+            buzzer_on();
+ 8000ec6:	f7ff fbb7 	bl	8000638 <buzzer_on>
+ 8000eca:	e001      	b.n	8000ed0 <update_security_lockout+0x74>
+        } else {
+            buzzer_off();
+ 8000ecc:	f7ff fbc0 	bl	8000650 <buzzer_off>
+        }
+        buzzer_active = should_sound;
+ 8000ed0:	4a10      	ldr	r2, [pc, #64]	@ (8000f14 <update_security_lockout+0xb8>)
+ 8000ed2:	7afb      	ldrb	r3, [r7, #11]
+ 8000ed4:	7013      	strb	r3, [r2, #0]
+    }
+
+    // Round up so 30 appears initially and 1 remains until expiry.
+    uint32_t seconds_remaining =
+        (LOCKOUT_DURATION_MS - elapsed_ms + 999U) / 1000U;
+ 8000ed6:	68fa      	ldr	r2, [r7, #12]
+ 8000ed8:	f647 1317 	movw	r3, #30999	@ 0x7917
+ 8000edc:	1a9b      	subs	r3, r3, r2
+    uint32_t seconds_remaining =
+ 8000ede:	4a0f      	ldr	r2, [pc, #60]	@ (8000f1c <update_security_lockout+0xc0>)
+ 8000ee0:	fba2 2303 	umull	r2, r3, r2, r3
+ 8000ee4:	099b      	lsrs	r3, r3, #6
+ 8000ee6:	607b      	str	r3, [r7, #4]
+
+    if (seconds_remaining != last_displayed_second) {
+ 8000ee8:	4b0d      	ldr	r3, [pc, #52]	@ (8000f20 <update_security_lockout+0xc4>)
+ 8000eea:	681b      	ldr	r3, [r3, #0]
+ 8000eec:	687a      	ldr	r2, [r7, #4]
+ 8000eee:	429a      	cmp	r2, r3
+ 8000ef0:	d007      	beq.n	8000f02 <update_security_lockout+0xa6>
+        lcd_show_lockout_time(seconds_remaining);
+ 8000ef2:	6878      	ldr	r0, [r7, #4]
+ 8000ef4:	f7ff fe10 	bl	8000b18 <lcd_show_lockout_time>
+        last_displayed_second = seconds_remaining;
+ 8000ef8:	4a09      	ldr	r2, [pc, #36]	@ (8000f20 <update_security_lockout+0xc4>)
+ 8000efa:	687b      	ldr	r3, [r7, #4]
+ 8000efc:	6013      	str	r3, [r2, #0]
+ 8000efe:	e000      	b.n	8000f02 <update_security_lockout+0xa6>
+        return;
+ 8000f00:	bf00      	nop
+    }
+}
+ 8000f02:	3710      	adds	r7, #16
+ 8000f04:	46bd      	mov	sp, r7
+ 8000f06:	bd80      	pop	{r7, pc}
+ 8000f08:	20000044 	.word	0x20000044
+ 8000f0c:	20000054 	.word	0x20000054
+ 8000f10:	20000040 	.word	0x20000040
+ 8000f14:	2000003c 	.word	0x2000003c
+ 8000f18:	20000050 	.word	0x20000050
+ 8000f1c:	10624dd3 	.word	0x10624dd3
+ 8000f20:	20000004 	.word	0x20000004
+
+08000f24 <update_keypad_rearm>:
+
+void update_keypad_rearm(void) {
+ 8000f24:	b480      	push	{r7}
+ 8000f26:	af00      	add	r7, sp, #0
+    if (!keypad_rearm_pending || keypad_locked ||
+ 8000f28:	4b14      	ldr	r3, [pc, #80]	@ (8000f7c <update_keypad_rearm+0x58>)
+ 8000f2a:	781b      	ldrb	r3, [r3, #0]
+ 8000f2c:	2b00      	cmp	r3, #0
+ 8000f2e:	d01f      	beq.n	8000f70 <update_keypad_rearm+0x4c>
+ 8000f30:	4b13      	ldr	r3, [pc, #76]	@ (8000f80 <update_keypad_rearm+0x5c>)
+ 8000f32:	781b      	ldrb	r3, [r3, #0]
+ 8000f34:	b2db      	uxtb	r3, r3
+ 8000f36:	2b00      	cmp	r3, #0
+ 8000f38:	d11a      	bne.n	8000f70 <update_keypad_rearm+0x4c>
+ 8000f3a:	4b12      	ldr	r3, [pc, #72]	@ (8000f84 <update_keypad_rearm+0x60>)
+ 8000f3c:	781b      	ldrb	r3, [r3, #0]
+ 8000f3e:	2b00      	cmp	r3, #0
+ 8000f40:	d116      	bne.n	8000f70 <update_keypad_rearm+0x4c>
+        lockout_active || result_message_active) {
+ 8000f42:	4b11      	ldr	r3, [pc, #68]	@ (8000f88 <update_keypad_rearm+0x64>)
+ 8000f44:	781b      	ldrb	r3, [r3, #0]
+ 8000f46:	2b00      	cmp	r3, #0
+ 8000f48:	d112      	bne.n	8000f70 <update_keypad_rearm+0x4c>
+        return;
+    }
+
+    // Prevent a held key or an old pending edge from retriggering.
+    if ((GPIOI->IDR & COLUMN_MASK) == COLUMN_MASK) {
+ 8000f4a:	4b10      	ldr	r3, [pc, #64]	@ (8000f8c <update_keypad_rearm+0x68>)
+ 8000f4c:	691b      	ldr	r3, [r3, #16]
+ 8000f4e:	f003 030f 	and.w	r3, r3, #15
+ 8000f52:	2b0f      	cmp	r3, #15
+ 8000f54:	d10d      	bne.n	8000f72 <update_keypad_rearm+0x4e>
+        EXTI->PR = COLUMN_MASK;
+ 8000f56:	4b0e      	ldr	r3, [pc, #56]	@ (8000f90 <update_keypad_rearm+0x6c>)
+ 8000f58:	220f      	movs	r2, #15
+ 8000f5a:	615a      	str	r2, [r3, #20]
+        EXTI->IMR |= COLUMN_MASK;
+ 8000f5c:	4b0c      	ldr	r3, [pc, #48]	@ (8000f90 <update_keypad_rearm+0x6c>)
+ 8000f5e:	681b      	ldr	r3, [r3, #0]
+ 8000f60:	4a0b      	ldr	r2, [pc, #44]	@ (8000f90 <update_keypad_rearm+0x6c>)
+ 8000f62:	f043 030f 	orr.w	r3, r3, #15
+ 8000f66:	6013      	str	r3, [r2, #0]
+        keypad_rearm_pending = 0U;
+ 8000f68:	4b04      	ldr	r3, [pc, #16]	@ (8000f7c <update_keypad_rearm+0x58>)
+ 8000f6a:	2200      	movs	r2, #0
+ 8000f6c:	701a      	strb	r2, [r3, #0]
+ 8000f6e:	e000      	b.n	8000f72 <update_keypad_rearm+0x4e>
+        return;
+ 8000f70:	bf00      	nop
+    }
+}
+ 8000f72:	46bd      	mov	sp, r7
+ 8000f74:	f85d 7b04 	ldr.w	r7, [sp], #4
+ 8000f78:	4770      	bx	lr
+ 8000f7a:	bf00      	nop
+ 8000f7c:	20000050 	.word	0x20000050
+ 8000f80:	20000029 	.word	0x20000029
+ 8000f84:	20000044 	.word	0x20000044
+ 8000f88:	20000046 	.word	0x20000046
+ 8000f8c:	40022000 	.word	0x40022000
+ 8000f90:	40013c00 	.word	0x40013c00
+
+08000f94 <main>:
+
+// ============================================================
+// MAIN: INITIALIZE HARDWARE, POLL TIMER AND UPDATE STATES
 // ============================================================
 int main(void) {
- 8000bb4:	b580      	push	{r7, lr}
- 8000bb6:	b086      	sub	sp, #24
- 8000bb8:	af00      	add	r7, sp, #0
-    // Clock the GPIO ports used by the keypad, LCD, and buzzer.
+ 8000f94:	b580      	push	{r7, lr}
+ 8000f96:	b082      	sub	sp, #8
+ 8000f98:	af00      	add	r7, sp, #0
     RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN |
- 8000bba:	4b85      	ldr	r3, [pc, #532]	@ (8000dd0 <main+0x21c>)
- 8000bbc:	6b1a      	ldr	r2, [r3, #48]	@ 0x30
- 8000bbe:	4984      	ldr	r1, [pc, #528]	@ (8000dd0 <main+0x21c>)
- 8000bc0:	f240 1323 	movw	r3, #291	@ 0x123
- 8000bc4:	4313      	orrs	r3, r2
- 8000bc6:	630b      	str	r3, [r1, #48]	@ 0x30
+ 8000f9a:	4b21      	ldr	r3, [pc, #132]	@ (8001020 <main+0x8c>)
+ 8000f9c:	6b1a      	ldr	r2, [r3, #48]	@ 0x30
+ 8000f9e:	4920      	ldr	r1, [pc, #128]	@ (8001020 <main+0x8c>)
+ 8000fa0:	f240 1323 	movw	r3, #291	@ 0x123
+ 8000fa4:	4313      	orrs	r3, r2
+ 8000fa6:	630b      	str	r3, [r1, #48]	@ 0x30
                     RCC_AHB1ENR_GPIOBEN |
                     RCC_AHB1ENR_GPIOFEN |
                     RCC_AHB1ENR_GPIOIEN;
     RCC->APB2ENR |= RCC_APB2ENR_SYSCFGEN;
- 8000bc8:	4b81      	ldr	r3, [pc, #516]	@ (8000dd0 <main+0x21c>)
- 8000bca:	6c5b      	ldr	r3, [r3, #68]	@ 0x44
- 8000bcc:	4a80      	ldr	r2, [pc, #512]	@ (8000dd0 <main+0x21c>)
- 8000bce:	f443 4380 	orr.w	r3, r3, #16384	@ 0x4000
- 8000bd2:	6453      	str	r3, [r2, #68]	@ 0x44
+ 8000fa8:	4b1d      	ldr	r3, [pc, #116]	@ (8001020 <main+0x8c>)
+ 8000faa:	6c5b      	ldr	r3, [r3, #68]	@ 0x44
+ 8000fac:	4a1c      	ldr	r2, [pc, #112]	@ (8001020 <main+0x8c>)
+ 8000fae:	f443 4380 	orr.w	r3, r3, #16384	@ 0x4000
+ 8000fb2:	6453      	str	r3, [r2, #68]	@ 0x44
 
-    // LCD initialization is blocking, so complete it before starting TIM2.
+    // Initialize the LCD before starting the timebase.
     setup_lcd_data_bus();
- 8000bd4:	f7ff fb9a 	bl	800030c <setup_lcd_data_bus>
+ 8000fb4:	f7ff f9aa 	bl	800030c <setup_lcd_data_bus>
     setup_lcd();
- 8000bd8:	f7ff fc5c 	bl	8000494 <setup_lcd>
-    lcd_write(LCD_LINE1, 0U);
- 8000bdc:	2100      	movs	r1, #0
- 8000bde:	2080      	movs	r0, #128	@ 0x80
- 8000be0:	f7ff fcc4 	bl	800056c <lcd_write>
-    lcd_print("Enter PIN:");
- 8000be4:	487b      	ldr	r0, [pc, #492]	@ (8000dd4 <main+0x220>)
- 8000be6:	f7ff fce2 	bl	80005ae <lcd_print>
-    lcd_write(LCD_LINE2, 0U);
- 8000bea:	2100      	movs	r1, #0
- 8000bec:	20c0      	movs	r0, #192	@ 0xc0
- 8000bee:	f7ff fcbd 	bl	800056c <lcd_write>
+ 8000fb8:	f7ff fa6c 	bl	8000494 <setup_lcd>
+    lcd_show_pin_prompt();
+ 8000fbc:	f7ff fd3a 	bl	8000a34 <lcd_show_pin_prompt>
 
-    // Configure outputs and timer before enabling keypad interrupts.
     default_matrix_gpios();
- 8000bf2:	f7ff fd3b 	bl	800066c <default_matrix_gpios>
+ 8000fc0:	f7ff fb54 	bl	800066c <default_matrix_gpios>
     setup_buzzer();
- 8000bf6:	f7ff fcf1 	bl	80005dc <setup_buzzer>
+ 8000fc4:	f7ff fb0a 	bl	80005dc <setup_buzzer>
     configure_timer();
- 8000bfa:	f7ff fe1b 	bl	8000834 <configure_timer>
+ 8000fc8:	f7ff fc34 	bl	8000834 <configure_timer>
     configure_matrix_interrupts();
- 8000bfe:	f7ff fdc7 	bl	8000790 <configure_matrix_interrupts>
+ 8000fcc:	f7ff fbe0 	bl	8000790 <configure_matrix_interrupts>
 
     while (1) {
-        // 1. Advance software milliseconds when the polled update flag is set.
-    	now_ms = TIM2->CNT;
- 8000c02:	f04f 4380 	mov.w	r3, #1073741824	@ 0x40000000
- 8000c06:	6a5b      	ldr	r3, [r3, #36]	@ 0x24
- 8000c08:	4a73      	ldr	r2, [pc, #460]	@ (8000dd8 <main+0x224>)
- 8000c0a:	6013      	str	r3, [r2, #0]
-
-        // 2. Start the 30-second security lockout after three bad PINs.
-        if (fail_count >= 3U && !lockout_active) {
- 8000c0c:	4b73      	ldr	r3, [pc, #460]	@ (8000ddc <main+0x228>)
- 8000c0e:	781b      	ldrb	r3, [r3, #0]
- 8000c10:	2b02      	cmp	r3, #2
- 8000c12:	d920      	bls.n	8000c56 <main+0xa2>
- 8000c14:	4b72      	ldr	r3, [pc, #456]	@ (8000de0 <main+0x22c>)
- 8000c16:	781b      	ldrb	r3, [r3, #0]
- 8000c18:	2b00      	cmp	r3, #0
- 8000c1a:	d11c      	bne.n	8000c56 <main+0xa2>
-            EXTI->IMR &= ~COLUMN_MASK;
- 8000c1c:	4b71      	ldr	r3, [pc, #452]	@ (8000de4 <main+0x230>)
- 8000c1e:	681b      	ldr	r3, [r3, #0]
- 8000c20:	4a70      	ldr	r2, [pc, #448]	@ (8000de4 <main+0x230>)
- 8000c22:	f023 030f 	bic.w	r3, r3, #15
- 8000c26:	6013      	str	r3, [r2, #0]
-            fail_count = 0U;
- 8000c28:	4b6c      	ldr	r3, [pc, #432]	@ (8000ddc <main+0x228>)
- 8000c2a:	2200      	movs	r2, #0
- 8000c2c:	701a      	strb	r2, [r3, #0]
-            lockout_start_ms = now_ms;
- 8000c2e:	4b6a      	ldr	r3, [pc, #424]	@ (8000dd8 <main+0x224>)
- 8000c30:	681b      	ldr	r3, [r3, #0]
- 8000c32:	4a6d      	ldr	r2, [pc, #436]	@ (8000de8 <main+0x234>)
- 8000c34:	6013      	str	r3, [r2, #0]
-            lockout_active = 1U;
- 8000c36:	4b6a      	ldr	r3, [pc, #424]	@ (8000de0 <main+0x22c>)
- 8000c38:	2201      	movs	r2, #1
- 8000c3a:	701a      	strb	r2, [r3, #0]
-
-            // Begin the lockout buzzer with one second ON.
-            buzzer_start_ms = now_ms;
- 8000c3c:	4b66      	ldr	r3, [pc, #408]	@ (8000dd8 <main+0x224>)
- 8000c3e:	681b      	ldr	r3, [r3, #0]
- 8000c40:	4a6a      	ldr	r2, [pc, #424]	@ (8000dec <main+0x238>)
- 8000c42:	6013      	str	r3, [r2, #0]
-            buzzer_duration_ms = 1000U;
- 8000c44:	4b6a      	ldr	r3, [pc, #424]	@ (8000df0 <main+0x23c>)
- 8000c46:	f44f 727a 	mov.w	r2, #1000	@ 0x3e8
- 8000c4a:	601a      	str	r2, [r3, #0]
-            buzzer_active = 1U;
- 8000c4c:	4b69      	ldr	r3, [pc, #420]	@ (8000df4 <main+0x240>)
- 8000c4e:	2201      	movs	r2, #1
- 8000c50:	701a      	strb	r2, [r3, #0]
-            buzzer_on();
- 8000c52:	f7ff fcf1 	bl	8000638 <buzzer_on>
-        }
-
-        // 3. Consume keypad event published by the interrupt handler.
         if (key_ready) {
- 8000c56:	4b68      	ldr	r3, [pc, #416]	@ (8000df8 <main+0x244>)
- 8000c58:	781b      	ldrb	r3, [r3, #0]
- 8000c5a:	b2db      	uxtb	r3, r3
- 8000c5c:	2b00      	cmp	r3, #0
- 8000c5e:	d009      	beq.n	8000c74 <main+0xc0>
+ 8000fd0:	4b14      	ldr	r3, [pc, #80]	@ (8001024 <main+0x90>)
+ 8000fd2:	781b      	ldrb	r3, [r3, #0]
+ 8000fd4:	b2db      	uxtb	r3, r3
+ 8000fd6:	2b00      	cmp	r3, #0
+ 8000fd8:	d011      	beq.n	8000ffe <main+0x6a>
             char key = last_key;
- 8000c60:	4b66      	ldr	r3, [pc, #408]	@ (8000dfc <main+0x248>)
- 8000c62:	781b      	ldrb	r3, [r3, #0]
- 8000c64:	75fb      	strb	r3, [r7, #23]
+ 8000fda:	4b13      	ldr	r3, [pc, #76]	@ (8001028 <main+0x94>)
+ 8000fdc:	781b      	ldrb	r3, [r3, #0]
+ 8000fde:	71fb      	strb	r3, [r7, #7]
             key_ready = 0U;
- 8000c66:	4b64      	ldr	r3, [pc, #400]	@ (8000df8 <main+0x244>)
- 8000c68:	2200      	movs	r2, #0
- 8000c6a:	701a      	strb	r2, [r3, #0]
-            handle_key(key);
- 8000c6c:	7dfb      	ldrb	r3, [r7, #23]
- 8000c6e:	4618      	mov	r0, r3
- 8000c70:	f7ff ff18 	bl	8000aa4 <handle_key>
-        }
-
-        // 4. Release debounce; do not unmask EXTI during security lockout.
-        if (keypad_locked) {
- 8000c74:	4b62      	ldr	r3, [pc, #392]	@ (8000e00 <main+0x24c>)
- 8000c76:	781b      	ldrb	r3, [r3, #0]
- 8000c78:	b2db      	uxtb	r3, r3
- 8000c7a:	2b00      	cmp	r3, #0
- 8000c7c:	d034      	beq.n	8000ce8 <main+0x134>
-            if ((GPIOI->IDR & COLUMN_MASK) == COLUMN_MASK) {
- 8000c7e:	4b61      	ldr	r3, [pc, #388]	@ (8000e04 <main+0x250>)
- 8000c80:	691b      	ldr	r3, [r3, #16]
- 8000c82:	f003 030f 	and.w	r3, r3, #15
- 8000c86:	2b0f      	cmp	r3, #15
- 8000c88:	d12b      	bne.n	8000ce2 <main+0x12e>
-                if (!release_started) {
- 8000c8a:	4b5f      	ldr	r3, [pc, #380]	@ (8000e08 <main+0x254>)
- 8000c8c:	781b      	ldrb	r3, [r3, #0]
- 8000c8e:	2b00      	cmp	r3, #0
- 8000c90:	d107      	bne.n	8000ca2 <main+0xee>
-                    release_started = 1U;
- 8000c92:	4b5d      	ldr	r3, [pc, #372]	@ (8000e08 <main+0x254>)
- 8000c94:	2201      	movs	r2, #1
- 8000c96:	701a      	strb	r2, [r3, #0]
-                    release_time = now_ms;
- 8000c98:	4b4f      	ldr	r3, [pc, #316]	@ (8000dd8 <main+0x224>)
- 8000c9a:	681b      	ldr	r3, [r3, #0]
- 8000c9c:	4a5b      	ldr	r2, [pc, #364]	@ (8000e0c <main+0x258>)
- 8000c9e:	6013      	str	r3, [r2, #0]
- 8000ca0:	e022      	b.n	8000ce8 <main+0x134>
-                } else if ((uint32_t)(now_ms - release_time) >= 20U &&
- 8000ca2:	4b4d      	ldr	r3, [pc, #308]	@ (8000dd8 <main+0x224>)
- 8000ca4:	681a      	ldr	r2, [r3, #0]
- 8000ca6:	4b59      	ldr	r3, [pc, #356]	@ (8000e0c <main+0x258>)
- 8000ca8:	681b      	ldr	r3, [r3, #0]
- 8000caa:	1ad3      	subs	r3, r2, r3
- 8000cac:	2b13      	cmp	r3, #19
- 8000cae:	d91b      	bls.n	8000ce8 <main+0x134>
-                           !key_ready) {
- 8000cb0:	4b51      	ldr	r3, [pc, #324]	@ (8000df8 <main+0x244>)
- 8000cb2:	781b      	ldrb	r3, [r3, #0]
- 8000cb4:	b2db      	uxtb	r3, r3
-                } else if ((uint32_t)(now_ms - release_time) >= 20U &&
- 8000cb6:	2b00      	cmp	r3, #0
- 8000cb8:	d116      	bne.n	8000ce8 <main+0x134>
-                    EXTI->PR = COLUMN_MASK;
- 8000cba:	4b4a      	ldr	r3, [pc, #296]	@ (8000de4 <main+0x230>)
- 8000cbc:	220f      	movs	r2, #15
- 8000cbe:	615a      	str	r2, [r3, #20]
-                    keypad_locked = 0U;
- 8000cc0:	4b4f      	ldr	r3, [pc, #316]	@ (8000e00 <main+0x24c>)
- 8000cc2:	2200      	movs	r2, #0
- 8000cc4:	701a      	strb	r2, [r3, #0]
-
-                    if (!lockout_active) {
- 8000cc6:	4b46      	ldr	r3, [pc, #280]	@ (8000de0 <main+0x22c>)
- 8000cc8:	781b      	ldrb	r3, [r3, #0]
- 8000cca:	2b00      	cmp	r3, #0
- 8000ccc:	d105      	bne.n	8000cda <main+0x126>
-                        EXTI->IMR |= COLUMN_MASK;
- 8000cce:	4b45      	ldr	r3, [pc, #276]	@ (8000de4 <main+0x230>)
- 8000cd0:	681b      	ldr	r3, [r3, #0]
- 8000cd2:	4a44      	ldr	r2, [pc, #272]	@ (8000de4 <main+0x230>)
- 8000cd4:	f043 030f 	orr.w	r3, r3, #15
- 8000cd8:	6013      	str	r3, [r2, #0]
-                    }
-
-                    release_started = 0U;
- 8000cda:	4b4b      	ldr	r3, [pc, #300]	@ (8000e08 <main+0x254>)
- 8000cdc:	2200      	movs	r2, #0
- 8000cde:	701a      	strb	r2, [r3, #0]
- 8000ce0:	e002      	b.n	8000ce8 <main+0x134>
-                }
-            } else {
-                release_started = 0U;
- 8000ce2:	4b49      	ldr	r3, [pc, #292]	@ (8000e08 <main+0x254>)
- 8000ce4:	2200      	movs	r2, #0
- 8000ce6:	701a      	strb	r2, [r3, #0]
+ 8000fe0:	4b10      	ldr	r3, [pc, #64]	@ (8001024 <main+0x90>)
+ 8000fe2:	2200      	movs	r2, #0
+ 8000fe4:	701a      	strb	r2, [r3, #0]
+            if (!lockout_active && !result_message_active) {
+ 8000fe6:	4b11      	ldr	r3, [pc, #68]	@ (800102c <main+0x98>)
+ 8000fe8:	781b      	ldrb	r3, [r3, #0]
+ 8000fea:	2b00      	cmp	r3, #0
+ 8000fec:	d107      	bne.n	8000ffe <main+0x6a>
+ 8000fee:	4b10      	ldr	r3, [pc, #64]	@ (8001030 <main+0x9c>)
+ 8000ff0:	781b      	ldrb	r3, [r3, #0]
+ 8000ff2:	2b00      	cmp	r3, #0
+ 8000ff4:	d103      	bne.n	8000ffe <main+0x6a>
+                handle_key(key);
+ 8000ff6:	79fb      	ldrb	r3, [r7, #7]
+ 8000ff8:	4618      	mov	r0, r3
+ 8000ffa:	f7ff fe3b 	bl	8000c74 <handle_key>
             }
         }
 
-        // 5. Turn off ordinary keypress/success beeps at their deadline.
-        if (!lockout_active && buzzer_active &&
- 8000ce8:	4b3d      	ldr	r3, [pc, #244]	@ (8000de0 <main+0x22c>)
- 8000cea:	781b      	ldrb	r3, [r3, #0]
- 8000cec:	2b00      	cmp	r3, #0
- 8000cee:	d111      	bne.n	8000d14 <main+0x160>
- 8000cf0:	4b40      	ldr	r3, [pc, #256]	@ (8000df4 <main+0x240>)
- 8000cf2:	781b      	ldrb	r3, [r3, #0]
- 8000cf4:	2b00      	cmp	r3, #0
- 8000cf6:	d00d      	beq.n	8000d14 <main+0x160>
-            (uint32_t)(now_ms - buzzer_start_ms) >= buzzer_duration_ms) {
- 8000cf8:	4b37      	ldr	r3, [pc, #220]	@ (8000dd8 <main+0x224>)
- 8000cfa:	681a      	ldr	r2, [r3, #0]
- 8000cfc:	4b3b      	ldr	r3, [pc, #236]	@ (8000dec <main+0x238>)
- 8000cfe:	681b      	ldr	r3, [r3, #0]
- 8000d00:	1ad2      	subs	r2, r2, r3
- 8000d02:	4b3b      	ldr	r3, [pc, #236]	@ (8000df0 <main+0x23c>)
- 8000d04:	681b      	ldr	r3, [r3, #0]
-        if (!lockout_active && buzzer_active &&
- 8000d06:	429a      	cmp	r2, r3
- 8000d08:	d304      	bcc.n	8000d14 <main+0x160>
-            buzzer_off();
- 8000d0a:	f7ff fca1 	bl	8000650 <buzzer_off>
-            buzzer_active = 0U;
- 8000d0e:	4b39      	ldr	r3, [pc, #228]	@ (8000df4 <main+0x240>)
- 8000d10:	2200      	movs	r2, #0
- 8000d12:	701a      	strb	r2, [r3, #0]
-        }
+        // TIM2's 32-bit counter increments once per millisecond.
+        now_ms = TIM2->CNT;
+ 8000ffe:	f04f 4380 	mov.w	r3, #1073741824	@ 0x40000000
+ 8001002:	6a5b      	ldr	r3, [r3, #36]	@ 0x24
+ 8001004:	4a0b      	ldr	r2, [pc, #44]	@ (8001034 <main+0xa0>)
+ 8001006:	6013      	str	r3, [r2, #0]
 
-        // 6. Manage security lockout and alternating 1-second buzzer states.
-        if (lockout_active) {
- 8000d14:	4b32      	ldr	r3, [pc, #200]	@ (8000de0 <main+0x22c>)
- 8000d16:	781b      	ldrb	r3, [r3, #0]
- 8000d18:	2b00      	cmp	r3, #0
- 8000d1a:	f43f af72 	beq.w	8000c02 <main+0x4e>
-            if ((uint32_t)(now_ms - lockout_start_ms) >= LOCKOUT_DURATION) {
- 8000d1e:	4b2e      	ldr	r3, [pc, #184]	@ (8000dd8 <main+0x224>)
- 8000d20:	681a      	ldr	r2, [r3, #0]
- 8000d22:	4b31      	ldr	r3, [pc, #196]	@ (8000de8 <main+0x234>)
- 8000d24:	681b      	ldr	r3, [r3, #0]
- 8000d26:	1ad3      	subs	r3, r2, r3
- 8000d28:	f247 522f 	movw	r2, #29999	@ 0x752f
- 8000d2c:	4293      	cmp	r3, r2
- 8000d2e:	d90e      	bls.n	8000d4e <main+0x19a>
-                buzzer_off();
- 8000d30:	f7ff fc8e 	bl	8000650 <buzzer_off>
-                buzzer_active = 0U;
- 8000d34:	4b2f      	ldr	r3, [pc, #188]	@ (8000df4 <main+0x240>)
- 8000d36:	2200      	movs	r2, #0
- 8000d38:	701a      	strb	r2, [r3, #0]
-                lockout_active = 0U;
- 8000d3a:	4b29      	ldr	r3, [pc, #164]	@ (8000de0 <main+0x22c>)
- 8000d3c:	2200      	movs	r2, #0
- 8000d3e:	701a      	strb	r2, [r3, #0]
-                EXTI->IMR |= COLUMN_MASK;
- 8000d40:	4b28      	ldr	r3, [pc, #160]	@ (8000de4 <main+0x230>)
- 8000d42:	681b      	ldr	r3, [r3, #0]
- 8000d44:	4a27      	ldr	r2, [pc, #156]	@ (8000de4 <main+0x230>)
- 8000d46:	f043 030f 	orr.w	r3, r3, #15
- 8000d4a:	6013      	str	r3, [r2, #0]
- 8000d4c:	e02c      	b.n	8000da8 <main+0x1f4>
-            } else {
-                if (buzzer_active &&
- 8000d4e:	4b29      	ldr	r3, [pc, #164]	@ (8000df4 <main+0x240>)
- 8000d50:	781b      	ldrb	r3, [r3, #0]
- 8000d52:	2b00      	cmp	r3, #0
- 8000d54:	d012      	beq.n	8000d7c <main+0x1c8>
-                    (uint32_t)(now_ms - buzzer_start_ms) >= buzzer_duration_ms) {
- 8000d56:	4b20      	ldr	r3, [pc, #128]	@ (8000dd8 <main+0x224>)
- 8000d58:	681a      	ldr	r2, [r3, #0]
- 8000d5a:	4b24      	ldr	r3, [pc, #144]	@ (8000dec <main+0x238>)
- 8000d5c:	681b      	ldr	r3, [r3, #0]
- 8000d5e:	1ad2      	subs	r2, r2, r3
- 8000d60:	4b23      	ldr	r3, [pc, #140]	@ (8000df0 <main+0x23c>)
- 8000d62:	681b      	ldr	r3, [r3, #0]
-                if (buzzer_active &&
- 8000d64:	429a      	cmp	r2, r3
- 8000d66:	d309      	bcc.n	8000d7c <main+0x1c8>
-                    buzzer_off();
- 8000d68:	f7ff fc72 	bl	8000650 <buzzer_off>
-                    buzzer_active = 0U;
- 8000d6c:	4b21      	ldr	r3, [pc, #132]	@ (8000df4 <main+0x240>)
- 8000d6e:	2200      	movs	r2, #0
- 8000d70:	701a      	strb	r2, [r3, #0]
-                    buzzer_start_ms = now_ms;
- 8000d72:	4b19      	ldr	r3, [pc, #100]	@ (8000dd8 <main+0x224>)
- 8000d74:	681b      	ldr	r3, [r3, #0]
- 8000d76:	4a1d      	ldr	r2, [pc, #116]	@ (8000dec <main+0x238>)
- 8000d78:	6013      	str	r3, [r2, #0]
- 8000d7a:	e015      	b.n	8000da8 <main+0x1f4>
-                } else if (!buzzer_active &&
- 8000d7c:	4b1d      	ldr	r3, [pc, #116]	@ (8000df4 <main+0x240>)
- 8000d7e:	781b      	ldrb	r3, [r3, #0]
- 8000d80:	2b00      	cmp	r3, #0
- 8000d82:	d111      	bne.n	8000da8 <main+0x1f4>
-                           (uint32_t)(now_ms - buzzer_start_ms) >= buzzer_duration_ms) {
- 8000d84:	4b14      	ldr	r3, [pc, #80]	@ (8000dd8 <main+0x224>)
- 8000d86:	681a      	ldr	r2, [r3, #0]
- 8000d88:	4b18      	ldr	r3, [pc, #96]	@ (8000dec <main+0x238>)
- 8000d8a:	681b      	ldr	r3, [r3, #0]
- 8000d8c:	1ad2      	subs	r2, r2, r3
- 8000d8e:	4b18      	ldr	r3, [pc, #96]	@ (8000df0 <main+0x23c>)
- 8000d90:	681b      	ldr	r3, [r3, #0]
-                } else if (!buzzer_active &&
- 8000d92:	429a      	cmp	r2, r3
- 8000d94:	d308      	bcc.n	8000da8 <main+0x1f4>
-                    buzzer_on();
- 8000d96:	f7ff fc4f 	bl	8000638 <buzzer_on>
-                    buzzer_active = 1U;
- 8000d9a:	4b16      	ldr	r3, [pc, #88]	@ (8000df4 <main+0x240>)
- 8000d9c:	2201      	movs	r2, #1
- 8000d9e:	701a      	strb	r2, [r3, #0]
-                    buzzer_start_ms = now_ms;
- 8000da0:	4b0d      	ldr	r3, [pc, #52]	@ (8000dd8 <main+0x224>)
- 8000da2:	681b      	ldr	r3, [r3, #0]
- 8000da4:	4a11      	ldr	r2, [pc, #68]	@ (8000dec <main+0x238>)
- 8000da6:	6013      	str	r3, [r2, #0]
-                }
-            }
 
-            char time_string[12];
+        update_release_debounce();
+ 8001008:	f7ff fea0 	bl	8000d4c <update_release_debounce>
+        update_normal_buzzer();
+ 800100c:	f7ff fede 	bl	8000dcc <update_normal_buzzer>
+        update_result_message();
+ 8001010:	f7ff ff00 	bl	8000e14 <update_result_message>
+        update_security_lockout();
+ 8001014:	f7ff ff22 	bl	8000e5c <update_security_lockout>
+        update_keypad_rearm();
+ 8001018:	f7ff ff84 	bl	8000f24 <update_keypad_rearm>
+        if (key_ready) {
+ 800101c:	e7d8      	b.n	8000fd0 <main+0x3c>
+ 800101e:	bf00      	nop
+ 8001020:	40023800 	.word	0x40023800
+ 8001024:	20000028 	.word	0x20000028
+ 8001028:	2000002a 	.word	0x2000002a
+ 800102c:	20000044 	.word	0x20000044
+ 8001030:	20000046 	.word	0x20000046
+ 8001034:	20000054 	.word	0x20000054
 
-            uint32_t seconds_remaining = 27U;
- 8000da8:	231b      	movs	r3, #27
- 8000daa:	613b      	str	r3, [r7, #16]
-
-            number_to_string(seconds_remaining, time_string);
- 8000dac:	1d3b      	adds	r3, r7, #4
- 8000dae:	4619      	mov	r1, r3
- 8000db0:	6938      	ldr	r0, [r7, #16]
- 8000db2:	f7ff fe31 	bl	8000a18 <number_to_string>
-
-            lcd_write(LCD_LINE2, 0U);
- 8000db6:	2100      	movs	r1, #0
- 8000db8:	20c0      	movs	r0, #192	@ 0xc0
- 8000dba:	f7ff fbd7 	bl	800056c <lcd_write>
-            lcd_print("Time: ");
- 8000dbe:	4814      	ldr	r0, [pc, #80]	@ (8000e10 <main+0x25c>)
- 8000dc0:	f7ff fbf5 	bl	80005ae <lcd_print>
-            lcd_print(time_string);
- 8000dc4:	1d3b      	adds	r3, r7, #4
- 8000dc6:	4618      	mov	r0, r3
- 8000dc8:	f7ff fbf1 	bl	80005ae <lcd_print>
-    	now_ms = TIM2->CNT;
- 8000dcc:	e719      	b.n	8000c02 <main+0x4e>
- 8000dce:	bf00      	nop
- 8000dd0:	40023800 	.word	0x40023800
- 8000dd4:	08000f9c 	.word	0x08000f9c
- 8000dd8:	20000040 	.word	0x20000040
- 8000ddc:	2000003d 	.word	0x2000003d
- 8000de0:	2000003c 	.word	0x2000003c
- 8000de4:	40013c00 	.word	0x40013c00
- 8000de8:	20000038 	.word	0x20000038
- 8000dec:	2000002c 	.word	0x2000002c
- 8000df0:	20000030 	.word	0x20000030
- 8000df4:	20000034 	.word	0x20000034
- 8000df8:	20000020 	.word	0x20000020
- 8000dfc:	20000022 	.word	0x20000022
- 8000e00:	20000021 	.word	0x20000021
- 8000e04:	40022000 	.word	0x40022000
- 8000e08:	20000044 	.word	0x20000044
- 8000e0c:	20000048 	.word	0x20000048
- 8000e10:	08000fa8 	.word	0x08000fa8
-
-08000e14 <NMI_Handler>:
+08001038 <NMI_Handler>:
 /******************************************************************************/
 /**
   * @brief This function handles Non maskable interrupt.
   */
 void NMI_Handler(void)
 {
- 8000e14:	b480      	push	{r7}
- 8000e16:	af00      	add	r7, sp, #0
+ 8001038:	b480      	push	{r7}
+ 800103a:	af00      	add	r7, sp, #0
   /* USER CODE BEGIN NonMaskableInt_IRQn 0 */
 
   /* USER CODE END NonMaskableInt_IRQn 0 */
   /* USER CODE BEGIN NonMaskableInt_IRQn 1 */
    while (1)
- 8000e18:	bf00      	nop
- 8000e1a:	e7fd      	b.n	8000e18 <NMI_Handler+0x4>
+ 800103c:	bf00      	nop
+ 800103e:	e7fd      	b.n	800103c <NMI_Handler+0x4>
 
-08000e1c <HardFault_Handler>:
+08001040 <HardFault_Handler>:
 
 /**
   * @brief This function handles Hard fault interrupt.
   */
 void HardFault_Handler(void)
 {
- 8000e1c:	b480      	push	{r7}
- 8000e1e:	af00      	add	r7, sp, #0
+ 8001040:	b480      	push	{r7}
+ 8001042:	af00      	add	r7, sp, #0
   /* USER CODE BEGIN HardFault_IRQn 0 */
 
   /* USER CODE END HardFault_IRQn 0 */
   while (1)
- 8000e20:	bf00      	nop
- 8000e22:	e7fd      	b.n	8000e20 <HardFault_Handler+0x4>
+ 8001044:	bf00      	nop
+ 8001046:	e7fd      	b.n	8001044 <HardFault_Handler+0x4>
 
-08000e24 <MemManage_Handler>:
+08001048 <MemManage_Handler>:
 
 /**
   * @brief This function handles Memory management fault.
   */
 void MemManage_Handler(void)
 {
- 8000e24:	b480      	push	{r7}
- 8000e26:	af00      	add	r7, sp, #0
+ 8001048:	b480      	push	{r7}
+ 800104a:	af00      	add	r7, sp, #0
   /* USER CODE BEGIN MemoryManagement_IRQn 0 */
 
   /* USER CODE END MemoryManagement_IRQn 0 */
   while (1)
- 8000e28:	bf00      	nop
- 8000e2a:	e7fd      	b.n	8000e28 <MemManage_Handler+0x4>
+ 800104c:	bf00      	nop
+ 800104e:	e7fd      	b.n	800104c <MemManage_Handler+0x4>
 
-08000e2c <BusFault_Handler>:
+08001050 <BusFault_Handler>:
 
 /**
   * @brief This function handles Pre-fetch fault, memory access fault.
   */
 void BusFault_Handler(void)
 {
- 8000e2c:	b480      	push	{r7}
- 8000e2e:	af00      	add	r7, sp, #0
+ 8001050:	b480      	push	{r7}
+ 8001052:	af00      	add	r7, sp, #0
   /* USER CODE BEGIN BusFault_IRQn 0 */
 
   /* USER CODE END BusFault_IRQn 0 */
   while (1)
- 8000e30:	bf00      	nop
- 8000e32:	e7fd      	b.n	8000e30 <BusFault_Handler+0x4>
+ 8001054:	bf00      	nop
+ 8001056:	e7fd      	b.n	8001054 <BusFault_Handler+0x4>
 
-08000e34 <UsageFault_Handler>:
+08001058 <UsageFault_Handler>:
 
 /**
   * @brief This function handles Undefined instruction or illegal state.
   */
 void UsageFault_Handler(void)
 {
- 8000e34:	b480      	push	{r7}
- 8000e36:	af00      	add	r7, sp, #0
+ 8001058:	b480      	push	{r7}
+ 800105a:	af00      	add	r7, sp, #0
   /* USER CODE BEGIN UsageFault_IRQn 0 */
 
   /* USER CODE END UsageFault_IRQn 0 */
   while (1)
- 8000e38:	bf00      	nop
- 8000e3a:	e7fd      	b.n	8000e38 <UsageFault_Handler+0x4>
+ 800105c:	bf00      	nop
+ 800105e:	e7fd      	b.n	800105c <UsageFault_Handler+0x4>
 
-08000e3c <SVC_Handler>:
+08001060 <SVC_Handler>:
 
 /**
   * @brief This function handles System service call via SWI instruction.
   */
 void SVC_Handler(void)
 {
- 8000e3c:	b480      	push	{r7}
- 8000e3e:	af00      	add	r7, sp, #0
+ 8001060:	b480      	push	{r7}
+ 8001062:	af00      	add	r7, sp, #0
 
   /* USER CODE END SVCall_IRQn 0 */
   /* USER CODE BEGIN SVCall_IRQn 1 */
 
   /* USER CODE END SVCall_IRQn 1 */
 }
- 8000e40:	bf00      	nop
- 8000e42:	46bd      	mov	sp, r7
- 8000e44:	f85d 7b04 	ldr.w	r7, [sp], #4
- 8000e48:	4770      	bx	lr
+ 8001064:	bf00      	nop
+ 8001066:	46bd      	mov	sp, r7
+ 8001068:	f85d 7b04 	ldr.w	r7, [sp], #4
+ 800106c:	4770      	bx	lr
 
-08000e4a <DebugMon_Handler>:
+0800106e <DebugMon_Handler>:
 
 /**
   * @brief This function handles Debug monitor.
   */
 void DebugMon_Handler(void)
 {
- 8000e4a:	b480      	push	{r7}
- 8000e4c:	af00      	add	r7, sp, #0
+ 800106e:	b480      	push	{r7}
+ 8001070:	af00      	add	r7, sp, #0
 
   /* USER CODE END DebugMonitor_IRQn 0 */
   /* USER CODE BEGIN DebugMonitor_IRQn 1 */
 
   /* USER CODE END DebugMonitor_IRQn 1 */
 }
- 8000e4e:	bf00      	nop
- 8000e50:	46bd      	mov	sp, r7
- 8000e52:	f85d 7b04 	ldr.w	r7, [sp], #4
- 8000e56:	4770      	bx	lr
+ 8001072:	bf00      	nop
+ 8001074:	46bd      	mov	sp, r7
+ 8001076:	f85d 7b04 	ldr.w	r7, [sp], #4
+ 800107a:	4770      	bx	lr
 
-08000e58 <PendSV_Handler>:
+0800107c <PendSV_Handler>:
 
 /**
   * @brief This function handles Pendable request for system service.
   */
 void PendSV_Handler(void)
 {
- 8000e58:	b480      	push	{r7}
- 8000e5a:	af00      	add	r7, sp, #0
+ 800107c:	b480      	push	{r7}
+ 800107e:	af00      	add	r7, sp, #0
 
   /* USER CODE END PendSV_IRQn 0 */
   /* USER CODE BEGIN PendSV_IRQn 1 */
 
   /* USER CODE END PendSV_IRQn 1 */
 }
- 8000e5c:	bf00      	nop
- 8000e5e:	46bd      	mov	sp, r7
- 8000e60:	f85d 7b04 	ldr.w	r7, [sp], #4
- 8000e64:	4770      	bx	lr
+ 8001080:	bf00      	nop
+ 8001082:	46bd      	mov	sp, r7
+ 8001084:	f85d 7b04 	ldr.w	r7, [sp], #4
+ 8001088:	4770      	bx	lr
 
-08000e66 <SysTick_Handler>:
+0800108a <SysTick_Handler>:
 
 /**
   * @brief This function handles System tick timer.
   */
 void SysTick_Handler(void)
 {
- 8000e66:	b580      	push	{r7, lr}
- 8000e68:	af00      	add	r7, sp, #0
+ 800108a:	b580      	push	{r7, lr}
+ 800108c:	af00      	add	r7, sp, #0
   /* USER CODE BEGIN SysTick_IRQn 0 */
 
   /* USER CODE END SysTick_IRQn 0 */
   HAL_IncTick();
- 8000e6a:	f000 f83f 	bl	8000eec <HAL_IncTick>
+ 800108e:	f000 f83f 	bl	8001110 <HAL_IncTick>
   /* USER CODE BEGIN SysTick_IRQn 1 */
 
   /* USER CODE END SysTick_IRQn 1 */
 }
- 8000e6e:	bf00      	nop
- 8000e70:	bd80      	pop	{r7, pc}
+ 8001092:	bf00      	nop
+ 8001094:	bd80      	pop	{r7, pc}
 	...
 
-08000e74 <SystemInit>:
+08001098 <SystemInit>:
   *         SystemFrequency variable.
   * @param  None
   * @retval None
   */
 void SystemInit(void)
 {
- 8000e74:	b480      	push	{r7}
- 8000e76:	af00      	add	r7, sp, #0
+ 8001098:	b480      	push	{r7}
+ 800109a:	af00      	add	r7, sp, #0
   /* FPU settings ------------------------------------------------------------*/
 #if (__FPU_PRESENT == 1) && (__FPU_USED == 1)
   SCB->CPACR |= ((3UL << 10*2)|(3UL << 11*2));  /* set CP10 and CP11 Full Access */
- 8000e78:	4b06      	ldr	r3, [pc, #24]	@ (8000e94 <SystemInit+0x20>)
- 8000e7a:	f8d3 3088 	ldr.w	r3, [r3, #136]	@ 0x88
- 8000e7e:	4a05      	ldr	r2, [pc, #20]	@ (8000e94 <SystemInit+0x20>)
- 8000e80:	f443 0370 	orr.w	r3, r3, #15728640	@ 0xf00000
- 8000e84:	f8c2 3088 	str.w	r3, [r2, #136]	@ 0x88
+ 800109c:	4b06      	ldr	r3, [pc, #24]	@ (80010b8 <SystemInit+0x20>)
+ 800109e:	f8d3 3088 	ldr.w	r3, [r3, #136]	@ 0x88
+ 80010a2:	4a05      	ldr	r2, [pc, #20]	@ (80010b8 <SystemInit+0x20>)
+ 80010a4:	f443 0370 	orr.w	r3, r3, #15728640	@ 0xf00000
+ 80010a8:	f8c2 3088 	str.w	r3, [r2, #136]	@ 0x88
 
   /* Configure the Vector Table location -------------------------------------*/
 #if defined(USER_VECT_TAB_ADDRESS)
   SCB->VTOR = VECT_TAB_BASE_ADDRESS | VECT_TAB_OFFSET; /* Vector Table Relocation in Internal SRAM */
 #endif /* USER_VECT_TAB_ADDRESS */
 }
- 8000e88:	bf00      	nop
- 8000e8a:	46bd      	mov	sp, r7
- 8000e8c:	f85d 7b04 	ldr.w	r7, [sp], #4
- 8000e90:	4770      	bx	lr
- 8000e92:	bf00      	nop
- 8000e94:	e000ed00 	.word	0xe000ed00
+ 80010ac:	bf00      	nop
+ 80010ae:	46bd      	mov	sp, r7
+ 80010b0:	f85d 7b04 	ldr.w	r7, [sp], #4
+ 80010b4:	4770      	bx	lr
+ 80010b6:	bf00      	nop
+ 80010b8:	e000ed00 	.word	0xe000ed00
 
-08000e98 <Reset_Handler>:
+080010bc <Reset_Handler>:
 
     .section  .text.Reset_Handler
   .weak  Reset_Handler
   .type  Reset_Handler, %function
 Reset_Handler:  
   ldr   sp, =_estack      /* set stack pointer */
- 8000e98:	f8df d034 	ldr.w	sp, [pc, #52]	@ 8000ed0 <LoopFillZerobss+0xe>
+ 80010bc:	f8df d034 	ldr.w	sp, [pc, #52]	@ 80010f4 <LoopFillZerobss+0xe>
   
 /* Call the clock system initialization function.*/
   bl  SystemInit   
- 8000e9c:	f7ff ffea 	bl	8000e74 <SystemInit>
+ 80010c0:	f7ff ffea 	bl	8001098 <SystemInit>
 
 /* Copy the data segment initializers from flash to SRAM */  
   ldr r0, =_sdata
- 8000ea0:	480c      	ldr	r0, [pc, #48]	@ (8000ed4 <LoopFillZerobss+0x12>)
+ 80010c4:	480c      	ldr	r0, [pc, #48]	@ (80010f8 <LoopFillZerobss+0x12>)
   ldr r1, =_edata
- 8000ea2:	490d      	ldr	r1, [pc, #52]	@ (8000ed8 <LoopFillZerobss+0x16>)
+ 80010c6:	490d      	ldr	r1, [pc, #52]	@ (80010fc <LoopFillZerobss+0x16>)
   ldr r2, =_sidata
- 8000ea4:	4a0d      	ldr	r2, [pc, #52]	@ (8000edc <LoopFillZerobss+0x1a>)
+ 80010c8:	4a0d      	ldr	r2, [pc, #52]	@ (8001100 <LoopFillZerobss+0x1a>)
   movs r3, #0
- 8000ea6:	2300      	movs	r3, #0
+ 80010ca:	2300      	movs	r3, #0
   b LoopCopyDataInit
- 8000ea8:	e002      	b.n	8000eb0 <LoopCopyDataInit>
+ 80010cc:	e002      	b.n	80010d4 <LoopCopyDataInit>
 
-08000eaa <CopyDataInit>:
+080010ce <CopyDataInit>:
 
 CopyDataInit:
   ldr r4, [r2, r3]
- 8000eaa:	58d4      	ldr	r4, [r2, r3]
+ 80010ce:	58d4      	ldr	r4, [r2, r3]
   str r4, [r0, r3]
- 8000eac:	50c4      	str	r4, [r0, r3]
+ 80010d0:	50c4      	str	r4, [r0, r3]
   adds r3, r3, #4
- 8000eae:	3304      	adds	r3, #4
+ 80010d2:	3304      	adds	r3, #4
 
-08000eb0 <LoopCopyDataInit>:
+080010d4 <LoopCopyDataInit>:
 
 LoopCopyDataInit:
   adds r4, r0, r3
- 8000eb0:	18c4      	adds	r4, r0, r3
+ 80010d4:	18c4      	adds	r4, r0, r3
   cmp r4, r1
- 8000eb2:	428c      	cmp	r4, r1
+ 80010d6:	428c      	cmp	r4, r1
   bcc CopyDataInit
- 8000eb4:	d3f9      	bcc.n	8000eaa <CopyDataInit>
+ 80010d8:	d3f9      	bcc.n	80010ce <CopyDataInit>
   
 /* Zero fill the bss segment. */
   ldr r2, =_sbss
- 8000eb6:	4a0a      	ldr	r2, [pc, #40]	@ (8000ee0 <LoopFillZerobss+0x1e>)
+ 80010da:	4a0a      	ldr	r2, [pc, #40]	@ (8001104 <LoopFillZerobss+0x1e>)
   ldr r4, =_ebss
- 8000eb8:	4c0a      	ldr	r4, [pc, #40]	@ (8000ee4 <LoopFillZerobss+0x22>)
+ 80010dc:	4c0a      	ldr	r4, [pc, #40]	@ (8001108 <LoopFillZerobss+0x22>)
   movs r3, #0
- 8000eba:	2300      	movs	r3, #0
+ 80010de:	2300      	movs	r3, #0
   b LoopFillZerobss
- 8000ebc:	e001      	b.n	8000ec2 <LoopFillZerobss>
+ 80010e0:	e001      	b.n	80010e6 <LoopFillZerobss>
 
-08000ebe <FillZerobss>:
+080010e2 <FillZerobss>:
 
 FillZerobss:
   str  r3, [r2]
- 8000ebe:	6013      	str	r3, [r2, #0]
+ 80010e2:	6013      	str	r3, [r2, #0]
   adds r2, r2, #4
- 8000ec0:	3204      	adds	r2, #4
+ 80010e4:	3204      	adds	r2, #4
 
-08000ec2 <LoopFillZerobss>:
+080010e6 <LoopFillZerobss>:
 
 LoopFillZerobss:
   cmp r2, r4
- 8000ec2:	42a2      	cmp	r2, r4
+ 80010e6:	42a2      	cmp	r2, r4
   bcc FillZerobss
- 8000ec4:	d3fb      	bcc.n	8000ebe <FillZerobss>
+ 80010e8:	d3fb      	bcc.n	80010e2 <FillZerobss>
   
 /* Call static constructors */
     bl __libc_init_array
- 8000ec6:	f000 f825 	bl	8000f14 <__libc_init_array>
+ 80010ea:	f000 f82d 	bl	8001148 <__libc_init_array>
 /* Call the application's entry point.*/
   bl  main
- 8000eca:	f7ff fe73 	bl	8000bb4 <main>
+ 80010ee:	f7ff ff51 	bl	8000f94 <main>
   bx  lr    
- 8000ece:	4770      	bx	lr
+ 80010f2:	4770      	bx	lr
   ldr   sp, =_estack      /* set stack pointer */
- 8000ed0:	20050000 	.word	0x20050000
+ 80010f4:	20050000 	.word	0x20050000
   ldr r0, =_sdata
- 8000ed4:	20000000 	.word	0x20000000
+ 80010f8:	20000000 	.word	0x20000000
   ldr r1, =_edata
- 8000ed8:	20000004 	.word	0x20000004
+ 80010fc:	2000000c 	.word	0x2000000c
   ldr r2, =_sidata
- 8000edc:	08000fd0 	.word	0x08000fd0
+ 8001100:	08001224 	.word	0x08001224
   ldr r2, =_sbss
- 8000ee0:	20000004 	.word	0x20000004
+ 8001104:	2000000c 	.word	0x2000000c
   ldr r4, =_ebss
- 8000ee4:	20000050 	.word	0x20000050
+ 8001108:	20000064 	.word	0x20000064
 
-08000ee8 <ADC_IRQHandler>:
+0800110c <ADC_IRQHandler>:
  * @retval None       
 */
     .section  .text.Default_Handler,"ax",%progbits
 Default_Handler:
 Infinite_Loop:
   b  Infinite_Loop
- 8000ee8:	e7fe      	b.n	8000ee8 <ADC_IRQHandler>
+ 800110c:	e7fe      	b.n	800110c <ADC_IRQHandler>
 	...
 
-08000eec <HAL_IncTick>:
+08001110 <HAL_IncTick>:
  * @note This function is declared as __weak to be overwritten in case of other 
   *      implementations in user file.
   * @retval None
   */
 __weak void HAL_IncTick(void)
 {
- 8000eec:	b480      	push	{r7}
- 8000eee:	af00      	add	r7, sp, #0
+ 8001110:	b480      	push	{r7}
+ 8001112:	af00      	add	r7, sp, #0
   uwTick += uwTickFreq;
- 8000ef0:	4b06      	ldr	r3, [pc, #24]	@ (8000f0c <HAL_IncTick+0x20>)
- 8000ef2:	781b      	ldrb	r3, [r3, #0]
- 8000ef4:	461a      	mov	r2, r3
- 8000ef6:	4b06      	ldr	r3, [pc, #24]	@ (8000f10 <HAL_IncTick+0x24>)
- 8000ef8:	681b      	ldr	r3, [r3, #0]
- 8000efa:	4413      	add	r3, r2
- 8000efc:	4a04      	ldr	r2, [pc, #16]	@ (8000f10 <HAL_IncTick+0x24>)
- 8000efe:	6013      	str	r3, [r2, #0]
+ 8001114:	4b06      	ldr	r3, [pc, #24]	@ (8001130 <HAL_IncTick+0x20>)
+ 8001116:	781b      	ldrb	r3, [r3, #0]
+ 8001118:	461a      	mov	r2, r3
+ 800111a:	4b06      	ldr	r3, [pc, #24]	@ (8001134 <HAL_IncTick+0x24>)
+ 800111c:	681b      	ldr	r3, [r3, #0]
+ 800111e:	4413      	add	r3, r2
+ 8001120:	4a04      	ldr	r2, [pc, #16]	@ (8001134 <HAL_IncTick+0x24>)
+ 8001122:	6013      	str	r3, [r2, #0]
 }
- 8000f00:	bf00      	nop
- 8000f02:	46bd      	mov	sp, r7
- 8000f04:	f85d 7b04 	ldr.w	r7, [sp], #4
- 8000f08:	4770      	bx	lr
- 8000f0a:	bf00      	nop
- 8000f0c:	20000002 	.word	0x20000002
- 8000f10:	2000004c 	.word	0x2000004c
+ 8001124:	bf00      	nop
+ 8001126:	46bd      	mov	sp, r7
+ 8001128:	f85d 7b04 	ldr.w	r7, [sp], #4
+ 800112c:	4770      	bx	lr
+ 800112e:	bf00      	nop
+ 8001130:	20000008 	.word	0x20000008
+ 8001134:	20000060 	.word	0x20000060
 
-08000f14 <__libc_init_array>:
- 8000f14:	b570      	push	{r4, r5, r6, lr}
- 8000f16:	4b0d      	ldr	r3, [pc, #52]	@ (8000f4c <__libc_init_array+0x38>)
- 8000f18:	4d0d      	ldr	r5, [pc, #52]	@ (8000f50 <__libc_init_array+0x3c>)
- 8000f1a:	1b5b      	subs	r3, r3, r5
- 8000f1c:	109c      	asrs	r4, r3, #2
- 8000f1e:	2600      	movs	r6, #0
- 8000f20:	42a6      	cmp	r6, r4
- 8000f22:	d109      	bne.n	8000f38 <__libc_init_array+0x24>
- 8000f24:	f000 f81a 	bl	8000f5c <_init>
- 8000f28:	4d0a      	ldr	r5, [pc, #40]	@ (8000f54 <__libc_init_array+0x40>)
- 8000f2a:	4b0b      	ldr	r3, [pc, #44]	@ (8000f58 <__libc_init_array+0x44>)
- 8000f2c:	1b5b      	subs	r3, r3, r5
- 8000f2e:	109c      	asrs	r4, r3, #2
- 8000f30:	2600      	movs	r6, #0
- 8000f32:	42a6      	cmp	r6, r4
- 8000f34:	d105      	bne.n	8000f42 <__libc_init_array+0x2e>
- 8000f36:	bd70      	pop	{r4, r5, r6, pc}
- 8000f38:	f855 3b04 	ldr.w	r3, [r5], #4
- 8000f3c:	4798      	blx	r3
- 8000f3e:	3601      	adds	r6, #1
- 8000f40:	e7ee      	b.n	8000f20 <__libc_init_array+0xc>
- 8000f42:	f855 3b04 	ldr.w	r3, [r5], #4
- 8000f46:	4798      	blx	r3
- 8000f48:	3601      	adds	r6, #1
- 8000f4a:	e7f2      	b.n	8000f32 <__libc_init_array+0x1e>
- 8000f4c:	08000fc8 	.word	0x08000fc8
- 8000f50:	08000fc8 	.word	0x08000fc8
- 8000f54:	08000fc8 	.word	0x08000fc8
- 8000f58:	08000fcc 	.word	0x08000fcc
+08001138 <memset>:
+ 8001138:	4402      	add	r2, r0
+ 800113a:	4603      	mov	r3, r0
+ 800113c:	4293      	cmp	r3, r2
+ 800113e:	d100      	bne.n	8001142 <memset+0xa>
+ 8001140:	4770      	bx	lr
+ 8001142:	f803 1b01 	strb.w	r1, [r3], #1
+ 8001146:	e7f9      	b.n	800113c <memset+0x4>
 
-08000f5c <_init>:
- 8000f5c:	b5f8      	push	{r3, r4, r5, r6, r7, lr}
- 8000f5e:	bf00      	nop
- 8000f60:	bcf8      	pop	{r3, r4, r5, r6, r7}
- 8000f62:	bc08      	pop	{r3}
- 8000f64:	469e      	mov	lr, r3
- 8000f66:	4770      	bx	lr
+08001148 <__libc_init_array>:
+ 8001148:	b570      	push	{r4, r5, r6, lr}
+ 800114a:	4b0d      	ldr	r3, [pc, #52]	@ (8001180 <__libc_init_array+0x38>)
+ 800114c:	4d0d      	ldr	r5, [pc, #52]	@ (8001184 <__libc_init_array+0x3c>)
+ 800114e:	1b5b      	subs	r3, r3, r5
+ 8001150:	109c      	asrs	r4, r3, #2
+ 8001152:	2600      	movs	r6, #0
+ 8001154:	42a6      	cmp	r6, r4
+ 8001156:	d109      	bne.n	800116c <__libc_init_array+0x24>
+ 8001158:	f000 f81a 	bl	8001190 <_init>
+ 800115c:	4d0a      	ldr	r5, [pc, #40]	@ (8001188 <__libc_init_array+0x40>)
+ 800115e:	4b0b      	ldr	r3, [pc, #44]	@ (800118c <__libc_init_array+0x44>)
+ 8001160:	1b5b      	subs	r3, r3, r5
+ 8001162:	109c      	asrs	r4, r3, #2
+ 8001164:	2600      	movs	r6, #0
+ 8001166:	42a6      	cmp	r6, r4
+ 8001168:	d105      	bne.n	8001176 <__libc_init_array+0x2e>
+ 800116a:	bd70      	pop	{r4, r5, r6, pc}
+ 800116c:	f855 3b04 	ldr.w	r3, [r5], #4
+ 8001170:	4798      	blx	r3
+ 8001172:	3601      	adds	r6, #1
+ 8001174:	e7ee      	b.n	8001154 <__libc_init_array+0xc>
+ 8001176:	f855 3b04 	ldr.w	r3, [r5], #4
+ 800117a:	4798      	blx	r3
+ 800117c:	3601      	adds	r6, #1
+ 800117e:	e7f2      	b.n	8001166 <__libc_init_array+0x1e>
+ 8001180:	0800121c 	.word	0x0800121c
+ 8001184:	0800121c 	.word	0x0800121c
+ 8001188:	0800121c 	.word	0x0800121c
+ 800118c:	08001220 	.word	0x08001220
 
-08000f68 <_fini>:
- 8000f68:	b5f8      	push	{r3, r4, r5, r6, r7, lr}
- 8000f6a:	bf00      	nop
- 8000f6c:	bcf8      	pop	{r3, r4, r5, r6, r7}
- 8000f6e:	bc08      	pop	{r3}
- 8000f70:	469e      	mov	lr, r3
- 8000f72:	4770      	bx	lr
+08001190 <_init>:
+ 8001190:	b5f8      	push	{r3, r4, r5, r6, r7, lr}
+ 8001192:	bf00      	nop
+ 8001194:	bcf8      	pop	{r3, r4, r5, r6, r7}
+ 8001196:	bc08      	pop	{r3}
+ 8001198:	469e      	mov	lr, r3
+ 800119a:	4770      	bx	lr
+
+0800119c <_fini>:
+ 800119c:	b5f8      	push	{r3, r4, r5, r6, r7, lr}
+ 800119e:	bf00      	nop
+ 80011a0:	bcf8      	pop	{r3, r4, r5, r6, r7}
+ 80011a2:	bc08      	pop	{r3}
+ 80011a4:	469e      	mov	lr, r3
+ 80011a6:	4770      	bx	lr

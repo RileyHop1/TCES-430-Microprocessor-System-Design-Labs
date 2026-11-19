@@ -18,6 +18,8 @@
 		<item key="SmartImportRootWizardPage.STORE_NESTED_PROJECTS" value="true"/>
 		<item key="SmartImportRootWizardPage.STORE_CONFIGURE_NATURES" value="true"/>
 		<list key="org.eclipse.ui.internal.wizards.datatransfer.SmartImportRootWizardPage.knownSources">
+			<item value="/Users/rileyhopper/Programming/School/TCES-430/lab5"/>
+			<item value="/Users/rileyhopper/Programming/School/TCES-430"/>
 			<item value="/Users/rileyhopper/Programming/School/TCES-430/Lab4-part2"/>
 			<item value="/Users/rileyhopper/Programming/School"/>
 			<item value="/Users/rileyhopper/Programming/School/TCES-430/lab4"/>

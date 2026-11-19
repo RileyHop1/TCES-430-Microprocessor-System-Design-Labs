@@ -77,7 +77,7 @@
 #define SUCCESS_BEEP_MS       2000U
 #define SUCCESS_MESSAGE_MS    2000U
 #define ERROR_MESSAGE_MS      1000U
-#define BUZZER_PIN            0U      // Active buzzer: GPIOB PB0
+#define BUZZER_PIN 6U  // PG6, Arduino D2
 
 // ============================================================
 // APPLICATION STATE AND ISR-MAIN COMMUNICATION
@@ -224,25 +224,28 @@ void lcd_print(const char *message) {
 // ============================================================
 // ACTIVE BUZZER - GPIOB PB0 (HIGH = ON)
 // ============================================================
+
+
 void setup_buzzer(void) {
-    RCC->AHB1ENR |= RCC_AHB1ENR_GPIOBEN;
+    RCC->AHB1ENR |= RCC_AHB1ENR_GPIOGEN;
 
-    // General-purpose output, push-pull, no pull-up or pull-down.
-    GPIOB->MODER &= ~(3U << (BUZZER_PIN * 2U));
-    GPIOB->MODER |=  (1U << (BUZZER_PIN * 2U));
-    GPIOB->OTYPER &= ~(1U << BUZZER_PIN);
-    GPIOB->PUPDR &= ~(3U << (BUZZER_PIN * 2U));
+    GPIOG->BSRR = (1U << (BUZZER_PIN + 16U));
 
-    GPIOB->BSRR = (1U << (BUZZER_PIN + 16U)); // Begin OFF.
+    GPIOG->MODER &= ~(3U << (BUZZER_PIN * 2U));
+    GPIOG->MODER |=  (1U << (BUZZER_PIN * 2U));
+
+    GPIOG->OTYPER &= ~(1U << BUZZER_PIN);
+    GPIOG->PUPDR &= ~(3U << (BUZZER_PIN * 2U));
 }
 
 void buzzer_on(void) {
-    GPIOB->BSRR = (1U << BUZZER_PIN);
+    GPIOG->BSRR = (1U << BUZZER_PIN);
 }
 
 void buzzer_off(void) {
-    GPIOB->BSRR = (1U << (BUZZER_PIN + 16U));
+    GPIOG->BSRR = (1U << (BUZZER_PIN + 16U));
 }
+
 
 // ============================================================
 // KEYPAD GPIO MODES: DEFAULT = ROWS LOW / COLUMNS PULL-UP
@@ -622,10 +625,6 @@ int main(void) {
     configure_matrix_interrupts();
 
     while (1) {
-        // TIM2's 32-bit counter increments once per millisecond.
-        // Unlike UIF polling, this does not lose time during LCD writes.
-        now_ms = TIM2->CNT;
-
         if (key_ready) {
             char key = last_key;
             key_ready = 0U;
@@ -633,6 +632,10 @@ int main(void) {
                 handle_key(key);
             }
         }
+
+        // TIM2's 32-bit counter increments once per millisecond.
+        now_ms = TIM2->CNT;
+
 
         update_release_debounce();
         update_normal_buzzer();
