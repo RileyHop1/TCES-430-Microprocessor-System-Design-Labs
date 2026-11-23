@@ -1,7 +1,6 @@
 "./Core/Src/compare.o"
 "./Core/Src/main.o"
 "./Core/Src/part1.o"
-"./Core/Src/part2.o"
 "./Core/Src/stm32f7xx_hal_msp.o"
 "./Core/Src/stm32f7xx_it.o"
 "./Core/Src/syscalls.o"

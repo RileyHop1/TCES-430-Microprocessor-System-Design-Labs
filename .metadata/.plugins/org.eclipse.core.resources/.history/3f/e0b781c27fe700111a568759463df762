@@ -1,0 +1,126 @@
+                show_status_for(STATUS_BUSY);
+            } else if (strcmp(entered_comand, MSG_SAFE) == 0) {
+                show_status_for(STATUS_SAFE);
+            } else {
+                show_result_for(ERROR, ERROR_MESSAGE_MS);
+            }
+            reset_input();
+        }
+        return;
+    }
+
+    if (comand_index < COMAND_LENGTH - 1U) {
+        entered_comand[comand_index++] = key;
+        entered_comand[comand_index] = '\0';
+    } else {
+        input_state = INPUT_DISCARD;
+        discarded_pin = 0U;
+    }
+}
+
+static void handle_key(char key) {
+    // Only the first byte selects the packet type.
+    if (input_state == INPUT_WAITING) {
+        if (key == 'P') {
+            input_state = INPUT_PIN;
+            pin_separator_received = 0U;
+            pin_index = 0U;
+            entered_pin[0] = '\0';
+            result_message_active = 0U;
+            lcd_show_pin_prompt();
+        } else if (key == 'M' || key == 'C') {
+            input_state = INPUT_MESSAGE;
+            comand_index = 1U;
+            entered_comand[0] = key;
+            entered_comand[1] = '\0';
+        }
+        return;
+    }
+
+    if (input_state == INPUT_DISCARD) {
+        if (key == '\n') {
+            if (discarded_pin) {
+                access_denied();
+            } else {
+                show_result_for(ERROR, ERROR_MESSAGE_MS);
+            }
+            reset_input();
+        }
+        return;
+    }
+
+    if (input_state == INPUT_PIN) {
+        handle_pin_byte(key);
+    } else if (input_state == INPUT_MESSAGE) {
+        handle_message_byte(key);
+    }
+}
+
+static void emergency_reset(void) {
+    // The local override has priority over all pending LCD/buzzer activity.
+    reset_input();
+    result_message_active = 0U;
+    stop_buzzer();
+    led_off();
+    lcd_show_pin_prompt();
+    send_reply('A');
+}
+
+static void update_override_button(uint32_t now_ms) {
+    uint8_t pressed = (GPIOI->IDR & (1U << BUTTON_PIN)) != 0U;
+
+    if (pressed != button_last_sample) {
+        button_last_sample = pressed;
+        button_change_ms = now_ms;
+    }
+
+    if (pressed != button_stable_state &&
+        (uint32_t)(now_ms - button_change_ms) >= BUTTON_DEBOUNCE_MS) {
+        button_stable_state = pressed;
+
+        if (pressed) {
+            emergency_reset();
+        }
+    }
+}
+
+static void update_result_message(uint32_t now_ms) {
+    if (result_message_active &&
+        (uint32_t)(now_ms - result_message_start_ms) >= result_message_duration_ms) {
+        result_message_active = 0U;
+        lcd_show_pin_prompt();
+    }
+}
+
+int node_b_handle_byte(char key) {
+    handle_key(key);
+    return 0;
+}
+
+int node_b_init(void) {
+    RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN |
+                    RCC_AHB1ENR_GPIOFEN |
+                    RCC_AHB1ENR_GPIOGEN |
+                    RCC_AHB1ENR_GPIOIEN;
+    (void)RCC->AHB1ENR;
+
+    setup_buzzer();
+    setup_lcd_data_bus();
+    setup_status_led_and_button();
+    setup_lcd();
+    configure_timer();
+    reset_input();
+    lcd_show_pin_prompt();
+
+    return 0;
+}
+
+int node_b_step(void) {
+    uint32_t now_ms = TIM2->CNT;
+
+    update_override_button(now_ms);
+    update_buzzer(now_ms);
+    update_result_message(now_ms);
+
+    return 0;
+}

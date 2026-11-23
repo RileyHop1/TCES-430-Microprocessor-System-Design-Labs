@@ -1,0 +1,542 @@
+/*
+ * Lab 6 Node B: Slave LCD, buzzer, and Bluetooth command handling.
+ * STM32F746G-DISCO + HC-05 on USART6 (PC6 TX, PC7 RX, 9600 8N1).
+ * LCD D4-D7: PA0, PF10, PF9, PF8; RS: PF6; E: PF7; R/W: GND.
+ * Active-high buzzer: PG6; onboard green LED: PI1; blue button: PI11.
+ *
+ * Intended for Core/Src/node_b_lcd_buzzer.c in the CubeMX HAL Slave project.
+ * main.c owns the interrupt-driven UART receive queue and calls:
+ *   node_b_init() once;
+ *   node_b_handle_byte(char) for each dequeued UART byte;
+ *   node_b_step() on every main loop iteration.
+ */
+
+#include "main.h"
+#include <stdint.h>
+#include <string.h>
+
+extern UART_HandleTypeDef huart6;
+
+// LCD D4 -> PA0; D5 -> PF10; D6 -> PF9; D7 -> PF8
+// LCD RS -> PF6; E -> PF7; R/W -> GND
+#define DB4  0U
+#define DB5 10U
+#define DB6  9U
+#define DB7  8U
+#define RS   6U
+#define E    7U
+
+// HD44780-style 4-bit LCD commands from Lab 5.
+#define LCD_INIT_8BIT     0x03U
+#define LCD_INIT_4BIT     0x02U
+#define LCD_FUNCTION_SET  0x28U
+#define LCD_DISPLAY_OFF   0x08U
+#define LCD_DISPLAY_ON    0x0CU
+#define LCD_CLEAR         0x01U
+#define LCD_ENTRY_MODE    0x06U
+#define LCD_LINE1         0x80U
+#define LCD_LINE2         0xC0U
+
+// Lab 5 software delays are approximate, not calibrated microseconds.
+#define LCD_PULSE_DELAY   500U
+#define LCD_STARTUP_DELAY 4000000U
+#define LCD_INIT_DELAY    500000U
+#define LCD_CMD_DELAY     5000U
+#define LCD_CLEAR_DELAY   200000U
+#define LCD_BYTE_DELAY    5000U
+
+#define PASS_CODE          "1234"  // Change to "2580" if using the lab example.
+#define PIN_LENGTH         4U
+#define COMAND_LENGTH      9U       // Includes space for the trailing '\0'.
+#define SUCCESS_MESSAGE_MS 2000U
+#define ERROR_MESSAGE_MS   1000U
+#define BUTTON_DEBOUNCE_MS 30U
+
+#define BUZZER_PIN  6U       // PG6
+#define LED_PIN     1U       // PI1
+#define BUTTON_PIN 11U       // PI11, active high
+
+#define DOUBLE_BEEP_MS 120U
+#define DOUBLE_GAP_MS  120U
+#define DENIED_BEEP_MS 1000U
+
+// These macros exclude the wire newline; the parser handles '\n' separately.
+#define MSG_CLEAR "C"
+#define MSG_HELP  "M:HELP"
+#define MSG_READY "M:READY"
+#define MSG_BUSY  "M:BUSY"
+#define MSG_SAFE  "M:SAFE"
+
+#define STATUS_HELP  "HELP"
+#define STATUS_READY "READY"
+#define STATUS_BUSY  "BUSY"
+#define STATUS_SAFE  "SAFE"
+#define ERROR        "ERROR"
+
+static char entered_pin[PIN_LENGTH + 1U];
+static uint8_t pin_index;
+static char entered_comand[COMAND_LENGTH];
+static uint8_t comand_index;
+
+typedef enum {
+    INPUT_WAITING,
+    INPUT_PIN,
+    INPUT_MESSAGE,
+    INPUT_DISCARD
+} InputState;
+
+static InputState input_state = INPUT_WAITING;
+static uint8_t pin_separator_received;
+static uint8_t discarded_pin;
+
+typedef enum {
+    BUZZER_IDLE,
+    BUZZER_FIRST_BEEP,
+    BUZZER_GAP,
+    BUZZER_SECOND_BEEP,
+    BUZZER_DENIED_ALARM
+} BuzzerState;
+
+static BuzzerState buzzer_state = BUZZER_IDLE;
+static uint32_t buzzer_phase_start_ms;
+
+static uint8_t result_message_active;
+static uint32_t result_message_start_ms;
+static uint32_t result_message_duration_ms;
+
+static uint8_t button_last_sample;
+static uint8_t button_stable_state;
+static uint32_t button_change_ms;
+
+static void lcd_delay(uint32_t count) {
+    while (count--) {
+        __NOP();
+    }
+}
+
+static void setup_lcd_data_bus(void) {
+    // RCC clocks for GPIOA and GPIOF are enabled in node_b_init().
+    // Make PA0 and PF6-PF10 GPIO outputs.
+    GPIOA->MODER &= ~(3U << (DB4 * 2U));
+    GPIOF->MODER &= ~(3U << (DB5 * 2U));
+    GPIOF->MODER &= ~(3U << (DB6 * 2U));
+    GPIOF->MODER &= ~(3U << (DB7 * 2U));
+    GPIOF->MODER &= ~(3U << (RS  * 2U));
+    GPIOF->MODER &= ~(3U << (E   * 2U));
+    GPIOA->MODER |= (1U << (DB4 * 2U));
+    GPIOF->MODER |= (1U << (DB5 * 2U));
+    GPIOF->MODER |= (1U << (DB6 * 2U));
+    GPIOF->MODER |= (1U << (DB7 * 2U));
+    GPIOF->MODER |= (1U << (RS  * 2U));
+    GPIOF->MODER |= (1U << (E   * 2U));
+    // Push-pull outputs, matching your previous LCD wiring.
+    GPIOA->OTYPER &= ~(1U << DB4);
+    GPIOF->OTYPER &= ~(1U << DB5);
+    GPIOF->OTYPER &= ~(1U << DB6);
+    GPIOF->OTYPER &= ~(1U << DB7);
+    GPIOF->OTYPER &= ~(1U << RS);
+    GPIOF->OTYPER &= ~(1U << E);
+}
+
+static void send_lcd_nibble(uint8_t nibble, uint8_t rs) {
+    // Clear all four data pins and RS.
+    GPIOA->BSRR = (1U << (DB4 + 16U));
+    GPIOF->BSRR =
+        (1U << (DB5 + 16U)) |
+        (1U << (DB6 + 16U)) |
+        (1U << (DB7 + 16U)) |
+        (1U << (RS  + 16U));
+    // Place the nibble on D4-D7; RS selects command/data register.
+    GPIOA->BSRR = ((nibble & 1U) << DB4);
+    GPIOF->BSRR =
+        (((nibble >> 1U) & 1U) << DB5) |
+        (((nibble >> 2U) & 1U) << DB6) |
+        (((nibble >> 3U) & 1U) << DB7) |
+        ((rs & 1U) << RS);
+    // HD44780 accepts the nibble on E's falling edge.
+    lcd_delay(LCD_PULSE_DELAY);
+    GPIOF->BSRR = (1U << E);
+    lcd_delay(LCD_PULSE_DELAY);
+    GPIOF->BSRR = (1U << (E + 16U));
+    lcd_delay(LCD_PULSE_DELAY);
+}
+
+static void setup_lcd(void) {
+    GPIOF->BSRR = (1U << (E + 16U));
+    lcd_delay(LCD_STARTUP_DELAY);
+    // Synchronize LCD into known 8-bit startup state.
+    send_lcd_nibble(LCD_INIT_8BIT, 0U);
+    lcd_delay(LCD_INIT_DELAY);
+    send_lcd_nibble(LCD_INIT_8BIT, 0U);
+    lcd_delay(LCD_INIT_DELAY);
+    send_lcd_nibble(LCD_INIT_8BIT, 0U);
+    lcd_delay(LCD_INIT_DELAY);
+    // Switch to four-bit transactions.
+    send_lcd_nibble(LCD_INIT_4BIT, 0U);
+    lcd_delay(LCD_CMD_DELAY);
+    // Preserve your previous lab's sequence.
+    send_lcd_nibble(LCD_FUNCTION_SET >> 4U, 0U);
+    send_lcd_nibble(LCD_FUNCTION_SET & 0x0FU, 0U);
+    lcd_delay(LCD_CMD_DELAY);
+    send_lcd_nibble(LCD_DISPLAY_OFF >> 4U, 0U);
+    send_lcd_nibble(LCD_DISPLAY_OFF & 0x0FU, 0U);
+    lcd_delay(LCD_CMD_DELAY);
+    send_lcd_nibble(LCD_CLEAR >> 4U, 0U);
+    send_lcd_nibble(LCD_CLEAR & 0x0FU, 0U);
+    lcd_delay(LCD_CLEAR_DELAY);
+    send_lcd_nibble(LCD_ENTRY_MODE >> 4U, 0U);
+    send_lcd_nibble(LCD_ENTRY_MODE & 0x0FU, 0U);
+    lcd_delay(LCD_CMD_DELAY);
+    send_lcd_nibble(LCD_DISPLAY_ON >> 4U, 0U);
+    send_lcd_nibble(LCD_DISPLAY_ON & 0x0FU, 0U);
+    lcd_delay(LCD_CMD_DELAY);
+}
+
+static void lcd_write(uint8_t value, uint8_t rs) {
+    send_lcd_nibble(value >> 4U, rs);
+    send_lcd_nibble(value & 0x0FU, rs);
+    lcd_delay(LCD_BYTE_DELAY);
+}
+
+// Small adapter so the existing LCD driver can display a startup prompt.
+static void lcd_print(const char *message) {
+    while (*message != '\0') {
+        lcd_write((uint8_t)*message++, 1U);
+    }
+}
+
+static void setup_buzzer(void) {
+    GPIOG->BSRR = (1U << (BUZZER_PIN + 16U));
+
+    GPIOG->MODER &= ~(3U << (BUZZER_PIN * 2U));
+    GPIOG->MODER |=  (1U << (BUZZER_PIN * 2U));
+
+    GPIOG->OTYPER &= ~(1U << BUZZER_PIN);
+    GPIOG->PUPDR &= ~(3U << (BUZZER_PIN * 2U));
+}
+
+static void buzzer_on(void) {
+    GPIOG->BSRR = (1U << BUZZER_PIN);
+}
+
+static void buzzer_off(void) {
+    GPIOG->BSRR = (1U << (BUZZER_PIN + 16U));
+}
+
+static void configure_timer(void) {
+    RCC->APB1ENR |= RCC_APB1ENR_TIM2EN;
+    (void)RCC->APB1ENR;
+    TIM2->CR1 &= ~TIM_CR1_CEN;
+
+    // Assumes TIM2's input clock is 16 MHz.
+    // 16,000,000 / (15999 + 1) = 1000 counter ticks per second.
+    TIM2->PSC = 15999U;
+    TIM2->ARR = 0xFFFFFFFFU;
+    TIM2->EGR = TIM_EGR_UG;  // Load the new prescaler.
+    TIM2->CNT = 0U;
+    TIM2->SR = 0U;
+    TIM2->CR1 |= TIM_CR1_CEN;
+}
+
+static void lcd_clear_screen(void) {
+    lcd_write(LCD_CLEAR, 0U);
+    lcd_delay(LCD_CLEAR_DELAY);
+}
+
+// Keep the user's existing LCD driver above; these are the Slave behaviors.
+
+static void lcd_show_pin_prompt(void) {
+    lcd_clear_screen();
+    lcd_write(LCD_LINE1, 0U);
+    lcd_print("SYSTEM LOCKED");
+    lcd_write(LCD_LINE2, 0U);
+}
+
+static void lcd_show_result(const char *message) {
+    lcd_write(LCD_LINE2, 0U);
+    lcd_print("                ");
+    lcd_write(LCD_LINE2, 0U);
+    lcd_print(message);
+}
+
+static void lcd_show_received_message(const char *message) {
+    lcd_clear_screen();
+    lcd_write(LCD_LINE1, 0U);
+    lcd_print("MSG RECEIVED:");
+    lcd_write(LCD_LINE2, 0U);
+    lcd_print(message);
+}
+
+static void show_result_for(const char *message, uint32_t duration_ms) {
+    result_message_active = 1U;
+    result_message_start_ms = TIM2->CNT;
+    result_message_duration_ms = duration_ms;
+    lcd_show_result(message);
+}
+
+static void show_status_for(const char *message) {
+    result_message_active = 1U;
+    result_message_start_ms = TIM2->CNT;
+    result_message_duration_ms = SUCCESS_MESSAGE_MS;
+    lcd_show_received_message(message);
+}
+
+static void setup_status_led_and_button(void) {
+    // PI1 is the green LED (push-pull output, initially off).
+    GPIOI->BSRR = (1U << (LED_PIN + 16U));
+    GPIOI->MODER = (GPIOI->MODER & ~(3U << (2U * LED_PIN))) |
+                    (1U << (2U * LED_PIN));
+    GPIOI->OTYPER &= ~(1U << LED_PIN);
+    GPIOI->PUPDR &= ~(3U << (2U * LED_PIN));
+
+    // PI11 is the blue user button, with a pull-down (pressed = HIGH).
+    GPIOI->MODER &= ~(3U << (2U * BUTTON_PIN));
+    GPIOI->PUPDR = (GPIOI->PUPDR & ~(3U << (2U * BUTTON_PIN))) |
+                   (2U << (2U * BUTTON_PIN));
+}
+
+static void led_on(void) {
+    GPIOI->BSRR = (1U << LED_PIN);
+}
+
+static void led_off(void) {
+    GPIOI->BSRR = (1U << (LED_PIN + 16U));
+}
+
+static void stop_buzzer(void) {
+    buzzer_state = BUZZER_IDLE;
+    buzzer_off();
+}
+
+static void start_granted_beeps(void) {
+    buzzer_state = BUZZER_FIRST_BEEP;
+    buzzer_phase_start_ms = TIM2->CNT;
+    buzzer_on();
+}
+
+static void start_denied_alarm(void) {
+    buzzer_state = BUZZER_DENIED_ALARM;
+    buzzer_phase_start_ms = TIM2->CNT;
+    buzzer_on();
+}
+
+static void update_buzzer(uint32_t now_ms) {
+    uint32_t elapsed_ms = (uint32_t)(now_ms - buzzer_phase_start_ms);
+
+    if (buzzer_state == BUZZER_FIRST_BEEP && elapsed_ms >= DOUBLE_BEEP_MS) {
+        buzzer_off();
+        buzzer_state = BUZZER_GAP;
+        buzzer_phase_start_ms = now_ms;
+    } else if (buzzer_state == BUZZER_GAP && elapsed_ms >= DOUBLE_GAP_MS) {
+        buzzer_on();
+        buzzer_state = BUZZER_SECOND_BEEP;
+        buzzer_phase_start_ms = now_ms;
+    } else if (buzzer_state == BUZZER_SECOND_BEEP && elapsed_ms >= DOUBLE_BEEP_MS) {
+        stop_buzzer();
+    } else if (buzzer_state == BUZZER_DENIED_ALARM && elapsed_ms >= DENIED_BEEP_MS) {
+        stop_buzzer();
+    }
+}
+
+static void send_reply(char reply) {
+    uint8_t data = (uint8_t)reply;
+    (void)HAL_UART_Transmit(&huart6, &data, 1U, 100U);
+}
+
+static void reset_input(void) {
+    input_state = INPUT_WAITING;
+    pin_index = 0U;
+    comand_index = 0U;
+    pin_separator_received = 0U;
+    discarded_pin = 0U;
+    memset(entered_pin, 0, sizeof(entered_pin));
+    memset(entered_comand, 0, sizeof(entered_comand));
+}
+
+static void access_granted(void) {
+    led_on();
+    start_granted_beeps();
+    send_reply('G');
+    show_result_for("ACCESS GRANTED", SUCCESS_MESSAGE_MS);
+}
+
+static void access_denied(void) {
+    led_off();
+    start_denied_alarm();
+    send_reply('D');
+    show_result_for("ACCESS DENIED!", ERROR_MESSAGE_MS);
+}
+
+static void handle_pin_byte(char key) {
+    // A PIN packet starts with P: and ends with a newline.
+    if (!pin_separator_received) {
+        if (key == ':') {
+            pin_separator_received = 1U;
+        } else {
+            input_state = INPUT_DISCARD;
+            discarded_pin = 1U;
+        }
+        return;
+    }
+
+    if (key == '\n') {
+        if (pin_index == PIN_LENGTH && strcmp(entered_pin, PASS_CODE) == 0) {
+            access_granted();
+        } else {
+            access_denied();
+        }
+        reset_input();
+        return;
+    }
+
+    if (key >= '0' && key <= '9' && pin_index < PIN_LENGTH) {
+        entered_pin[pin_index++] = key;
+        entered_pin[pin_index] = '\0';
+        // One asterisk per received digit, not one beep per UART byte.
+        lcd_write('*', 1U);
+    } else {
+        input_state = INPUT_DISCARD;
+        discarded_pin = 1U;
+    }
+}
+
+static void handle_message_byte(char key) {
+    if (key == '\n') {
+        if (strcmp(entered_comand, MSG_CLEAR) == 0) {
+            reset_input();
+            result_message_active = 0U;
+            stop_buzzer();
+            led_off();
+            lcd_show_pin_prompt();
+        } else {
+            if (strcmp(entered_comand, MSG_HELP) == 0) {
+                show_status_for(STATUS_HELP);
+            } else if (strcmp(entered_comand, MSG_READY) == 0) {
+                show_status_for(STATUS_READY);
+            } else if (strcmp(entered_comand, MSG_BUSY) == 0) {
+                show_status_for(STATUS_BUSY);
+            } else if (strcmp(entered_comand, MSG_SAFE) == 0) {
+                show_status_for(STATUS_SAFE);
+            } else {
+                show_result_for(ERROR, ERROR_MESSAGE_MS);
+            }
+            reset_input();
+        }
+        return;
+    }
+
+    if (comand_index < COMAND_LENGTH - 1U) {
+        entered_comand[comand_index++] = key;
+        entered_comand[comand_index] = '\0';
+    } else {
+        input_state = INPUT_DISCARD;
+        discarded_pin = 0U;
+    }
+}
+
+static void handle_key(char key) {
+    // Only the first byte selects the packet type.
+    if (input_state == INPUT_WAITING) {
+        if (key == 'P') {
+            input_state = INPUT_PIN;
+            pin_separator_received = 0U;
+            pin_index = 0U;
+            entered_pin[0] = '\0';
+            result_message_active = 0U;
+            lcd_show_pin_prompt();
+        } else if (key == 'M' || key == 'C') {
+            input_state = INPUT_MESSAGE;
+            comand_index = 1U;
+            entered_comand[0] = key;
+            entered_comand[1] = '\0';
+        }
+        return;
+    }
+
+    if (input_state == INPUT_DISCARD) {
+        if (key == '\n') {
+            if (discarded_pin) {
+                access_denied();
+            } else {
+                show_result_for(ERROR, ERROR_MESSAGE_MS);
+            }
+            reset_input();
+        }
+        return;
+    }
+
+    if (input_state == INPUT_PIN) {
+        handle_pin_byte(key);
+    } else if (input_state == INPUT_MESSAGE) {
+        handle_message_byte(key);
+    }
+}
+
+static void emergency_reset(void) {
+    // The local override has priority over all pending LCD/buzzer activity.
+    reset_input();
+    result_message_active = 0U;
+    stop_buzzer();
+    led_off();
+    lcd_show_pin_prompt();
+    send_reply('A');
+}
+
+static void update_override_button(uint32_t now_ms) {
+    uint8_t pressed = (GPIOI->IDR & (1U << BUTTON_PIN)) != 0U;
+
+    if (pressed != button_last_sample) {
+        button_last_sample = pressed;
+        button_change_ms = now_ms;
+    }
+
+    if (pressed != button_stable_state &&
+        (uint32_t)(now_ms - button_change_ms) >= BUTTON_DEBOUNCE_MS) {
+        button_stable_state = pressed;
+
+        if (pressed) {
+            emergency_reset();
+        }
+    }
+}
+
+static void update_result_message(uint32_t now_ms) {
+    if (result_message_active &&
+        (uint32_t)(now_ms - result_message_start_ms) >= result_message_duration_ms) {
+        result_message_active = 0U;
+        lcd_show_pin_prompt();
+    }
+}
+
+int node_b_handle_byte(char key) {
+    handle_key(key);
+    return 0;
+}
+
+int node_b_init(void) {
+    RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN |
+                    RCC_AHB1ENR_GPIOFEN |
+                    RCC_AHB1ENR_GPIOGEN |
+                    RCC_AHB1ENR_GPIOIEN;
+    (void)RCC->AHB1ENR;
+
+    setup_buzzer();
+    setup_lcd_data_bus();
+    setup_status_led_and_button();
+    setup_lcd();
+    configure_timer();
+    reset_input();
+    lcd_show_pin_prompt();
+
+    return 0;
+}
+
+int node_b_step(void) {
+    uint32_t now_ms = TIM2->CNT;
+
+    update_override_button(now_ms);
+    update_buzzer(now_ms);
+    update_result_message(now_ms);
+
+    return 0;
+}

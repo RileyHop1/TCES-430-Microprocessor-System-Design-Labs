@@ -1,0 +1,421 @@
+/*
+ * Lab 6 Node B: standalone LCD and buzzer test for STM32F746G-DISCO.
+ * Use as Core/Src/main.c in a separate copy of the bare-metal Lab 5 project.
+ * LCD D4-D7: PA0, PF10, PF9, PF8. RS: PF6. E: PF7. R/W: GND.
+ * Active-high buzzer: PG6 (Arduino D2), as driven by the Lab 5 code.
+ * Reset runs a demo: 1234, then three wrong PINs, then a 30 s lockout.
+ * TIM2 assumes its input clock is 16 MHz, as in Lab 5.
+ */
+
+#include "main.h"
+
+// LCD D4 -> PA0; D5 -> PF10; D6 -> PF9; D7 -> PF8
+// LCD RS -> PF6; E -> PF7; R/W -> GND
+#define DB4  0U
+#define DB5 10U
+#define DB6  9U
+#define DB7  8U
+#define RS   6U
+#define E    7U
+// HD44780-style 4-bit LCD commands from the previous lab
+#define LCD_INIT_8BIT     0x03U
+#define LCD_INIT_4BIT     0x02U
+#define LCD_FUNCTION_SET  0x28U
+#define LCD_DISPLAY_OFF   0x08U
+#define LCD_DISPLAY_ON    0x0CU
+#define LCD_CLEAR         0x01U
+#define LCD_ENTRY_MODE    0x06U
+#define LCD_LINE1         0x80U
+#define LCD_LINE2         0xC0U
+// Preserve the previous lab's software delay counts.
+// These are approximate busy-loop delays, NOT calibrated microseconds.
+#define LCD_PULSE_DELAY   500U
+#define LCD_STARTUP_DELAY 4000000U
+#define LCD_INIT_DELAY    500000U
+#define LCD_CMD_DELAY     5000U
+#define LCD_CLEAR_DELAY   200000U
+#define LCD_BYTE_DELAY    5000U
+
+#define PASS_CODE             "1234"
+#define PIN_LENGTH            4U
+#define LOCKOUT_DURATION_MS   30000U
+#define KEY_BEEP_MS           100U
+#define SUCCESS_BEEP_MS       2000U
+#define SUCCESS_MESSAGE_MS    2000U
+#define ERROR_MESSAGE_MS      1000U
+#define BUZZER_PIN 6U  // PG6, Arduino D2
+#define DEMO_START_MS 2000U
+#define DEMO_KEY_INTERVAL_MS 250U
+
+static char entered_pin[PIN_LENGTH + 1U];
+static uint8_t pin_index;
+
+static uint32_t buzzer_start_ms;
+static uint32_t buzzer_duration_ms;
+static uint8_t buzzer_active;
+
+static uint32_t lockout_start_ms;
+static uint8_t lockout_active;
+static uint8_t fail_count;
+static uint32_t last_displayed_second = UINT32_MAX;
+
+static uint8_t result_message_active;
+static uint32_t result_message_start_ms;
+static uint32_t result_message_duration_ms;
+
+static void lcd_delay(uint32_t count) {
+    while (count--) {
+        __NOP();
+    }
+}
+
+static void setup_lcd_data_bus(void) {
+    // RCC clocks for GPIOA and GPIOF are enabled in main().
+    // Make PA0 and PF6-PF10 GPIO outputs.
+    GPIOA->MODER &= ~(3U << (DB4 * 2U));
+    GPIOF->MODER &= ~(3U << (DB5 * 2U));
+    GPIOF->MODER &= ~(3U << (DB6 * 2U));
+    GPIOF->MODER &= ~(3U << (DB7 * 2U));
+    GPIOF->MODER &= ~(3U << (RS  * 2U));
+    GPIOF->MODER &= ~(3U << (E   * 2U));
+    GPIOA->MODER |= (1U << (DB4 * 2U));
+    GPIOF->MODER |= (1U << (DB5 * 2U));
+    GPIOF->MODER |= (1U << (DB6 * 2U));
+    GPIOF->MODER |= (1U << (DB7 * 2U));
+    GPIOF->MODER |= (1U << (RS  * 2U));
+    GPIOF->MODER |= (1U << (E   * 2U));
+    // Push-pull outputs, matching your previous LCD wiring.
+    GPIOA->OTYPER &= ~(1U << DB4);
+    GPIOF->OTYPER &= ~(1U << DB5);
+    GPIOF->OTYPER &= ~(1U << DB6);
+    GPIOF->OTYPER &= ~(1U << DB7);
+    GPIOF->OTYPER &= ~(1U << RS);
+    GPIOF->OTYPER &= ~(1U << E);
+}
+
+static void send_lcd_nibble(uint8_t nibble, uint8_t rs) {
+    // Clear all four data pins and RS.
+    GPIOA->BSRR = (1U << (DB4 + 16U));
+    GPIOF->BSRR =
+        (1U << (DB5 + 16U)) |
+        (1U << (DB6 + 16U)) |
+        (1U << (DB7 + 16U)) |
+        (1U << (RS  + 16U));
+    // Place the nibble on D4-D7; RS selects command/data register.
+    GPIOA->BSRR = ((nibble & 1U) << DB4);
+    GPIOF->BSRR =
+        (((nibble >> 1U) & 1U) << DB5) |
+        (((nibble >> 2U) & 1U) << DB6) |
+        (((nibble >> 3U) & 1U) << DB7) |
+        ((rs & 1U) << RS);
+    // HD44780 accepts the nibble on E's falling edge.
+    lcd_delay(LCD_PULSE_DELAY);
+    GPIOF->BSRR = (1U << E);
+    lcd_delay(LCD_PULSE_DELAY);
+    GPIOF->BSRR = (1U << (E + 16U));
+    lcd_delay(LCD_PULSE_DELAY);
+}
+
+static void setup_lcd(void) {
+    GPIOF->BSRR = (1U << (E + 16U));
+    lcd_delay(LCD_STARTUP_DELAY);
+    // Synchronize LCD into known 8-bit startup state.
+    send_lcd_nibble(LCD_INIT_8BIT, 0U);
+    lcd_delay(LCD_INIT_DELAY);
+    send_lcd_nibble(LCD_INIT_8BIT, 0U);
+    lcd_delay(LCD_INIT_DELAY);
+    send_lcd_nibble(LCD_INIT_8BIT, 0U);
+    lcd_delay(LCD_INIT_DELAY);
+    // Switch to four-bit transactions.
+    send_lcd_nibble(LCD_INIT_4BIT, 0U);
+    lcd_delay(LCD_CMD_DELAY);
+    // Preserve your previous lab's sequence.
+    send_lcd_nibble(LCD_FUNCTION_SET >> 4U, 0U);
+    send_lcd_nibble(LCD_FUNCTION_SET & 0x0FU, 0U);
+    lcd_delay(LCD_CMD_DELAY);
+    send_lcd_nibble(LCD_DISPLAY_OFF >> 4U, 0U);
+    send_lcd_nibble(LCD_DISPLAY_OFF & 0x0FU, 0U);
+    lcd_delay(LCD_CMD_DELAY);
+    send_lcd_nibble(LCD_CLEAR >> 4U, 0U);
+    send_lcd_nibble(LCD_CLEAR & 0x0FU, 0U);
+    lcd_delay(LCD_CLEAR_DELAY);
+    send_lcd_nibble(LCD_ENTRY_MODE >> 4U, 0U);
+    send_lcd_nibble(LCD_ENTRY_MODE & 0x0FU, 0U);
+    lcd_delay(LCD_CMD_DELAY);
+    send_lcd_nibble(LCD_DISPLAY_ON >> 4U, 0U);
+    send_lcd_nibble(LCD_DISPLAY_ON & 0x0FU, 0U);
+    lcd_delay(LCD_CMD_DELAY);
+}
+
+static void lcd_write(uint8_t value, uint8_t rs) {
+    send_lcd_nibble(value >> 4U, rs);
+    send_lcd_nibble(value & 0x0FU, rs);
+    lcd_delay(LCD_BYTE_DELAY);
+}
+
+// Small adapter so the existing LCD driver can display a startup prompt.
+static void lcd_print(const char *message) {
+    while (*message != '\0') {
+        lcd_write((uint8_t)*message++, 1U);
+    }
+}
+
+static void setup_buzzer(void) {
+    GPIOG->BSRR = (1U << (BUZZER_PIN + 16U));
+
+    GPIOG->MODER &= ~(3U << (BUZZER_PIN * 2U));
+    GPIOG->MODER |=  (1U << (BUZZER_PIN * 2U));
+
+    GPIOG->OTYPER &= ~(1U << BUZZER_PIN);
+    GPIOG->PUPDR &= ~(3U << (BUZZER_PIN * 2U));
+}
+
+static void buzzer_on(void) {
+    GPIOG->BSRR = (1U << BUZZER_PIN);
+}
+
+static void buzzer_off(void) {
+    GPIOG->BSRR = (1U << (BUZZER_PIN + 16U));
+}
+
+static void configure_timer(void) {
+    RCC->APB1ENR |= RCC_APB1ENR_TIM2EN;
+    (void)RCC->APB1ENR;
+    TIM2->CR1 &= ~TIM_CR1_CEN;
+
+    // Assumes TIM2's input clock is 16 MHz.
+    // 16,000,000 / (15999 + 1) = 1000 counter ticks per second.
+    TIM2->PSC = 15999U;
+    TIM2->ARR = 0xFFFFFFFFU;
+    TIM2->EGR = TIM_EGR_UG;  // Load the new prescaler.
+    TIM2->CNT = 0U;
+    TIM2->SR = 0U;
+    TIM2->CR1 |= TIM_CR1_CEN;
+}
+
+static void lcd_clear_screen(void) {
+    lcd_write(LCD_CLEAR, 0U);
+    lcd_delay(LCD_CLEAR_DELAY);
+}
+
+static void lcd_show_pin_prompt(void) {
+    lcd_clear_screen();
+    lcd_write(LCD_LINE1, 0U);
+    lcd_print("Enter PIN:");
+    lcd_write(LCD_LINE2, 0U);
+}
+
+static void lcd_show_result(const char *message) {
+    // Overwrite any masked digits or older result text on line two.
+    lcd_write(LCD_LINE2, 0U);
+    lcd_print("                ");
+    lcd_write(LCD_LINE2, 0U);
+    lcd_print(message);
+}
+
+// Caller supplies >= 11 bytes for any uint32_t value.
+static void number_to_string(uint32_t number, char *buffer) {
+    uint32_t temp = number;
+    uint8_t digits = 0U;
+
+    do {
+        ++digits;
+        temp /= 10U;
+    } while (temp != 0U);
+
+    buffer[digits] = '\0';
+    for (uint8_t i = digits; i > 0U; --i) {
+        uint8_t digit = (uint8_t)(number % 10U);
+        buffer[i - 1U] = (char)('0' + digit);
+        number /= 10U;
+    }
+}
+
+static void lcd_show_lockout_time(uint32_t remaining_seconds) {
+    char time_string[12];
+    number_to_string(remaining_seconds, time_string);
+
+    lcd_write(LCD_LINE2, 0U);
+    lcd_print("Time: ");
+    lcd_print(time_string);
+    lcd_print("  ");  // Clear old digit when changing 10 -> 9.
+}
+
+static void start_normal_beep(uint32_t duration_ms) {
+    buzzer_on();
+    buzzer_start_ms = TIM2->CNT;
+    buzzer_duration_ms = duration_ms;
+    buzzer_active = 1U;
+}
+
+static void show_result_for(const char *message, uint32_t duration_ms) {
+    result_message_active = 1U;
+    result_message_start_ms = TIM2->CNT;
+    result_message_duration_ms = duration_ms;
+    lcd_show_result(message);
+}
+
+static void start_security_lockout(void) {
+    result_message_active = 0U;
+    fail_count = 0U;
+
+    lockout_active = 1U;
+    lockout_start_ms = TIM2->CNT;
+    last_displayed_second = UINT32_MAX;
+
+    buzzer_on();
+    buzzer_active = 1U;
+
+    lcd_clear_screen();
+    lcd_write(LCD_LINE1, 0U);
+    lcd_print("LOCKED!");
+    last_displayed_second = LOCKOUT_DURATION_MS / 1000U;
+    lcd_show_lockout_time(last_displayed_second);
+}
+
+static void handle_key(char key) {
+    if (lockout_active || result_message_active) {
+        return;
+    }
+
+    // A simulated keypress uses the same path as Lab 5's keypad input.
+    start_normal_beep(KEY_BEEP_MS);
+
+    // Non-numeric keys are ignored by the PIN-entry mechanism.
+    if (key < '0' || key > '9' || pin_index >= PIN_LENGTH) {
+        return;
+    }
+
+    entered_pin[pin_index] = key;
+    ++pin_index;
+    entered_pin[pin_index] = '\0';
+    lcd_write('*', 1U);
+
+    if (pin_index == PIN_LENGTH) {
+        if (strcmp(entered_pin, PASS_CODE) == 0) {
+            fail_count = 0U;
+            start_normal_beep(SUCCESS_BEEP_MS); // Overrides 100 ms beep.
+            show_result_for("Access Granted", SUCCESS_MESSAGE_MS);
+        } else {
+            ++fail_count;
+            if (fail_count >= 3U) {
+                start_security_lockout();
+            } else {
+                show_result_for("Incorrect PIN", ERROR_MESSAGE_MS);
+            }
+        }
+
+        // Reset PIN buffer while retaining the result/lockout display.
+        memset(entered_pin, 0, sizeof(entered_pin));
+        pin_index = 0U;
+    }
+}
+
+static void update_normal_buzzer(uint32_t now_ms) {
+    if (!lockout_active && buzzer_active &&
+        (uint32_t)(now_ms - buzzer_start_ms) >= buzzer_duration_ms) {
+        buzzer_off();
+        buzzer_active = 0U;
+    }
+}
+
+static void update_result_message(uint32_t now_ms) {
+    if (result_message_active &&
+        (uint32_t)(now_ms - result_message_start_ms) >=
+            result_message_duration_ms) {
+        result_message_active = 0U;
+        lcd_show_pin_prompt();
+    }
+}
+
+static void update_security_lockout(uint32_t now_ms) {
+    if (!lockout_active) {
+        return;
+    }
+
+    uint32_t elapsed_ms = (uint32_t)(now_ms - lockout_start_ms);
+    if (elapsed_ms >= LOCKOUT_DURATION_MS) {
+        buzzer_off();
+        buzzer_active = 0U;
+        lockout_active = 0U;
+        lcd_show_pin_prompt();
+        return;
+    }
+
+    // Alternating seconds: 1 s ON, 1 s OFF, repeated.
+    uint8_t should_sound = ((elapsed_ms / 1000U) % 2U) == 0U;
+    if (should_sound != buzzer_active) {
+        if (should_sound) {
+            buzzer_on();
+        } else {
+            buzzer_off();
+        }
+        buzzer_active = should_sound;
+    }
+
+    // Round up so 30 appears initially and 1 remains until expiry.
+    uint32_t seconds_remaining =
+        (LOCKOUT_DURATION_MS - elapsed_ms + 999U) / 1000U;
+
+    if (seconds_remaining != last_displayed_second) {
+        lcd_show_lockout_time(seconds_remaining);
+        last_displayed_second = seconds_remaining;
+    }
+}
+
+static void update_demo(uint32_t now_ms) {
+    static const char demo_pins[][PIN_LENGTH + 1U] = {
+        PASS_CODE, "0000", "1111", "2222"
+    };
+    static uint8_t attempt;
+    static uint8_t digit;
+    static uint32_t last_key_ms;
+    static uint32_t key_interval_ms = DEMO_START_MS;
+
+    if (attempt == sizeof(demo_pins) / sizeof(demo_pins[0]) ||
+        lockout_active || result_message_active ||
+        (uint32_t)(now_ms - last_key_ms) < key_interval_ms) {
+        return;
+    }
+
+    last_key_ms = now_ms;
+    key_interval_ms = DEMO_KEY_INTERVAL_MS;
+    handle_key(demo_pins[attempt][digit++]);
+    if (digit == PIN_LENGTH) {
+        digit = 0U;
+        ++attempt;
+    }
+}
+
+//Small little wrapper.
+int node_b_handle_byte(char key) {
+
+	handle_key(key);
+
+	return 0;
+}
+
+int node_b_init(void) {
+    RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN |
+                    RCC_AHB1ENR_GPIOFEN |
+                    RCC_AHB1ENR_GPIOGEN;
+    (void)RCC->AHB1ENR;
+
+    setup_buzzer();
+    setup_lcd_data_bus();
+    setup_lcd();
+    lcd_show_pin_prompt();
+    configure_timer();
+
+    return 0;
+}
+
+int node_b_step(void) {
+	uint32_t now_ms = TIM2->CNT;
+    update_normal_buzzer(now_ms);
+    update_result_message(now_ms);
+    update_security_lockout(now_ms);
+    update_demo(now_ms);
+
+    return 0;
+}

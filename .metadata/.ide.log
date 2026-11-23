@@ -1,58 +1,21 @@
-2026-11-17 08:09:32,230 [INFO] Activator:177 - 
-
-
-2026-11-17 08:09:32,235 [INFO] Activator:178 - !SESSION log4j initialized
-2026-11-17 08:09:34,971 [INFO] LogOutputStream:77 - [STDOUT_REDIRECT] 
-2026-11-17 08:09:35,380 [INFO] LogOutputStream:77 - [STDOUT_REDIRECT] Start the detection of the machine's architecture
-2026-11-17 08:09:35,391 [INFO] LogOutputStream:77 - [STDOUT_REDIRECT] use arm architecture
-2026-11-17 08:09:35,391 [INFO] LogOutputStream:77 - [STDOUT_REDIRECT] Architecture: Apple Silicon (ARM64)
-2026-11-17 08:14:55,163 [ERROR] ConfigurationRetriever:142 - IOException on connection: Read timed out
-2026-11-17 09:12:58,780 [ERROR] ConfigurationRetriever:142 - IOException on connection: sw-center.st.com
-2026-11-17 09:12:58,782 [ERROR] ConfigurationRetriever:142 - IOException on connection: sw-center.st.com
-2026-11-17 09:12:58,782 [ERROR] ConfigurationRetriever:142 - IOException on connection: sw-center.st.com
-2026-11-17 09:17:32,853 [ERROR] ConfigurationRetriever:142 - IOException on connection: sw-center.st.com
-2026-11-17 09:17:32,853 [ERROR] ConfigurationRetriever:142 - IOException on connection: sw-center.st.com
-2026-11-17 09:17:32,853 [ERROR] ConfigurationRetriever:142 - IOException on connection: sw-center.st.com
-2026-11-17 09:17:35,053 [ERROR] ConfigurationRetriever:142 - IOException on connection: sw-center.st.com
-2026-11-17 09:17:35,054 [ERROR] ConfigurationRetriever:142 - IOException on connection: sw-center.st.com
-2026-11-17 09:17:35,054 [ERROR] ConfigurationRetriever:142 - IOException on connection: sw-center.st.com
-2026-11-17 09:18:02,023 [ERROR] ConfigurationRetriever:142 - IOException on connection: sw-center.st.com
-2026-11-17 09:18:02,023 [ERROR] ConfigurationRetriever:142 - IOException on connection: sw-center.st.com
-2026-11-17 09:18:02,023 [ERROR] ConfigurationRetriever:142 - IOException on connection: sw-center.st.com
-2026-11-17 09:18:02,244 [ERROR] ConfigurationRetriever:142 - IOException on connection: sw-center.st.com
-2026-11-17 09:18:02,245 [ERROR] ConfigurationRetriever:142 - IOException on connection: sw-center.st.com
-2026-11-17 09:18:02,245 [ERROR] ConfigurationRetriever:142 - IOException on connection: sw-center.st.com
-2026-11-17 09:18:30,006 [ERROR] ConfigurationRetriever:142 - IOException on connection: sw-center.st.com
-2026-11-17 09:18:30,006 [ERROR] ConfigurationRetriever:142 - IOException on connection: sw-center.st.com
-2026-11-17 09:18:30,006 [ERROR] ConfigurationRetriever:142 - IOException on connection: sw-center.st.com
-2026-11-17 09:18:30,232 [ERROR] ConfigurationRetriever:142 - IOException on connection: sw-center.st.com
-2026-11-17 09:18:30,233 [ERROR] ConfigurationRetriever:142 - IOException on connection: sw-center.st.com
-2026-11-17 09:18:30,233 [ERROR] ConfigurationRetriever:142 - IOException on connection: sw-center.st.com
-2026-11-17 09:20:13,812 [ERROR] ConfigurationRetriever:142 - IOException on connection: Network is unreachable
-2026-11-17 09:20:13,814 [ERROR] ConfigurationRetriever:142 - IOException on connection: Network is unreachable
-2026-11-17 09:20:13,815 [ERROR] ConfigurationRetriever:142 - IOException on connection: Network is unreachable
-2026-11-17 09:20:13,832 [ERROR] ConfigurationRetriever:142 - IOException on connection: Network is unreachable
-2026-11-17 09:20:13,833 [ERROR] ConfigurationRetriever:142 - IOException on connection: Network is unreachable
-2026-11-17 09:20:13,833 [ERROR] ConfigurationRetriever:142 - IOException on connection: Network is unreachable
-2026-11-17 09:22:03,408 [ERROR] ConfigurationRetriever:142 - IOException on connection: Connect timed out
-2026-11-17 09:22:05,411 [ERROR] ConfigurationRetriever:142 - IOException on connection: Connect timed out
-2026-11-17 09:22:11,713 [ERROR] ConfigurationRetriever:142 - IOException on connection: Connect timed out
-2026-11-17 09:58:06,601 [ERROR] ConfigurationRetriever:142 - IOException on connection: sw-center.st.com
-2026-11-17 09:58:06,605 [ERROR] ConfigurationRetriever:142 - IOException on connection: sw-center.st.com
-2026-11-17 09:58:06,605 [ERROR] ConfigurationRetriever:142 - IOException on connection: sw-center.st.com
-2026-11-17 09:58:06,621 [ERROR] ConfigurationRetriever:142 - IOException on connection: sw-center.st.com
-2026-11-17 09:58:06,621 [ERROR] ConfigurationRetriever:142 - IOException on connection: sw-center.st.com
-2026-11-17 09:58:06,621 [ERROR] ConfigurationRetriever:142 - IOException on connection: sw-center.st.com
-2026-11-17 09:58:06,637 [ERROR] ConfigurationRetriever:142 - IOException on connection: sw-center.st.com
-2026-11-17 09:58:06,637 [ERROR] ConfigurationRetriever:142 - IOException on connection: sw-center.st.com
-2026-11-17 09:58:06,637 [ERROR] ConfigurationRetriever:142 - IOException on connection: sw-center.st.com
-2026-11-17 10:08:12,497 [ERROR] ConfigurationRetriever:142 - IOException on connection: Connect timed out
-2026-11-17 10:10:07,447 [INFO] Activator:177 - 
-
-
-2026-11-17 10:10:07,448 [INFO] Activator:178 - !SESSION log4j initialized
-2026-11-17 10:10:12,679 [INFO] LogOutputStream:77 - [STDOUT_REDIRECT] 
-2026-11-17 10:10:12,782 [INFO] LogOutputStream:77 - [STDOUT_REDIRECT] Start the detection of the machine's architecture
-2026-11-17 10:10:12,790 [INFO] LogOutputStream:77 - [STDOUT_REDIRECT] use arm architecture
-2026-11-17 10:10:12,791 [INFO] LogOutputStream:77 - [STDOUT_REDIRECT] Architecture: Apple Silicon (ARM64)
-2026-11-17 10:10:20,785 [ERROR] ConfigurationRetriever:142 - IOException on connection: Read timed out
+2026-11-21 13:59:59,603 [ERROR] ConfigurationRetriever:142 - IOException on connection: Connect timed out
+2026-11-21 14:00:01,608 [ERROR] ConfigurationRetriever:142 - IOException on connection: Connect timed out
+2026-11-21 14:00:03,611 [ERROR] ConfigurationRetriever:142 - IOException on connection: Connect timed out
+2026-11-21 14:27:09,578 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] Nov 21, 2026 2:27:09 PM com.github.weisj.jsvg.nodes.container.BaseContainerNode isAcceptableType
+2026-11-21 14:27:09,578 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] WARNING: Element <g> not allowed in <clippath> (or not implemented)
+2026-11-21 14:27:09,578 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] 
+2026-11-21 14:27:09,579 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] Nov 21, 2026 2:27:09 PM com.github.weisj.jsvg.nodes.container.BaseContainerNode isAcceptableType
+2026-11-21 14:27:09,580 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] WARNING: Element <g> not allowed in <clippath> (or not implemented)
+2026-11-21 14:27:09,580 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] 
+2026-11-21 14:27:09,582 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] Nov 21, 2026 2:27:09 PM com.github.weisj.jsvg.nodes.container.BaseContainerNode isAcceptableType
+2026-11-21 14:27:09,582 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] WARNING: Element <g> not allowed in <clippath> (or not implemented)
+2026-11-21 14:27:09,583 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] 
+2026-11-21 14:27:09,584 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] Nov 21, 2026 2:27:09 PM com.github.weisj.jsvg.nodes.container.BaseContainerNode isAcceptableType
+2026-11-21 14:27:09,584 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] WARNING: Element <g> not allowed in <clippath> (or not implemented)
+2026-11-21 14:27:09,584 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] 
+2026-11-21 14:28:43,141 [ERROR] ConfigurationRetriever:142 - IOException on connection: Connect timed out
+2026-11-21 14:28:45,142 [ERROR] ConfigurationRetriever:142 - IOException on connection: Connect timed out
+2026-11-21 14:28:47,144 [ERROR] ConfigurationRetriever:142 - IOException on connection: Connect timed out
+2026-11-21 14:28:49,161 [ERROR] ConfigurationRetriever:142 - IOException on connection: Connect timed out
+2026-11-21 14:28:51,163 [ERROR] ConfigurationRetriever:142 - IOException on connection: Connect timed out
+2026-11-21 14:28:53,165 [ERROR] ConfigurationRetriever:142 - IOException on connection: Connect timed out

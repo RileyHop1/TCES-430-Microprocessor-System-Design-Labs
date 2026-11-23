@@ -1,0 +1,10 @@
+16:57:12 **** Incremental Build of configuration Debug for project Prelab6 ****
+make -j14 all 
+arm-none-eabi-size  Prelab6.elf 
+   text	   data	    bss	    dec	    hex	filename
+  11952	     12	   1708	  13672	   3568	Prelab6.elf
+Finished building: default.size.stdout
+ 
+
+16:57:12 Build Finished. 0 errors, 0 warnings. (took 72ms)
+

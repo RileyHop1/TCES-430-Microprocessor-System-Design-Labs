@@ -94,8 +94,8 @@ part2:
  80001e6:	f04f 33ff 	mov.w	r3, #4294967295	@ 0xffffffff
 	MOVS R4, #2 	//a
  80001ea:	2402      	movs	r4, #2
-	MOVS R5, #1 	//b
- 80001ec:	2501      	movs	r5, #1
+	MOVS R5, #2 	//b
+ 80001ec:	2502      	movs	r5, #2
 
 080001ee <WHILE_START>:
 
