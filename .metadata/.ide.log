@@ -1,21 +1,62 @@
-2026-11-21 13:59:59,603 [ERROR] ConfigurationRetriever:142 - IOException on connection: Connect timed out
-2026-11-21 14:00:01,608 [ERROR] ConfigurationRetriever:142 - IOException on connection: Connect timed out
-2026-11-21 14:00:03,611 [ERROR] ConfigurationRetriever:142 - IOException on connection: Connect timed out
-2026-11-21 14:27:09,578 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] Nov 21, 2026 2:27:09 PM com.github.weisj.jsvg.nodes.container.BaseContainerNode isAcceptableType
-2026-11-21 14:27:09,578 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] WARNING: Element <g> not allowed in <clippath> (or not implemented)
-2026-11-21 14:27:09,578 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] 
-2026-11-21 14:27:09,579 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] Nov 21, 2026 2:27:09 PM com.github.weisj.jsvg.nodes.container.BaseContainerNode isAcceptableType
-2026-11-21 14:27:09,580 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] WARNING: Element <g> not allowed in <clippath> (or not implemented)
-2026-11-21 14:27:09,580 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] 
-2026-11-21 14:27:09,582 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] Nov 21, 2026 2:27:09 PM com.github.weisj.jsvg.nodes.container.BaseContainerNode isAcceptableType
-2026-11-21 14:27:09,582 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] WARNING: Element <g> not allowed in <clippath> (or not implemented)
-2026-11-21 14:27:09,583 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] 
-2026-11-21 14:27:09,584 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] Nov 21, 2026 2:27:09 PM com.github.weisj.jsvg.nodes.container.BaseContainerNode isAcceptableType
-2026-11-21 14:27:09,584 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] WARNING: Element <g> not allowed in <clippath> (or not implemented)
-2026-11-21 14:27:09,584 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] 
-2026-11-21 14:28:43,141 [ERROR] ConfigurationRetriever:142 - IOException on connection: Connect timed out
-2026-11-21 14:28:45,142 [ERROR] ConfigurationRetriever:142 - IOException on connection: Connect timed out
-2026-11-21 14:28:47,144 [ERROR] ConfigurationRetriever:142 - IOException on connection: Connect timed out
-2026-11-21 14:28:49,161 [ERROR] ConfigurationRetriever:142 - IOException on connection: Connect timed out
-2026-11-21 14:28:51,163 [ERROR] ConfigurationRetriever:142 - IOException on connection: Connect timed out
-2026-11-21 14:28:53,165 [ERROR] ConfigurationRetriever:142 - IOException on connection: Connect timed out
+2026-11-23 15:30:52,088 [ERROR] ConfigurationRetriever:142 - IOException on connection: sw-center.st.com
+2026-11-23 15:30:52,090 [ERROR] ConfigurationRetriever:142 - IOException on connection: sw-center.st.com
+2026-11-23 15:30:52,090 [ERROR] ConfigurationRetriever:142 - IOException on connection: sw-center.st.com
+2026-11-23 15:30:52,375 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] 
+2026-11-23 15:31:26,981 [INFO] Activator:177 - 
+
+
+2026-11-23 15:31:26,982 [INFO] Activator:178 - !SESSION log4j initialized
+2026-11-23 15:31:27,592 [INFO] LogOutputStream:77 - [STDOUT_REDIRECT] 
+2026-11-23 15:31:27,699 [INFO] LogOutputStream:77 - [STDOUT_REDIRECT] Start the detection of the machine's architecture
+2026-11-23 15:31:27,701 [ERROR] ConfigurationRetriever:142 - IOException on connection: sw-center.st.com
+2026-11-23 15:31:27,701 [ERROR] ConfigurationRetriever:142 - IOException on connection: sw-center.st.com
+2026-11-23 15:31:27,701 [ERROR] ConfigurationRetriever:142 - IOException on connection: sw-center.st.com
+2026-11-23 15:31:27,707 [INFO] LogOutputStream:77 - [STDOUT_REDIRECT] use arm architecture
+2026-11-23 15:31:27,707 [INFO] LogOutputStream:77 - [STDOUT_REDIRECT] Architecture: Apple Silicon (ARM64)
+2026-11-23 15:31:27,708 [ERROR] ConfigurationRetriever:142 - IOException on connection: sw-center.st.com
+2026-11-23 15:31:27,708 [ERROR] ConfigurationRetriever:142 - IOException on connection: sw-center.st.com
+2026-11-23 15:31:27,709 [ERROR] ConfigurationRetriever:142 - IOException on connection: sw-center.st.com
+2026-11-23 15:31:27,749 [ERROR] ConfigurationRetriever:142 - IOException on connection: sw-center.st.com
+2026-11-23 15:31:27,749 [ERROR] ConfigurationRetriever:142 - IOException on connection: sw-center.st.com
+2026-11-23 15:31:27,750 [ERROR] ConfigurationRetriever:142 - IOException on connection: sw-center.st.com
+2026-11-23 15:33:15,900 [ERROR] ConfigurationRetriever:142 - IOException on connection: Network is unreachable
+2026-11-23 15:33:15,900 [ERROR] ConfigurationRetriever:142 - IOException on connection: Network is unreachable
+2026-11-23 15:33:15,900 [ERROR] ConfigurationRetriever:142 - IOException on connection: Network is unreachable
+2026-11-23 15:33:18,227 [INFO] Activator:177 - 
+
+
+2026-11-23 15:33:18,227 [INFO] Activator:178 - !SESSION log4j initialized
+2026-11-23 15:33:48,688 [INFO] LogOutputStream:77 - [STDOUT_REDIRECT] 
+2026-11-23 15:34:13,607 [INFO] LogOutputStream:77 - [STDOUT_REDIRECT] Start the detection of the machine's architecture
+2026-11-23 15:34:13,609 [ERROR] ConfigurationRetriever:142 - IOException on connection: Network is unreachable
+2026-11-23 15:34:13,610 [ERROR] ConfigurationRetriever:142 - IOException on connection: Network is unreachable
+2026-11-23 15:34:13,610 [ERROR] ConfigurationRetriever:142 - IOException on connection: Network is unreachable
+2026-11-23 15:34:13,615 [INFO] LogOutputStream:77 - [STDOUT_REDIRECT] use arm architecture
+2026-11-23 15:34:13,615 [INFO] LogOutputStream:77 - [STDOUT_REDIRECT] Architecture: Apple Silicon (ARM64)
+2026-11-23 15:34:13,616 [ERROR] ConfigurationRetriever:142 - IOException on connection: Network is unreachable
+2026-11-23 15:34:13,616 [ERROR] ConfigurationRetriever:142 - IOException on connection: Network is unreachable
+2026-11-23 15:34:13,616 [ERROR] ConfigurationRetriever:142 - IOException on connection: Network is unreachable
+2026-11-23 15:34:13,651 [ERROR] ConfigurationRetriever:142 - IOException on connection: Network is unreachable
+2026-11-23 15:34:13,651 [ERROR] ConfigurationRetriever:142 - IOException on connection: Network is unreachable
+2026-11-23 15:34:13,652 [ERROR] ConfigurationRetriever:142 - IOException on connection: Network is unreachable
+2026-11-23 15:55:25,904 [ERROR] ConfigurationRetriever:142 - IOException on connection: Network is unreachable
+2026-11-23 15:55:25,905 [ERROR] ConfigurationRetriever:142 - IOException on connection: Network is unreachable
+2026-11-23 15:55:25,906 [ERROR] ConfigurationRetriever:142 - IOException on connection: Network is unreachable
+2026-11-23 15:55:25,940 [ERROR] ConfigurationRetriever:142 - IOException on connection: Network is unreachable
+2026-11-23 15:55:25,940 [ERROR] ConfigurationRetriever:142 - IOException on connection: Network is unreachable
+2026-11-23 15:55:25,940 [ERROR] ConfigurationRetriever:142 - IOException on connection: Network is unreachable
+2026-11-23 16:01:38,040 [ERROR] ConfigurationRetriever:142 - IOException on connection: Network is unreachable
+2026-11-23 16:01:38,042 [ERROR] ConfigurationRetriever:142 - IOException on connection: Network is unreachable
+2026-11-23 16:01:38,042 [ERROR] ConfigurationRetriever:142 - IOException on connection: Network is unreachable
+2026-11-23 16:28:20,319 [ERROR] ConfigurationRetriever:142 - IOException on connection: sw-center.st.com
+2026-11-23 16:28:20,320 [ERROR] ConfigurationRetriever:142 - IOException on connection: sw-center.st.com
+2026-11-23 16:28:20,320 [ERROR] ConfigurationRetriever:142 - IOException on connection: sw-center.st.com
+2026-11-23 16:29:45,402 [ERROR] ConfigurationRetriever:142 - IOException on connection: sw-center.st.com
+2026-11-23 16:29:45,402 [ERROR] ConfigurationRetriever:142 - IOException on connection: sw-center.st.com
+2026-11-23 16:29:45,403 [ERROR] ConfigurationRetriever:142 - IOException on connection: sw-center.st.com
+2026-11-23 16:31:06,636 [ERROR] ConfigurationRetriever:142 - IOException on connection: sw-center.st.com
+2026-11-23 16:31:06,637 [ERROR] ConfigurationRetriever:142 - IOException on connection: sw-center.st.com
+2026-11-23 16:31:06,638 [ERROR] ConfigurationRetriever:142 - IOException on connection: sw-center.st.com
+2026-11-23 17:02:47,732 [ERROR] ConfigurationRetriever:142 - IOException on connection: sw-center.st.com
+2026-11-23 17:02:47,733 [ERROR] ConfigurationRetriever:142 - IOException on connection: sw-center.st.com
+2026-11-23 17:02:47,734 [ERROR] ConfigurationRetriever:142 - IOException on connection: sw-center.st.com

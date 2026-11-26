@@ -45,7 +45,6 @@ UART_HandleTypeDef huart6;
 
 /* USER CODE BEGIN PV */
 uint8_t rx_byte;
-volatile uint8_t reply_ready = 0;
 volatile uint8_t reply_byte = 0;
 
 
@@ -110,19 +109,7 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	  node_a_step();
-
-	  if (reply_ready) {
-		  uint8_t reply;
-
-		  __disable_irq();
-		  reply  = reply_byte;
-		  reply_ready = 0;
-
-		  __enable_irq();
-
-		  node_a_handle_reply((char)reply);
-	  }
+    node_a_step();
   }
   /* USER CODE END 3 */
 }
@@ -219,14 +206,10 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOI_CLK_ENABLE();
   __HAL_RCC_GPIOC_CLK_ENABLE();
 
-  /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOI, GPIO_PIN_1, GPIO_PIN_RESET);
-
   /*Configure GPIO pin : PI1 */
   GPIO_InitStruct.Pin = GPIO_PIN_1;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(GPIOI, &GPIO_InitStruct);
 
   /* USER CODE BEGIN MX_GPIO_Init_2 */
@@ -238,7 +221,6 @@ static void MX_GPIO_Init(void)
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
     if (huart->Instance == USART6) {
         reply_byte = rx_byte;
-        reply_ready = 1;
 
         HAL_UART_Receive_IT(&huart6, &rx_byte, 1);
     }

@@ -1,0 +1,547 @@
+
+/*
+ * Lab 6 Node A: keypad transmitter for STM32F746G-DISCO.
+ * Columns C1-C4: PI0, PI1, PI2, PI3 (D5, D13, D8, D7).
+ * Rows R1-R4: PB8, PB9, PB14, PB15 (D15, D14, D12, D11).
+ * Watch last_key, submitted_pin and submission_count in the debugger.
+ * TIM2 assumes its input clock is 16 MHz, as in Lab 5.
+ */
+
+#include "main.h"
+
+#define M_COLUMN_PIN1  0U
+#define M_COLUMN_PIN2  1U
+#define M_COLUMN_PIN3  2U
+#define M_COLUMN_PIN4  3U
+// KEYPAD PINS - ROWS: GPIOB, avoiding the LCD's PF6-PF10
+// PB8=D15, PB9=D14, PB14=D12, PB15=D11 (Arduino header)
+#define M_ROW_PIN1     8U
+#define M_ROW_PIN2     9U
+#define M_ROW_PIN3    14U
+#define M_ROW_PIN4    15U
+#define COLUMN_MASK  0x000FU
+#define COLUMN_MODE_MASK 0xFFU
+#define COLUMN_PULLUP_BITS 0x55U
+#define ROW_MASK     0xC300U  // PB8, PB9, PB14, PB15
+#define ROW_MODE_MASK ( \
+    (3U << (2U * M_ROW_PIN1)) | \
+    (3U << (2U * M_ROW_PIN2)) | \
+    (3U << (2U * M_ROW_PIN3)) | \
+    (3U << (2U * M_ROW_PIN4)) )
+#define ROW_OUTPUT_MODE ( \
+    (1U << (2U * M_ROW_PIN1)) | \
+    (1U << (2U * M_ROW_PIN2)) | \
+    (1U << (2U * M_ROW_PIN3)) | \
+    (1U << (2U * M_ROW_PIN4)) )
+
+#define PIN_LENGTH 4U
+#define RELEASE_DEBOUNCE_MS 20U
+
+static volatile uint8_t key_ready;
+static volatile uint8_t keypad_locked;
+static volatile char last_key;
+
+extern UART_HandleTypeDef huart6;
+
+// These retain the last complete PIN and the total submissions for debugging.
+volatile char submitted_pin[PIN_LENGTH + 1U];
+volatile uint32_t submission_count;
+
+static const char key_table[4][4] = {
+    {'1', '2', '3', 'A'},
+    {'4', '5', '6', 'B'},
+    {'7', '8', '9', 'C'},
+    {'*', '0', '#', 'D'}
+};
+static char entered_pin[PIN_LENGTH];
+static uint8_t pin_index;
+static uint8_t release_started;
+static uint32_t release_time;
+
+static void send_pin(void);
+
+static void default_matrix_gpios(void) {
+    GPIOB->BSRR = ROW_MASK << 16U;
+    GPIOI->BSRR = COLUMN_MASK << 16U;
+
+    GPIOB->OTYPER &= ~ROW_MASK;
+    GPIOB->MODER =
+        (GPIOB->MODER & ~ROW_MODE_MASK) | ROW_OUTPUT_MODE;
+    GPIOB->PUPDR &= ~ROW_MODE_MASK;
+
+    // Configure PI0, PI1, PI2, PI3 as pull-up inputs.
+    GPIOI->OTYPER &= ~COLUMN_MASK;
+    GPIOI->PUPDR =
+        (GPIOI->PUPDR & ~COLUMN_MODE_MASK) |
+        COLUMN_PULLUP_BITS;
+    GPIOI->MODER &= ~COLUMN_MODE_MASK;
+}
+
+static void alternate_matrix_gpios(uint8_t col) {
+    // Protect against an invalid column index.
+	if ((COLUMN_MASK & (1U << col)) == 0U) {
+	    return;
+	}
+    // Enable row pull-ups BEFORE switching them into input mode.
+    GPIOB->PUPDR =
+        (GPIOB->PUPDR & ~ROW_MODE_MASK) | ROW_OUTPUT_MODE;
+    GPIOB->MODER &= ~ROW_MODE_MASK;
+    // Only the EXTI-triggering column is driven LOW.
+    GPIOI->BSRR = (1U << (col + 16U));
+    GPIOI->OTYPER &= ~(1U << col);
+    GPIOI->PUPDR &= ~(3U << (2U * col));
+    GPIOI->MODER =
+        (GPIOI->MODER & ~(3U << (2U * col))) |
+        (1U << (2U * col));
+}
+
+static void configure_matrix_interrupts(void) {
+    // Map EXTI lines 0–3 to port I.
+    SYSCFG->EXTICR[0] = (SYSCFG->EXTICR[0] & ~0xFFFFU) | 0x8888U;
+
+... (228 lines left)
+
+message.txt
+9 KB
+
+/* USER CODE BEGIN Header */
+/**
+  ******************************************************************************
+  * @file           : main.c
+  * @brief          : Main program body
+  ******************************************************************************
+  * @attention
+  *
+  * Copyright (c) 2026 STMicroelectronics.
+  * All rights reserved.
+  *
+  * This software is licensed under terms that can be found in the LICENSE file
+  * in the root directory of this software component.
+  * If no LICENSE file comes with this software, it is provided AS-IS.
+  *
+  ******************************************************************************
+  */
+/* USER CODE END Header */
+/* Includes ------------------------------------------------------------------*/
+#include "main.h"
+
+/* Private includes ----------------------------------------------------------*/
+/* USER CODE BEGIN Includes */
+
+/* USER CODE END Includes */
+
+/* Private typedef -----------------------------------------------------------*/
+/* USER CODE BEGIN PTD */
+
+/* USER CODE END PTD */
+
+/* Private define ------------------------------------------------------------*/
+/* USER CODE BEGIN PD */
+
+/* USER CODE END PD */
+
+/* Private macro -------------------------------------------------------------*/
+/* USER CODE BEGIN PM */
+
+/* USER CODE END PM */
+
+/* Private variables ---------------------------------------------------------*/
+
+UART_HandleTypeDef huart6;
+
+/* USER CODE BEGIN PV */
+uint8_t rx_byte;
+volatile uint8_t reply_byte = 0;
+
+
+/* USER CODE END PV */
+
+/* Private function prototypes -----------------------------------------------*/
+void SystemClock_Config(void);
+static void MPU_Config(void);
+static void MX_GPIO_Init(void);
+static void MX_USART6_UART_Init(void);
+/* USER CODE BEGIN PFP */
+
+/* USER CODE END PFP */
+
+/* Private user code ---------------------------------------------------------*/
+/* USER CODE BEGIN 0 */
+
+/* USER CODE END 0 */
+
+/**
+  * @brief  The application entry point.
+  * @retval int
+  */
+int main(void)
+{
+
+  /* USER CODE BEGIN 1 */
+
+  /* USER CODE END 1 */
+
+  /* MPU Configuration--------------------------------------------------------*/
+  MPU_Config();
+
+  /* MCU Configuration--------------------------------------------------------*/
+
+  /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
+  HAL_Init();
+
+  /* USER CODE BEGIN Init */
+
+  /* USER CODE END Init */
+
+  /* Configure the system clock */
+  SystemClock_Config();
+
+  /* USER CODE BEGIN SysInit */
+
+  /* USER CODE END SysInit */
+
+  /* Initialize all configured peripherals */
+  MX_GPIO_Init();
+  MX_USART6_UART_Init();
+  /* USER CODE BEGIN 2 */
+... (190 lines left)
+
+message.txt
+8 KB
+Murphy [TW],
+ —
+4:56 PM
+Goyum deleted
+﻿
+Brutus
+daniilddd
+Живчик
++1
+
+/*
+ * Lab 6 Node A: keypad transmitter for STM32F746G-DISCO.
+ * Columns C1-C4: PI0, PI1, PI2, PI3 (D5, D13, D8, D7).
+ * Rows R1-R4: PB8, PB9, PB14, PB15 (D15, D14, D12, D11).
+ * Watch last_key, submitted_pin and submission_count in the debugger.
+ * TIM2 assumes its input clock is 16 MHz, as in Lab 5.
+ */
+
+#include "main.h"
+
+#define M_COLUMN_PIN1  0U
+#define M_COLUMN_PIN2  1U
+#define M_COLUMN_PIN3  2U
+#define M_COLUMN_PIN4  3U
+// KEYPAD PINS - ROWS: GPIOB, avoiding the LCD's PF6-PF10
+// PB8=D15, PB9=D14, PB14=D12, PB15=D11 (Arduino header)
+#define M_ROW_PIN1     8U
+#define M_ROW_PIN2     9U
+#define M_ROW_PIN3    14U
+#define M_ROW_PIN4    15U
+#define COLUMN_MASK  0x000FU
+#define COLUMN_MODE_MASK 0xFFU
+#define COLUMN_PULLUP_BITS 0x55U
+#define ROW_MASK     0xC300U  // PB8, PB9, PB14, PB15
+#define ROW_MODE_MASK ( \
+    (3U << (2U * M_ROW_PIN1)) | \
+    (3U << (2U * M_ROW_PIN2)) | \
+    (3U << (2U * M_ROW_PIN3)) | \
+    (3U << (2U * M_ROW_PIN4)) )
+#define ROW_OUTPUT_MODE ( \
+    (1U << (2U * M_ROW_PIN1)) | \
+    (1U << (2U * M_ROW_PIN2)) | \
+    (1U << (2U * M_ROW_PIN3)) | \
+    (1U << (2U * M_ROW_PIN4)) )
+
+#define PIN_LENGTH 4U
+#define RELEASE_DEBOUNCE_MS 20U
+
+static volatile uint8_t key_ready;
+static volatile uint8_t keypad_locked;
+static volatile char last_key;
+
+extern UART_HandleTypeDef huart6;
+
+// These retain the last complete PIN and the total submissions for debugging.
+volatile char submitted_pin[PIN_LENGTH + 1U];
+volatile uint32_t submission_count;
+
+static const char key_table[4][4] = {
+    {'1', '2', '3', 'A'},
+    {'4', '5', '6', 'B'},
+    {'7', '8', '9', 'C'},
+    {'*', '0', '#', 'D'}
+};
+static char entered_pin[PIN_LENGTH];
+static uint8_t pin_index;
+static uint8_t release_started;
+static uint32_t release_time;
+
+static void send_pin(void);
+
+static void default_matrix_gpios(void) {
+    GPIOB->BSRR = ROW_MASK << 16U;
+    GPIOI->BSRR = COLUMN_MASK << 16U;
+
+    GPIOB->OTYPER &= ~ROW_MASK;
+    GPIOB->MODER =
+        (GPIOB->MODER & ~ROW_MODE_MASK) | ROW_OUTPUT_MODE;
+    GPIOB->PUPDR &= ~ROW_MODE_MASK;
+
+    // Configure PI0, PI1, PI2, PI3 as pull-up inputs.
+    GPIOI->OTYPER &= ~COLUMN_MASK;
+    GPIOI->PUPDR =
+        (GPIOI->PUPDR & ~COLUMN_MODE_MASK) |
+        COLUMN_PULLUP_BITS;
+    GPIOI->MODER &= ~COLUMN_MODE_MASK;
+}
+
+static void alternate_matrix_gpios(uint8_t col) {
+    // Protect against an invalid column index.
+	if ((COLUMN_MASK & (1U << col)) == 0U) {
+	    return;
+	}
+    // Enable row pull-ups BEFORE switching them into input mode.
+    GPIOB->PUPDR =
+        (GPIOB->PUPDR & ~ROW_MODE_MASK) | ROW_OUTPUT_MODE;
+    GPIOB->MODER &= ~ROW_MODE_MASK;
+    // Only the EXTI-triggering column is driven LOW.
+    GPIOI->BSRR = (1U << (col + 16U));
+    GPIOI->OTYPER &= ~(1U << col);
+    GPIOI->PUPDR &= ~(3U << (2U * col));
+    GPIOI->MODER =
+        (GPIOI->MODER & ~(3U << (2U * col))) |
+        (1U << (2U * col));
+}
+
+static void configure_matrix_interrupts(void) {
+    // Map EXTI lines 0–3 to port I.
+    SYSCFG->EXTICR[0] = (SYSCFG->EXTICR[0] & ~0xFFFFU) | 0x8888U;
+
+    EXTI->IMR &= ~COLUMN_MASK;
+    EXTI->RTSR &= ~COLUMN_MASK;
+    EXTI->FTSR |= COLUMN_MASK;
+    EXTI->PR = COLUMN_MASK;
+
+    NVIC_SetPriority(EXTI0_IRQn, 10U);
+    NVIC_SetPriority(EXTI2_IRQn, 10U);
+    NVIC_SetPriority(EXTI3_IRQn, 10U);
+    NVIC_SetPriority(EXTI1_IRQn, 10U);
+
+    NVIC_ClearPendingIRQ(EXTI0_IRQn);
+    NVIC_ClearPendingIRQ(EXTI2_IRQn);
+    NVIC_ClearPendingIRQ(EXTI3_IRQn);
+    NVIC_ClearPendingIRQ(EXTI1_IRQn);
+
+    NVIC_EnableIRQ(EXTI0_IRQn);
+    NVIC_EnableIRQ(EXTI2_IRQn);
+    NVIC_EnableIRQ(EXTI3_IRQn);
+    NVIC_EnableIRQ(EXTI1_IRQn);
+
+    EXTI->IMR |= COLUMN_MASK;
+    __enable_irq();
+}
+
+static void configure_timer(void) {
+    RCC->APB1ENR |= RCC_APB1ENR_TIM2EN;
+    (void)RCC->APB1ENR;
+    TIM2->CR1 &= ~TIM_CR1_CEN;
+
+    // Assumes TIM2's input clock is 16 MHz.
+    // 16,000,000 / (15999 + 1) = 1000 counter ticks per second.
+    TIM2->PSC = 15999U;
+    TIM2->ARR = 0xFFFFFFFFU;
+    TIM2->EGR = TIM_EGR_UG;  // Load the new prescaler.
+    TIM2->CNT = 0U;
+    TIM2->SR = 0U;
+    TIM2->CR1 |= TIM_CR1_CEN;
+}
+
+static void keypad_interrupt_handler(uint8_t col) {
+    if (keypad_locked) {
+        return;
+    }
+    keypad_locked = 1U;
+    EXTI->IMR &= ~COLUMN_MASK;
+    uint8_t row = 10U;  // Invalid row until a LOW input is found.
+    alternate_matrix_gpios(col);
+    // Short settle delay (not the 20 ms mechanical debounce interval).
+    for (volatile uint32_t i = 0U; i < 300U; ++i) {
+        __NOP();
+    }
+    uint32_t row_states = GPIOB->IDR;
+    if ((row_states & (1U << M_ROW_PIN1)) == 0U) {
+        row = 0U;
+    } else if ((row_states & (1U << M_ROW_PIN2)) == 0U) {
+        row = 1U;
+    } else if ((row_states & (1U << M_ROW_PIN3)) == 0U) {
+        row = 2U;
+    } else if ((row_states & (1U << M_ROW_PIN4)) == 0U) {
+        row = 3U;
+    }
+    default_matrix_gpios();
+    if (row == 10U) {
+        return;  // The main loop will rearm EXTI after a stable release.
+    }
+    last_key = key_table[row][col];
+    key_ready = 1U;
+}
+
+void EXTI0_IRQHandler(void) {
+    if (EXTI->PR & (1U << M_COLUMN_PIN1)) {
+        keypad_interrupt_handler(M_COLUMN_PIN1);
+        EXTI->PR = (1U << M_COLUMN_PIN1);
+    }
+}
+
+
+void EXTI2_IRQHandler(void) {
+    if (EXTI->PR & (1U << M_COLUMN_PIN3)) {
+        keypad_interrupt_handler(M_COLUMN_PIN3);
+        EXTI->PR = (1U << M_COLUMN_PIN3);
+    }
+}
+
+void EXTI3_IRQHandler(void) {
+    if (EXTI->PR & (1U << M_COLUMN_PIN4)) {
+        keypad_interrupt_handler(M_COLUMN_PIN4);
+        EXTI->PR = (1U << M_COLUMN_PIN4);
+    }
+}
+
+void EXTI1_IRQHandler(void) {
+    if (EXTI->PR & (1U << M_COLUMN_PIN2)) {
+        keypad_interrupt_handler(M_COLUMN_PIN2);
+        EXTI->PR = (1U << M_COLUMN_PIN2);
+    }
+}
+
+static void handle_key(char key) {
+    // Clear PIN
+    if (key == '*') {
+        pin_index = 0;
+
+        uint8_t clear[] = "C\n";
+        HAL_UART_Transmit(&huart6, clear, 2, 100);
+        return;
+    }
+
+    // Submit completed PIN
+    if (key == '#') {
+        send_pin();
+        return;
+    }
+
+    // Quick-status messages
+    const char *message = NULL;
+
+    switch (key) {
+        case 'A': message = "M:HELP\n";  break;
+        case 'B': message = "M:READY\n"; break;
+        case 'C': message = "M:BUSY\n";  break;
+        case 'D': message = "M:SAFE\n";  break;
+        default: break;
+    }
+
+    if (message != NULL) {
+        HAL_UART_Transmit(
+            &huart6,
+            (uint8_t *)message,
+            (uint16_t)strlen(message),
+            100
+        );
+        return;
+    }
+
+    // Store numeric keys only
+    if (key >= '0' && key <= '9' &&
+        pin_index < PIN_LENGTH) {
+        entered_pin[pin_index++] = key;
+    }
+}
+
+static void update_release_debounce(uint32_t now_ms) {
+    if (!keypad_locked) {
+        return;
+    }
+
+    if ((GPIOI->IDR & COLUMN_MASK) != COLUMN_MASK) {
+        release_started = 0U;
+        return;
+    }
+
+    if (!release_started) {
+        release_started = 1U;
+        release_time = now_ms;
+        return;
+    }
+
+    if ((uint32_t)(now_ms - release_time) < RELEASE_DEBOUNCE_MS) {
+        return;
+    }
+
+    // Clear edges from the scan and contact bounce before arming EXTI again.
+    EXTI->PR = COLUMN_MASK;
+    release_started = 0U;
+    if ((GPIOI->IDR & COLUMN_MASK) == COLUMN_MASK) {
+        keypad_locked = 0U;
+        EXTI->IMR |= COLUMN_MASK;
+    }
+}
+
+static void send_pin(void) {
+    if (pin_index != PIN_LENGTH)
+        return;
+
+    uint8_t packet[7] = {
+        'P', ':',
+        entered_pin[0],
+        entered_pin[1],
+        entered_pin[2],
+        entered_pin[3],
+        '\n'
+    };
+
+    HAL_StatusTypeDef status = HAL_UART_Transmit(
+        &huart6, packet, sizeof(packet), 100
+    );
+
+    if (status == HAL_OK) {
+        for (uint8_t i = 0; i < PIN_LENGTH; i++)
+            submitted_pin[i] = entered_pin[i];
+
+        submitted_pin[PIN_LENGTH] = '\0';
+        submission_count++;
+        pin_index = 0;
+    }
+}
+
+int node_a_init(void) {
+    RCC->AHB1ENR |= RCC_AHB1ENR_GPIOBEN |
+                    RCC_AHB1ENR_GPIOIEN;
+    RCC->APB2ENR |= RCC_APB2ENR_SYSCFGEN;
+    (void)RCC->AHB1ENR;
+    (void)RCC->APB2ENR;
+
+    default_matrix_gpios();
+    configure_timer();
+    configure_matrix_interrupts();
+
+    return 0;
+
+}
+
+int node_a_step(void) {
+    uint32_t now_ms = TIM2->CNT;
+
+    if (key_ready) {
+        char key = last_key;
+        key_ready = 0U;
+
+        handle_key(key);
+    }
+
+    update_release_debounce(now_ms);
+
+    return 0;
+}

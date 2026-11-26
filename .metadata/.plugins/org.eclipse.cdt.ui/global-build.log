@@ -1,23 +1,22 @@
-11:19:00 **** Incremental Build of configuration Debug for project lab6-Master ****
+17:00:54 **** Incremental Build of configuration Debug for project lab6-Master ****
 make -j14 all 
 arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m7 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F746xx -c -I../Core/Inc -I../Drivers/STM32F7xx_HAL_Driver/Inc -I../Drivers/STM32F7xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F7xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv5-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
 arm-none-eabi-gcc "../Core/Src/node_a_keypad.c" -mcpu=cortex-m7 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F746xx -c -I../Core/Inc -I../Drivers/STM32F7xx_HAL_Driver/Inc -I../Drivers/STM32F7xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F7xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/node_a_keypad.d" -MT"Core/Src/node_a_keypad.o" --specs=nano.specs -mfpu=fpv5-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/node_a_keypad.o"
-arm-none-eabi-gcc "../Core/Src/stm32f7xx_hal_msp.c" -mcpu=cortex-m7 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F746xx -c -I../Core/Inc -I../Drivers/STM32F7xx_HAL_Driver/Inc -I../Drivers/STM32F7xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F7xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/stm32f7xx_hal_msp.d" -MT"Core/Src/stm32f7xx_hal_msp.o" --specs=nano.specs -mfpu=fpv5-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/stm32f7xx_hal_msp.o"
-arm-none-eabi-gcc "../Core/Src/stm32f7xx_it.c" -mcpu=cortex-m7 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F746xx -c -I../Core/Inc -I../Drivers/STM32F7xx_HAL_Driver/Inc -I../Drivers/STM32F7xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F7xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/stm32f7xx_it.d" -MT"Core/Src/stm32f7xx_it.o" --specs=nano.specs -mfpu=fpv5-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/stm32f7xx_it.o"
-../Core/Src/node_a_keypad.c:68:17: warning: 'led_start_ms' defined but not used [-Wunused-variable]
-   68 | static uint32_t led_start_ms;
-      |                 ^~~~~~~~~~~~
-../Core/Src/node_a_keypad.c:67:16: warning: 'led_active' defined but not used [-Wunused-variable]
-   67 | static uint8_t led_active;
-      |                ^~~~~~~~~~
 arm-none-eabi-gcc -o "lab6-Master.elf" @"objects.list"   -mcpu=cortex-m7 -T"/Users/rileyhopper/Programming/School/TCES-430/lab6-Master/STM32F746NGHX_FLASH.ld" --specs=nosys.specs -Wl,-Map="lab6-Master.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv5-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 Finished building target: lab6-Master.elf
  
 arm-none-eabi-size  lab6-Master.elf 
 arm-none-eabi-objdump -h -S lab6-Master.elf  > "lab6-Master.list"
    text	   data	    bss	    dec	    hex	filename
-  17096	     12	   1748	  18856	   49a8	lab6-Master.elf
+  16584	     12	   1740	  18336	   47a0	lab6-Master.elf
 Finished building: default.size.stdout
  
 Finished building: lab6-Master.list
+ 
+17:02:17 **** Incremental Build of configuration Debug for project lab6-Master ****
+make -j14 all 
+arm-none-eabi-size  lab6-Master.elf 
+   text	   data	    bss	    dec	    hex	filename
+  16584	     12	   1740	  18336	   47a0	lab6-Master.elf
+Finished building: default.size.stdout
  

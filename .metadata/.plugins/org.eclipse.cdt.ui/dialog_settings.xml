@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <section name="Workbench">
+	<item key="LastUsedSourceTemplate" value="Default C source template"/>
 	<section name="completion_proposal_size">
 	</section>
 	<section name="org.eclipse.cdt.ui.text.hover.CMacroExpansionExploration">
@@ -11,5 +12,30 @@
 		<item key="org.eclipse.cdt.internal.ui.text.COutlineInformationControlDIALOG_Y_ORIGIN" value="355"/>
 		<item key="org.eclipse.cdt.internal.ui.text.COutlineInformationControlDIALOG_USE_PERSISTED_SIZE" value="true"/>
 		<item key="org.eclipse.cdt.internal.ui.text.COutlineInformationControlDIALOG_USE_PERSISTED_LOCATION" value="true"/>
+	</section>
+	<section name="NewSourceFileCreationWizard.dialogBounds">
+		<item key="DIALOG_X_ORIGIN" value="667"/>
+		<item key="DIALOG_Y_ORIGIN" value="205"/>
+		<item key="DIALOG_WIDTH" value="586"/>
+		<item key="DIALOG_HEIGHT" value="420"/>
+		<item key="DIALOG_FONT_NAME" value="1|.AppleSystemUIFont|11.0|0|COCOA|1|.AppleSystemUIFont"/>
+	</section>
+	<section name="org.eclipse.cdt.internal.ui.browser.opentype.OpenTypeActionSettings">
+		<item key="show_namespaces" value="true"/>
+		<item key="show_classes" value="true"/>
+		<item key="show_structs" value="true"/>
+		<item key="show_typedefs" value="true"/>
+		<item key="show_enums" value="true"/>
+		<item key="show_unions" value="true"/>
+		<item key="show_functions" value="true"/>
+		<item key="show_variables" value="true"/>
+		<item key="show_enumerators" value="true"/>
+		<item key="show_macros" value="true"/>
+		<item key="show_concepts" value="true"/>
+		<item key="show_lowlevel" value="true"/>
+		<item key="x" value="497"/>
+		<item key="y" value="66"/>
+		<item key="width" value="519"/>
+		<item key="height" value="603"/>
 	</section>
 </section>

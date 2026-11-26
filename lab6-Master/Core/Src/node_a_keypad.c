@@ -1,9 +1,7 @@
 /*
- * Lab 6 Node A: standalone keypad test for STM32F746G-DISCO.
- * Use as Core/Src/main.c in a copy of the bare-metal Lab 5 project.
+ * Lab 6 Node A: keypad transmitter for STM32F746G-DISCO.
  * Columns C1-C4: PI0, PI1, PI2, PI3 (D5, D13, D8, D7).
  * Rows R1-R4: PB8, PB9, PB14, PB15 (D15, D14, D12, D11).
- * Optional external green LED: PG7 (D4), through 330 ohms to GND.
  * Watch last_key, submitted_pin and submission_count in the debugger.
  * TIM2 assumes its input clock is 16 MHz, as in Lab 5.
  */
@@ -11,7 +9,7 @@
 #include "main.h"
 
 #define M_COLUMN_PIN1  0U
-#define M_COLUMN_PIN2  4U
+#define M_COLUMN_PIN2  1U
 #define M_COLUMN_PIN3  2U
 #define M_COLUMN_PIN4  3U
 // KEYPAD PINS - ROWS: GPIOB, avoiding the LCD's PF6-PF10
@@ -20,9 +18,9 @@
 #define M_ROW_PIN2     9U
 #define M_ROW_PIN3    14U
 #define M_ROW_PIN4    15U
-#define COLUMN_MASK  0x001DU
-#define COLUMN_MODE_MASK 0x3F3U
-#define COLUMN_PULLUP_BITS 0x151U
+#define COLUMN_MASK  0x000FU
+#define COLUMN_MODE_MASK 0xFFU
+#define COLUMN_PULLUP_BITS 0x55U
 #define ROW_MASK     0xC300U  // PB8, PB9, PB14, PB15
 #define ROW_MODE_MASK ( \
     (3U << (2U * M_ROW_PIN1)) | \
@@ -37,11 +35,6 @@
 
 #define PIN_LENGTH 4U
 #define RELEASE_DEBOUNCE_MS 20U
-#define LED_PIN 1U
-
-#define GRANTED_DURATION_MS 2000U
-#define DENIED_BLINK_MS      150U
-#define DENIED_TOGGLES       6U
 
 static volatile uint8_t key_ready;
 static volatile uint8_t keypad_locked;
@@ -64,10 +57,6 @@ static uint8_t pin_index;
 static uint8_t release_started;
 static uint32_t release_time;
 
-static uint8_t feedback_mode = 0;
-static uint8_t blink_count = 0;
-static uint32_t feedback_start_ms = 0;
-
 static void send_pin(void);
 
 static void default_matrix_gpios(void) {
@@ -79,7 +68,7 @@ static void default_matrix_gpios(void) {
         (GPIOB->MODER & ~ROW_MODE_MASK) | ROW_OUTPUT_MODE;
     GPIOB->PUPDR &= ~ROW_MODE_MASK;
 
-    // Configure PI0, PI2, PI3, PI4 as pull-up inputs.
+    // Configure PI0, PI1, PI2, PI3 as pull-up inputs.
     GPIOI->OTYPER &= ~COLUMN_MASK;
     GPIOI->PUPDR =
         (GPIOI->PUPDR & ~COLUMN_MODE_MASK) |
@@ -106,13 +95,8 @@ static void alternate_matrix_gpios(uint8_t col) {
 }
 
 static void configure_matrix_interrupts(void) {
-    // PI0, PI2, PI3 use EXTICR[0].
-    // PI4 uses EXTICR[1].
-    SYSCFG->EXTICR[0] =
-        (SYSCFG->EXTICR[0] & ~0xFF0FU) | 0x8808U;
-
-    SYSCFG->EXTICR[1] =
-        (SYSCFG->EXTICR[1] & ~0x000FU) | 0x0008U;
+    // Map EXTI lines 0–3 to port I.
+    SYSCFG->EXTICR[0] = (SYSCFG->EXTICR[0] & ~0xFFFFU) | 0x8888U;
 
     EXTI->IMR &= ~COLUMN_MASK;
     EXTI->RTSR &= ~COLUMN_MASK;
@@ -122,17 +106,17 @@ static void configure_matrix_interrupts(void) {
     NVIC_SetPriority(EXTI0_IRQn, 10U);
     NVIC_SetPriority(EXTI2_IRQn, 10U);
     NVIC_SetPriority(EXTI3_IRQn, 10U);
-    NVIC_SetPriority(EXTI4_IRQn, 10U);
+    NVIC_SetPriority(EXTI1_IRQn, 10U);
 
     NVIC_ClearPendingIRQ(EXTI0_IRQn);
     NVIC_ClearPendingIRQ(EXTI2_IRQn);
     NVIC_ClearPendingIRQ(EXTI3_IRQn);
-    NVIC_ClearPendingIRQ(EXTI4_IRQn);
+    NVIC_ClearPendingIRQ(EXTI1_IRQn);
 
     NVIC_EnableIRQ(EXTI0_IRQn);
     NVIC_EnableIRQ(EXTI2_IRQn);
     NVIC_EnableIRQ(EXTI3_IRQn);
-    NVIC_EnableIRQ(EXTI4_IRQn);
+    NVIC_EnableIRQ(EXTI1_IRQn);
 
     EXTI->IMR |= COLUMN_MASK;
     __enable_irq();
@@ -179,10 +163,7 @@ static void keypad_interrupt_handler(uint8_t col) {
     if (row == 10U) {
         return;  // The main loop will rearm EXTI after a stable release.
     }
-    uint8_t column_index =
-        (col == M_COLUMN_PIN2) ? 1U : col;
-
-    last_key = key_table[row][column_index];
+    last_key = key_table[row][col];
     key_ready = 1U;
 }
 
@@ -208,20 +189,14 @@ void EXTI3_IRQHandler(void) {
     }
 }
 
-void EXTI4_IRQHandler(void) {
+void EXTI1_IRQHandler(void) {
     if (EXTI->PR & (1U << M_COLUMN_PIN2)) {
         keypad_interrupt_handler(M_COLUMN_PIN2);
         EXTI->PR = (1U << M_COLUMN_PIN2);
     }
 }
 
-static void setup_feedback_led(void) {
-    HAL_GPIO_WritePin(GPIOI, GPIO_PIN_1, GPIO_PIN_RESET);
-}
-
-static void handle_key(char key, uint32_t now_ms) {
-    (void)now_ms;
-
+static void handle_key(char key) {
     // Clear PIN
     if (key == '*') {
         pin_index = 0;
@@ -321,41 +296,13 @@ static void send_pin(void) {
     }
 }
 
-static void update_feedback_led(uint32_t now_ms) {
-    if (feedback_mode == 1) {
-        if ((uint32_t)(now_ms - feedback_start_ms)
-            >= GRANTED_DURATION_MS) {
-            HAL_GPIO_WritePin(
-                GPIOI, GPIO_PIN_1, GPIO_PIN_RESET
-            );
-            feedback_mode = 0;
-        }
-    }
-    else if (feedback_mode == 2) {
-        if ((uint32_t)(now_ms - feedback_start_ms)
-            >= DENIED_BLINK_MS) {
-            HAL_GPIO_TogglePin(GPIOI, GPIO_PIN_1);
-            feedback_start_ms = now_ms;
-            blink_count++;
-
-            if (blink_count >= DENIED_TOGGLES) {
-                HAL_GPIO_WritePin(
-                    GPIOI, GPIO_PIN_1, GPIO_PIN_RESET
-                );
-                feedback_mode = 0;
-            }
-        }
-    }
-}
 int node_a_init(void) {
     RCC->AHB1ENR |= RCC_AHB1ENR_GPIOBEN |
-                    RCC_AHB1ENR_GPIOGEN |
                     RCC_AHB1ENR_GPIOIEN;
     RCC->APB2ENR |= RCC_APB2ENR_SYSCFGEN;
     (void)RCC->AHB1ENR;
     (void)RCC->APB2ENR;
 
-    setup_feedback_led();
     default_matrix_gpios();
     configure_timer();
     configure_matrix_interrupts();
@@ -371,39 +318,10 @@ int node_a_step(void) {
         char key = last_key;
         key_ready = 0U;
 
-        handle_key(key, now_ms);
+        handle_key(key);
     }
 
     update_release_debounce(now_ms);
-    update_feedback_led(now_ms);
 
     return 0;
 }
-
-void node_a_handle_reply(char reply) {
-    feedback_start_ms = TIM2->CNT;
-    blink_count = 0;
-
-    if (reply == 'G') {
-        // Access granted
-        feedback_mode = 1;
-        HAL_GPIO_WritePin(
-            GPIOI, GPIO_PIN_1, GPIO_PIN_SET
-        );
-    }
-    else if (reply == 'D') {
-        // Access denied
-        feedback_mode = 2;
-        HAL_GPIO_WritePin(
-            GPIOI, GPIO_PIN_1, GPIO_PIN_SET
-        );
-    }
-    else if (reply == 'A') {
-        // Emergency acknowledgment received
-        feedback_mode = 0;
-        HAL_GPIO_WritePin(
-            GPIOI, GPIO_PIN_1, GPIO_PIN_RESET
-        );
-    }
-}
-
